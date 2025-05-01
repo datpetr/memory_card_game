@@ -12,22 +12,27 @@ public class Player {
     }
 
     public String getName() {
+        // will be added more code later
         return name;
     }
 
     public int getScore() {
+        // will be added more code later
         return score;
     }
 
     public void incrementScore() {
+        // will be added more code later
         score++;
     }
 
     public int getMoves() {
+        // will be added more code later
         return moves;
     }
 
     public void incrementMoves() {
+        // will be added more code later
         moves++;
     }
 }
