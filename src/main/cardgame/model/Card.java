@@ -15,21 +15,26 @@ public class Card {
 
     public String getValue() {
         return value;
+        // will be added more code later
     }
 
     public boolean isMatched() {
         return isMatched;
+        // will be added more code later
     }
 
     public void setMatched(boolean matched) {
         isMatched = matched;
+        // will be added more code later
     }
 
     public boolean isFaceUp() {
         return isFaceUp;
+        // will be added more code later
     }
 
     public void flip() {
         isFaceUp = !isFaceUp;
+        // will be added more code later
     }
 }
