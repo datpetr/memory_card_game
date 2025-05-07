@@ -5,6 +5,7 @@ import java.util.List;
 public class GameBoard {
     private Card[][] board;
     private int size;
+    private Deck deck;
 
     public GameBoard(int size, List<Card> cards) {
         this.size = size;
@@ -23,10 +24,13 @@ public class GameBoard {
         // will be added more code later
     }
 
-    public boolean allCardsMatched() {
-        // Check if all cards on the board are matched
-        // will be added more code later
-        return false;
+    public boolean allCardsMatched(Deck deck) {
+        for (Card card : deck.getCards()) {
+            if (!card.isMatched()) {
+                return false; // If any card is not matched, return false
+            }
+        }
+        return true; // All cards are matched
     }
 
     public void flipCard(int row, int col) {
