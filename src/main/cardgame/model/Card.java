@@ -1,6 +1,6 @@
 package main.cardgame.model;
 
-public class Card {
+public class Card implements CardBehavior{
     private int id;
     private String value;
     private boolean isMatched;
@@ -37,4 +37,11 @@ public class Card {
         isFaceUp = !isFaceUp;
         // will be added more code later
     }
+
+    public int getId() {
+        return id;
+        // will be added more code later
+    }
+
+
 }

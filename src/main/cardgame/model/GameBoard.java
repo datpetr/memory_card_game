@@ -28,4 +28,12 @@ public class GameBoard {
         // will be added more code later
         return false;
     }
+
+    public void flipCard(int row, int col) {
+        Card card = getCard(row, col);
+        if (card != null) {
+            card.flip(); // Flip the card
+        }
+    }
+
 }
