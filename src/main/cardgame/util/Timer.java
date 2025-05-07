@@ -22,4 +22,16 @@ public class Timer {
         return endTime - startTime;
         // will be added more code later
     }
+
+    public boolean isTimeUp() {
+        // Check if the time is up
+        // will be added more code later
+        return false;
+    }
+
+    public double getRemainingTime() {
+        // Calculate remaining time
+        // will be added more code later
+        return 0;
+    }
 }
