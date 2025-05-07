@@ -11,6 +11,12 @@ public class Player {
         this.moves = 0;
     }
 
+    public Player() {
+        this.name = "Unknown Player";
+        this.score = 0;
+        this.moves = 0;
+    }
+
     public String getName() {
         // will be added more code later
         return name;
