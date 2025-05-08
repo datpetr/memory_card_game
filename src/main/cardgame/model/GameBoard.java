@@ -26,6 +26,7 @@ public class GameBoard {
                 throw new IllegalArgumentException("Invalid level: " + level);
         }
     }
+
     public Card getCard(int row, int col) {
         return board[row][col];
         // will be added more code later
