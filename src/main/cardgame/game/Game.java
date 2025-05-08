@@ -1,12 +1,12 @@
 package main.cardgame.game;
 
+import main.cardgame.difficulty.DifficultyLevel;
 import main.cardgame.model.Card;
 import main.cardgame.model.GameBoard;
 import main.cardgame.model.Player;
 import main.cardgame.util.Logger;
 import main.cardgame.util.ScoreManager;
 import main.cardgame.util.Timer;
-
 
 public abstract class Game {
     private GameBoard board;
@@ -15,15 +15,27 @@ public abstract class Game {
     protected Timer timer;
     private Card firstSelection;
     private Card secondSelection;
+    private DifficultyLevel difficultyLevel; // New field for difficulty
 
-    public Game(GameBoard board, Player player) {
-        if (board == null || player == null) {
-            throw new IllegalArgumentException("GameBoard and Player cannot be null.");
+    public Game(GameBoard board, Player player, DifficultyLevel difficultyLevel) {
+        if (board == null || player == null || difficultyLevel == null) {
+            throw new IllegalArgumentException("GameBoard, Player, and DifficultyLevel cannot be null.");
         }
         this.board = board;
         this.player = player;
+        this.difficultyLevel = difficultyLevel; // Assign difficulty level
         this.scoreManager = new ScoreManager(player);
         this.timer = new Timer();
+
+        // Configure game settings based on difficulty
+        configureDifficulty();
+    }
+
+    // Configure game settings based on the difficulty level
+    private void configureDifficulty() {
+        board.setGridSize(difficultyLevel.getGridSize());
+        timer.setTimeLimit(difficultyLevel.getTimeLimit());
+        Logger.log("Game configured for difficulty: " + difficultyLevel.getClass().getSimpleName());
     }
 
     public void play() {
@@ -42,7 +54,6 @@ public abstract class Game {
                 firstCard.setMatched(true);
                 secondCard.setMatched(true);
             } else {
-                // Flip them back after a delay (simulate delay if needed)
                 firstCard.flip();
                 secondCard.flip();
             }
@@ -80,6 +91,10 @@ public abstract class Game {
         return secondSelection;
     }
 
+    public DifficultyLevel getDifficultyLevel() {
+        return difficultyLevel;
+    }
+
     // Setters
     public void setBoard(GameBoard board) {
         this.board = board;
@@ -103,5 +118,13 @@ public abstract class Game {
 
     public void setSecondSelection(Card secondSelection) {
         this.secondSelection = secondSelection;
+    }
+
+    public void setDifficultyLevel(DifficultyLevel difficultyLevel) {
+        if (difficultyLevel == null) {
+            throw new IllegalArgumentException("DifficultyLevel cannot be null.");
+        }
+        this.difficultyLevel = difficultyLevel;
+        configureDifficulty(); // Reconfigure game settings
     }
 }

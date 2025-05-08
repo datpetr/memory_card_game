@@ -40,4 +40,7 @@ public class Timer {
         long elapsedTime = System.currentTimeMillis() - startTime;
         return elapsedTime;
     }
+
+    public void setTimeLimit(int timeLimit) {
+    }
 }

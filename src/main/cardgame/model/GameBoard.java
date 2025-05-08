@@ -54,4 +54,6 @@ public class GameBoard {
         }
     }
 
+    public void setGridSize(int gridSize) {
+    }
 }
