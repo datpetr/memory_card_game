@@ -27,9 +27,13 @@ public class Player {
         return score;
     }
 
-    public void incrementScore() {
+    public void setScore(int newScore) {
         // will be added more code later
-        score++;
+        this.score = newScore;
+    }
+
+    public void incrementScore(int points) {
+        this.score += points;
     }
 
     public int getMoves() {

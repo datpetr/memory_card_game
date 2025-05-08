@@ -7,13 +7,25 @@ public class GameBoard {
     private int size;
     private Deck deck;
 
-    public GameBoard(int size, List<Card> cards) {
-        this.size = size;
+    public GameBoard(String level, List<Card> cards) {
+        this.size = determineSize(level);
         this.board = new Card[size][size];
         // Initialize the board with cards
         // will be added more code later
     }
 
+    private int determineSize(String level) {
+        switch (level.toLowerCase()) {
+            case "easy":
+                return 4;
+            case "medium":
+                return 6;
+            case "hard":
+                return 8;
+            default:
+                throw new IllegalArgumentException("Invalid level: " + level);
+        }
+    }
     public Card getCard(int row, int col) {
         return board[row][col];
         // will be added more code later

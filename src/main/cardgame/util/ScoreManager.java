@@ -1,25 +1,28 @@
 package main.cardgame.util;
 
-public class ScoreManager {
-    private int currentScore;
+import main.cardgame.model.Player;
+import main.cardgame.util.Timer;
 
-    public ScoreManager() {
-        this.currentScore = 0;
-        // will be added more code later
+public class ScoreManager {
+    private Player player;
+
+    public ScoreManager(Player player) {
+        this.player = player;
     }
 
-    public void incrementScore() {
-        currentScore++;
-        // will be added more code later
+    public void calculateAndUpdateScore(boolean isMatch, Timer timer) {
+        int points = isMatch ? 10 : 0; // Base points for a match
+        if (timer != null) {
+            points += (int) (timer.getRemainingTime() / 1000); // Add time bonus if applicable
+        }
+        player.incrementScore(points);
     }
 
     public void resetScore() {
-        currentScore = 0;
-        // will be added more code later
+        player.setScore(0);
     }
 
     public int getScore() {
-        return currentScore;
-        // will be added more code later
+        return player.getScore();
     }
 }

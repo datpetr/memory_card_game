@@ -2,20 +2,33 @@ package main.cardgame.model;
 
 public class Card implements CardBehavior{
     private int id;
-    private String value;
+    private String imagePath;
     private boolean isMatched;
     private boolean isFaceUp;
+    private static String backImagePath;
 
     public Card(int id, String value) {
         this.id = id;
-        this.value = value;
+        this.imagePath = imagePath;
         this.isMatched = false;
         this.isFaceUp = false;
     }
 
+    public static String getBackImagePath() {
+        return backImagePath;
+    }
+
+    public static void setBackImagePath(String backImagePath) {
+        Card.backImagePath = backImagePath;
+    }
+
     public String getValue() {
-        return value;
+        return imagePath;
         // will be added more code later
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 
     public boolean isMatched() {
