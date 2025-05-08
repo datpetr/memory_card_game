@@ -5,14 +5,17 @@ public class Player {
     private int score;
     private int moves;
 
-    public Player(String name) {
-        this.name = name;
+
+    // default constructor
+    public Player() {
+        this.name = "Unknown Player";
         this.score = 0;
         this.moves = 0;
     }
 
-    public Player() {
-        this.name = "Unknown Player";
+    // constructor with name
+    public Player(String name) {
+        this.name = name;
         this.score = 0;
         this.moves = 0;
     }

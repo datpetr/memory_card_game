@@ -20,6 +20,10 @@ public class Timer {
         this.startTime = System.currentTimeMillis();
     }
 
+    public void stopTimer() {
+        this.startTime = 0; // Reset the start time
+    }
+
     public boolean isTimeUp() {
         if (!isCountdown) {
             throw new UnsupportedOperationException("This timer does not support countdown.");
@@ -37,7 +41,20 @@ public class Timer {
     }
 
     public long getElapsedTime() {
-        long elapsedTime = System.currentTimeMillis() - startTime;
-        return elapsedTime;
+        if (isCountdown) {
+            throw new UnsupportedOperationException("This timer only supports countdown.");
+        }
+        return System.currentTimeMillis() - startTime;
+    }
+
+    public boolean isCountdown() {
+        return isCountdown;
+    }
+
+    public void setTimeLimit(int countdownSeconds) {
+        if (!isCountdown) {
+            throw new UnsupportedOperationException("Cannot set time limit for elapsed-time timer.");
+        }
+        this.countdownMillis = countdownSeconds * 1000L;
     }
 }
