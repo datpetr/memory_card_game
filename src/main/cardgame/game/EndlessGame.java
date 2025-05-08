@@ -1,15 +1,13 @@
 package main.cardgame.game;
 
+import main.cardgame.model.GameBoard;
+import main.cardgame.model.Player;
+
 public class EndlessGame extends Game {
     private boolean isStopped;
 
-    public EndlessGame(int boardSize, String playerName) {
-        super(boardSize, playerName);
-        this.isStopped = false;
-    }
-
-    public EndlessGame(String playerName, int boardSize){
-        super(boardSize, playerName);
+    public EndlessGame(GameBoard board, Player player) {
+        super(board, player); // Pass GameBoard and Player to the Game constructor
         this.isStopped = false;
     }
 
