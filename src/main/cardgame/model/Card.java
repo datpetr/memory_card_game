@@ -7,7 +7,7 @@ public class Card implements CardBehavior{
     private boolean isFaceUp;
     private static String backImagePath;
 
-    public Card(int id, String value) {
+    public Card(int id, String imagePath) {
         this.id = id;
         this.imagePath = imagePath;
         this.isMatched = false;
