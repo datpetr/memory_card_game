@@ -26,4 +26,13 @@ public class Deck {
         }
         return shuffledDeck; // Return the shuffled copy
     }
+
+    public Card findCardById(int id) {
+        for (Card card : cards) {
+            if (card.getId() == id) {
+                return card; // Return the card if the id matches
+            }
+        }
+        return null;
+    }
 }

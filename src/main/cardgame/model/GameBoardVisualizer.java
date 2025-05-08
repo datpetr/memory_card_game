@@ -1,6 +1,7 @@
 package main.cardgame.model;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
@@ -21,8 +22,9 @@ public class GameBoardVisualizer extends Application {
             for (int col = 0; col < BOARD_COLS; col++) {
                 Button cardButton = new Button();
                 cardButton.setPrefSize(CARD_SIZE, CARD_SIZE);
+                cardButton.setPadding(Insets.EMPTY); // Remove padding
 
-                // Corrected image path for the face-down card
+                // Face-down card image
                 Image faceDownImage = new Image("file:src/main/resources/images/back.png");
                 ImageView imageView = new ImageView(faceDownImage);
                 imageView.setFitWidth(CARD_SIZE);
@@ -31,7 +33,7 @@ public class GameBoardVisualizer extends Application {
 
                 gridPane.add(cardButton, col, row);
 
-                // Corrected image path for the face-up card
+                // Face-up card image
                 cardButton.setOnAction(event -> {
                     Image faceUpImage = new Image("file:src/main/resources/images/try.png");
                     imageView.setImage(faceUpImage);
