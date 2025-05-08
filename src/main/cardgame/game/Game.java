@@ -7,7 +7,6 @@ import main.cardgame.util.Logger;
 import main.cardgame.util.ScoreManager;
 import main.cardgame.util.Timer;
 
-
 public abstract class Game {
     private GameBoard board;
     private Player player;
@@ -16,6 +15,7 @@ public abstract class Game {
     private Card firstSelection;
     private Card secondSelection;
 
+    // Constructor for elapsed time-based games
     public Game(GameBoard board, Player player) {
         if (board == null || player == null) {
             throw new IllegalArgumentException("GameBoard and Player cannot be null.");
@@ -23,10 +23,22 @@ public abstract class Game {
         this.board = board;
         this.player = player;
         this.scoreManager = new ScoreManager(player);
-        this.timer = new Timer();
+        this.timer = new Timer(); // Default: elapsed time tracking
+    }
+
+    // Constructor for countdown-based games
+    public Game(GameBoard board, Player player, int countdownSeconds) {
+        if (board == null || player == null) {
+            throw new IllegalArgumentException("GameBoard and Player cannot be null.");
+        }
+        this.board = board;
+        this.player = player;
+        this.scoreManager = new ScoreManager(player);
+        this.timer = new Timer(countdownSeconds); // Countdown timer
     }
 
     public void play() {
+        timer.startTimer();
         // Main game loop logic
     }
 
@@ -41,11 +53,19 @@ public abstract class Game {
             if (firstCard.getValue().equals(secondCard.getValue())) {
                 firstCard.setMatched(true);
                 secondCard.setMatched(true);
+                player.incrementScore(10); // Increment score for a match
             } else {
                 // Flip them back after a delay (simulate delay if needed)
                 firstCard.flip();
                 secondCard.flip();
             }
+        }
+
+        player.incrementMoves();
+
+        // Check for time up in countdown mode
+        if (timer.isCountdown() && timer.isTimeUp()) {
+            endGame();
         }
     }
 
@@ -54,6 +74,11 @@ public abstract class Game {
     }
 
     public abstract boolean isGameOver();
+
+    public void endGame() {
+        timer.stopTimer(); // Stop the timer
+        System.out.println("Game Over! Final score: " + player.getScore());
+    }
 
     // Getters
     public GameBoard getBoard() {

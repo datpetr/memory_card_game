@@ -55,4 +55,13 @@ public class GameBoard {
         }
     }
 
+    public void setGridSize(int gridSize) {
+        this.size = gridSize;
+        this.board = new Card[size][size]; // Reinitialize the board with the new size
+        // will be added more code later
+    }
+
+    public int getGridSize() {
+        return size;
+    }
 }
