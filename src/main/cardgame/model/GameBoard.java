@@ -36,10 +36,12 @@ public class GameBoard {
         // will be added more code later
     }
 
-    public boolean allCardsMatched(Deck deck) {
-        for (Card card : deck.getCards()) {
-            if (!card.isMatched()) {
-                return false; // If any card is not matched, return false
+    public boolean allCardsMatched() {
+        for (Card[] row : board) {
+            for (Card card : row) {
+                if (card != null && !card.isMatched()) {
+                    return false; // If any card is not matched, return false
+                }
             }
         }
         return true; // All cards are matched
