@@ -16,12 +16,14 @@ public abstract class Game {
     private Card firstSelection;
     private Card secondSelection;
 
-    public Game(int boardSize, String playerName) {
-        // Initialize game components
-    }
-
-    public Game(String playerName, int boardSize) {
-        // Initialize game components
+    public Game(GameBoard board, Player player) {
+        if (board == null || player == null) {
+            throw new IllegalArgumentException("GameBoard and Player cannot be null.");
+        }
+        this.board = board;
+        this.player = player;
+        this.scoreManager = new ScoreManager(player);
+        this.timer = new Timer();
     }
 
     public void play() {
@@ -32,7 +34,7 @@ public abstract class Game {
         Card firstCard = getBoard().getCard(row1, col1);
         Card secondCard = getBoard().getCard(row2, col2);
 
-        if (firstCard != null && secondCard != null && firstCard != secondCard) {
+        if (firstCard != secondCard) {
             firstCard.flip();
             secondCard.flip();
 
