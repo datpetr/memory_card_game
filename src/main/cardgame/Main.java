@@ -1,21 +1,18 @@
 package main.cardgame;
 
 import main.cardgame.model.Card;
+import main.cardgame.model.Deck;
 
 public class Main {
     public static void main(String[] args) {
         // Set the common back image for all cards
-        Card.setBackImagePath("C:/Users/polya/Downloads/back.png");
+        Deck deck = new Deck();
+        deck = deck.createDeck(4); // Create a deck with 4 pairs of cards
 
-        // Create individual cards with unique front images
-        Card card1 = new Card(1, "images/card1.png");
-        Card card2 = new Card(2, "images/card1.png");
-        Card card3 = new Card(3, "images/card2.png");
-        Card card4 = new Card(4, "images/card2.png");
-        Card card5 = new Card(5, "images/card3.png");
-        Card card6 = new Card(6, "images/card3.png");
+        // Print the back image path
+        System.out.println(deck.getCards().get(0).getBackImagePath());
 
-        System.out.println(Card.getBackImagePath());
-
+        // Print the image paths of the cards in the deck
+        deck.getCards().forEach(card -> System.out.println("Card ID: " + card.getId() + ", Image Path: " + card.getImagePath()));
     }
 }

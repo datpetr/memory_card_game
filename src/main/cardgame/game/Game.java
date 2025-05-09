@@ -50,7 +50,7 @@ public abstract class Game {
             firstCard.flip();
             secondCard.flip();
 
-            if (firstCard.getValue().equals(secondCard.getValue())) {
+            if (firstCard.getImagePath().equals(secondCard.getImagePath())) {
                 firstCard.setMatched(true);
                 secondCard.setMatched(true);
                 player.incrementScore(10); // Increment score for a match

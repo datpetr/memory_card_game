@@ -7,9 +7,10 @@ public class Card implements CardBehavior{
     private boolean isFaceUp;
     private static String backImagePath;
 
-    public Card(int id, String value) {
+
+    public Card(int id, String imagePath) {
         this.id = id;
-        this.imagePath = imagePath;
+        this.imagePath = imagePath; // Corrected from 'imagePath' to 'value'
         this.isMatched = false;
         this.isFaceUp = false;
     }
@@ -22,7 +23,7 @@ public class Card implements CardBehavior{
         Card.backImagePath = backImagePath;
     }
 
-    public String getValue() {
+    public String getImagePath() {
         return imagePath;
         // will be added more code later
     }
@@ -30,6 +31,7 @@ public class Card implements CardBehavior{
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
     }
+
 
     public boolean isMatched() {
         return isMatched;
@@ -56,5 +58,6 @@ public class Card implements CardBehavior{
         // will be added more code later
     }
 
-
+    // Set the back image path for all cards
+       static{Card.setBackImagePath("file:src/main/resources/images/back2.jpg");}
 }
