@@ -1,6 +1,7 @@
 package main.cardgame.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Deck {
@@ -20,15 +21,8 @@ public class Deck {
     }
 
     public List<Card> shuffle() {
-        List<Card> shuffledDeck = new ArrayList<>(cards); // Create a copy of the original deck
-        for (int i = shuffledDeck.size() - 1; i > 0; i--) {
-            int j = (int) (Math.random() * (i + 1)); // Random index between 0 and i
-            // Swap shuffledDeck[i] with shuffledDeck[j]
-            Card temp = shuffledDeck.get(i);
-            shuffledDeck.set(i, shuffledDeck.get(j));
-            shuffledDeck.set(j, temp);
-        }
-        return shuffledDeck; // Return the shuffled copy
+        Collections.shuffle(cards); // Shuffle the original list in place
+        return new ArrayList<>(cards); // Return a copy of the shuffled list
     }
 
     public Card findCardById(int id) {
