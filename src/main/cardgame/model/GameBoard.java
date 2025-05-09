@@ -64,4 +64,17 @@ public class GameBoard {
     public int getGridSize() {
         return size;
     }
+
+    public boolean checkMatch(Card card1, Card card2) {
+        return card1.getImagePath().equals(card2.getImagePath());
+    }
+
+    public void initializeBoard(List<Card> cards) {
+        int index = 0;
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                board[row][col] = cards.get(index++);
+            }
+        }
+    }
 }
