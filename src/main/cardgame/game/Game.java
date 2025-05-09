@@ -3,7 +3,6 @@ package main.cardgame.game;
 import main.cardgame.model.Card;
 import main.cardgame.model.GameBoard;
 import main.cardgame.model.Player;
-import main.cardgame.util.Logger;
 import main.cardgame.util.ScoreManager;
 import main.cardgame.util.Timer;
 
@@ -42,32 +41,25 @@ public abstract class Game {
         // Main game loop logic
     }
 
-    public void processTurn(int row1, int col1, int row2, int col2) {
-        Card firstCard = getBoard().getCard(row1, col1);
-        Card secondCard = getBoard().getCard(row2, col2);
+    public boolean processTurn(Card card1, Card card2) {
+        boolean isMatch = getBoard().checkMatch(card1, card2);
 
-        if (firstCard != secondCard) {
-            firstCard.flip();
-            secondCard.flip();
-
-            if (firstCard.getImagePath().equals(secondCard.getImagePath())) {
-                firstCard.setMatched(true);
-                secondCard.setMatched(true);
-                player.incrementScore(10); // Increment score for a match
-            } else {
-                // Flip them back after a delay (simulate delay if needed)
-                firstCard.flip();
-                secondCard.flip();
-            }
+        if (isMatch) {
+            card1.setMatched(true);
+            card2.setMatched(true);
+            player.incrementScore(10);
         }
 
         player.incrementMoves();
 
-        // Check for time up in countdown mode
         if (timer.isCountdown() && timer.isTimeUp()) {
             endGame();
         }
+
+        return isMatch;
     }
+
+
 
     public void pickCard(int row, int col) {
         getBoard().flipCard(row, col); // Flip the card at the specified position
@@ -77,7 +69,7 @@ public abstract class Game {
 
     public void endGame() {
         timer.stopTimer(); // Stop the timer
-        System.out.println("Game Over! Final score: " + player.getScore());
+        System.out.println("main.cardgame.game.Game Over! Final score: " + player.getScore());
     }
 
     // Getters
@@ -130,3 +122,4 @@ public abstract class Game {
         this.secondSelection = secondSelection;
     }
 }
+
