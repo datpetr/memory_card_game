@@ -10,9 +10,22 @@ public class GameBoard {
     public GameBoard(String level, List<Card> cards) {
         this.size = determineSize(level);
         this.board = new Card[size][size];
-        // Initialize the board with cards
-        // will be added more code later
+
+        if (cards.size() != size * size) {
+            throw new IllegalArgumentException(
+                    "Invalid number of cards. Expected " + (size * size) +
+                            " but got " + cards.size()
+            );
+        }
+
+        int index = 0;
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                board[row][col] = cards.get(index++); // Properly populate the board
+            }
+        }
     }
+
 
     private int determineSize(String level) {
         switch (level.toLowerCase()) {
