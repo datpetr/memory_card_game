@@ -1,5 +1,7 @@
 package main.cardgame.model;
-
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
+import javafx.geometry.Pos;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
@@ -25,8 +27,8 @@ import java.util.List;
 import java.util.Map;
 
 public class GameBoardVisualizer extends Application {
-    private static final int BOARD_ROWS = 4;
-    private static final int BOARD_COLS = 4;
+    private static  int BOARD_ROWS = 4;
+    private static  int BOARD_COLS = 4;
     private static final double CARD_ASPECT_RATIO = 2.0 / 3.0;
     private static final double PADDING = 20;
     private static final double GAP = 10;
@@ -38,11 +40,91 @@ public class GameBoardVisualizer extends Application {
     private final Map<Card, ImageView> cardViews = new HashMap<>();
     private GridPane gridPane;
 
-    @Override
-    public void start(Stage primaryStage) {
-        initializeGame();
+    private void setupGreetingAndDifficultyScreen(Stage primaryStage) {
+        // Create greeting message
+        Label greetingLabel = new Label("Welcome to the Memory Card Game!");
+        greetingLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+
+        // Create buttons for difficulty levels
+        Button easyButton = new Button("Easy");
+        Button mediumButton = new Button("Medium");
+        Button hardButton = new Button("Hard");
+
+        // Create a start button
+        Button startButton = new Button("Start");
+        startButton.setDisable(true); // Initially disabled
+        startButton.setPrefSize(150,50);
+
+        // Difficulty selection logic
+        easyButton.setOnAction(e -> {
+            setDifficulty("easy");
+            startButton.setDisable(false);
+        });
+        mediumButton.setOnAction(e -> {
+            setDifficulty("medium");
+            startButton.setDisable(false);
+        });
+        hardButton.setOnAction(e -> {
+            setDifficulty("hard");
+            startButton.setDisable(false);
+        });
+
+        // Start button logic
+        startButton.setOnAction(e -> startGameWithDifficulty(primaryStage, selectedDifficulty));
+
+        // Arrange components in a VBox
+        VBox vbox = new VBox(20, greetingLabel, easyButton, mediumButton, hardButton, startButton);
+        vbox.setAlignment(Pos.CENTER);
+        vbox.setPadding(new Insets(PADDING));
+
+        // Set up the scene
+        Scene scene = new Scene(vbox, 400, 300);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Welcome");
+        primaryStage.show();
+    }
+
+    // Helper method to store the selected difficulty
+    private String selectedDifficulty;
+
+    private void setDifficulty(String difficulty) {
+        selectedDifficulty = difficulty;
+    }
+
+    private void startGameWithDifficulty(Stage primaryStage, String difficulty) {
+        switch (difficulty) {
+            case "easy":
+                BOARD_ROWS = 4;
+                BOARD_COLS = 4;
+                break;
+            case "medium":
+                BOARD_ROWS = 6;
+                BOARD_COLS = 6;
+                break;
+            case "hard":
+                BOARD_ROWS = 8;
+                BOARD_COLS = 8;
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown difficulty: " + difficulty);
+        }
+
+        int totalCardsNeeded = BOARD_ROWS * BOARD_COLS;
+        int requiredPairs = totalCardsNeeded / 2;
+
+        Deck deck = new Deck().createDeck(requiredPairs);
+        this.board = new GameBoard(difficulty, deck.getCards());
+        Player player = new Player("Player1");
+        this.game = new EndlessGame(board, player);
+
         setupUI(primaryStage);
     }
+
+    @Override
+    public void start(Stage primaryStage) {
+        setupGreetingAndDifficultyScreen(primaryStage);
+    }
+
 
     private void initializeGame() {
         int totalCardsNeeded = BOARD_ROWS * BOARD_COLS;
