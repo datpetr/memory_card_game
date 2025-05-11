@@ -21,7 +21,8 @@ import main.cardgame.model.Card;
 import main.cardgame.model.Deck;
 import main.cardgame.model.GameBoard;
 import main.cardgame.model.Player;
-
+import javafx.animation.ScaleTransition;
+import javafx.scene.control.DialogPane;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,11 @@ public class GameBoardVisualizer extends Application {
         startButton.setDisable(true); // Initially disabled
         startButton.setPrefSize(150,50);
 
+        easyButton.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-background-color: #4682b4; -fx-text-fill: white; -fx-background-radius: 10;");
+        mediumButton.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-background-color: #4682b4; -fx-text-fill: white; -fx-background-radius: 10;");
+        hardButton.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-background-color: #4682b4; -fx-text-fill: white; -fx-background-radius: 10;");
+        startButton.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-background-color: #32cd32; -fx-text-fill: white; -fx-background-radius: 10;");
+
         // Difficulty selection logic
         easyButton.setOnAction(e -> {
             setDifficulty("easy");
@@ -76,6 +82,7 @@ public class GameBoardVisualizer extends Application {
         VBox vbox = new VBox(20, greetingLabel, easyButton, mediumButton, hardButton, startButton);
         vbox.setAlignment(Pos.CENTER);
         vbox.setPadding(new Insets(PADDING));
+        vbox.setStyle("-fx-background-color: linear-gradient(to bottom, #f0f8ff, #87cefa);");
 
         // Set up the scene
         Scene scene = new Scene(vbox, 400, 300);
@@ -181,6 +188,8 @@ public class GameBoardVisualizer extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
+
+
         game.play();
     }
 
@@ -201,8 +210,19 @@ public class GameBoardVisualizer extends Application {
     private void handleCardFlip(Card card, ImageView imageView) {
         if (card.isMatched() || card.isFaceUp() || secondFlippedCard != null) return;
 
-        card.flip();
-        updateCardImage(card, imageView);
+        ScaleTransition flipOut = new ScaleTransition(Duration.millis(200), imageView);
+        flipOut.setFromX(1.0);
+        flipOut.setToX(0.0); // Shrink horizontally
+        flipOut.setOnFinished(event -> {
+            card.flip(); // Flip the card's state
+            updateCardImage(card, imageView); // Update the image to show the other side
+
+            ScaleTransition flipIn = new ScaleTransition(Duration.millis(200), imageView);
+            flipIn.setFromX(0.0);
+            flipIn.setToX(1.0); // Expand back to full size
+            flipIn.play();
+        });
+        flipOut.play();
 
         if (firstFlippedCard == null) {
             firstFlippedCard = card;
@@ -275,12 +295,29 @@ public class GameBoardVisualizer extends Application {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Game Won!");
-            alert.setHeaderText("Congratulations!");
+            alert.setHeaderText(null); // Disable default header text
             alert.setContentText(
                     "All matches found!\n" +
                             "Score: " + game.getPlayer().getScore() + "\n" +
-                            "Time: " + game.getTimer().getElapsedTime() + " seconds"
+                            "Time: " + game.getTimer().getElapsedTime() + " seconds\n" +
+                            "Moves: " + game.getPlayer().getMoves()
             );
+
+            // Apply custom styling to the dialog
+            DialogPane dialogPane = alert.getDialogPane();
+            dialogPane.setStyle(
+                    "-fx-background-color: linear-gradient(to bottom, #f0f8ff, #87cefa); " +
+                            "-fx-border-color: gold; " +
+                            "-fx-border-width: 3; " +
+                            "-fx-border-radius: 10; " +
+                            "-fx-background-radius: 10;"
+            );
+
+            // Add a custom header label
+            Label headerLabel = new Label("Congratulations!");
+            headerLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #4682b4;");
+            dialogPane.setHeader(headerLabel);
+
             alert.showAndWait();
         });
     }
