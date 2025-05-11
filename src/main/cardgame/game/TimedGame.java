@@ -27,8 +27,9 @@ public class TimedGame extends Game {
     public void endGame() {
         super.endGame();
 
+        // Only add the time bonus if game was won (not timed out)
         if (!getTimer().isTimeUp()) {
-            int remainingSeconds = (int) getTimer().getRemainingTime();
+            int remainingSeconds = (int) getTimer().getRemainingTime() / 1000;
             getPlayer().incrementScore(remainingSeconds / 2);
         }
     }
