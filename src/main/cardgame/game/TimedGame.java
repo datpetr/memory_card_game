@@ -15,32 +15,14 @@ public class TimedGame extends Game {
 
     public TimedGame(GameBoard board, Player player, int countdownSeconds) {
         super(board, player, countdownSeconds); // Pass GameBoard and playerName to the Game constructor
-        this.isStopped = false;// Initialize the timer
     }
 
-    public void startTimer() {
-        getTimer().startTimer();
-    }
-
-    public void stopGame() {
-        this.isStopped = true;
-    }
 
     @Override
     public boolean isGameOver() {
-        if (isStopped) {
-            return true; // Game ends if stopped by the player
-        }
-        if (timer.isTimeUp()) {
-            return true; // Game ends when the timer is up
-        }
-        if (getBoard().allCardsMatched()) {
-            return true; // Game ends when all cards are matched
-        }
-        return false;
+        return !isActive() || getBoard().allCardsMatched() || getTimer().isTimeUp();
     }
 
-    // creating the bonus points for remaining time
     @Override
     public void endGame() {
         super.endGame();
@@ -50,6 +32,16 @@ public class TimedGame extends Game {
             getPlayer().incrementScore(remainingSeconds / 2);
         }
     }
+
+    public void startTimer() {
+        getTimer().startTimer();
+    }
+
+    public void stopGame() {
+        this.isStopped = true;
+
+    }
+    // creating the bonus points for remaining time
 
     @Override
     public boolean processTurn(Card card1, Card card2) {
