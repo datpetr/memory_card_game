@@ -1,4 +1,4 @@
-package main.cardgame.model;
+package main.cardgame.ui;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;

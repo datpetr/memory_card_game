@@ -6,6 +6,11 @@ import main.cardgame.model.Player;
 import main.cardgame.util.ScoreManager;
 import main.cardgame.util.Timer;
 
+/**
+ * Abstract class representing a game of cards.
+ * This class provides the basic structure and functionality for a card game.
+ */
+
 public abstract class Game {
     private GameBoard board;
     private Player player;
