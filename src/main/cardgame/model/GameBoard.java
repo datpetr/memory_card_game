@@ -6,6 +6,8 @@ public class GameBoard {
     private Card[][] board;
     private int size;
     private Deck deck;
+    private int matchedPairsCount = 0;
+
 
     public GameBoard(String level, List<Card> cards) {
         this.size = determineSize(level);
@@ -79,15 +81,42 @@ public class GameBoard {
     }
 
     public boolean checkMatch(Card card1, Card card2) {
-        return card1.getImagePath().equals(card2.getImagePath());
+        boolean isMatch = card1.getImagePath().equals(card2.getImagePath());
+
+        if (isMatch && !card1.isMatched() && !card2.isMatched()) {
+            card1.setMatched(true);
+            card2.setMatched(true);
+            matchedPairsCount++;
+        }
+
+        return isMatch;
     }
 
     public void initializeBoard(List<Card> cards) {
+        if (cards == null) {
+            throw new IllegalArgumentException("Cards list cannot be null");
+        }
+
+        if (cards.size() != size * size) {
+            throw new IllegalArgumentException(
+                    "Invalid number of cards. Expected " + (size * size) +
+                            " but got " + cards.size()
+            );
+        }
+
         int index = 0;
         for (int row = 0; row < size; row++) {
             for (int col = 0; col < size; col++) {
                 board[row][col] = cards.get(index++);
             }
         }
+
+        // Reset matched pairs when initializing a new board
+        matchedPairsCount = 0;
     }
+
+    public int getMatchedPairsCount() {
+        return matchedPairsCount;
+    }
+
 }

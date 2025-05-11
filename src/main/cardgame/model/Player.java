@@ -21,31 +21,28 @@ public class Player {
     }
 
     public String getName() {
-        // will be added more code later
         return name;
     }
 
     public int getScore() {
-        // will be added more code later
         return score;
     }
 
     public void setScore(int newScore) {
-        // will be added more code later
         this.score = newScore;
     }
 
     public void incrementScore(int points) {
-        this.score += points;
+        this.score++;
     }
 
     public int getMoves() {
-        // will be added more code later
         return moves;
     }
 
     public void incrementMoves() {
-        // will be added more code later
-        moves++;
+        this.moves++;
     }
+
+    // since there is no sence in decreasing the number of movements, we don't need a decrement method
 }

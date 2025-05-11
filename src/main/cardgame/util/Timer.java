@@ -57,4 +57,13 @@ public class Timer {
         }
         this.countdownMillis = countdownSeconds * 1000L;
     }
+
+    // Method to get the maximum time for countdown timer
+    public long getMaxTime() {
+        if (!isCountdown) {
+            throw new UnsupportedOperationException("This timer does not support maximum time.");
+        }
+        return countdownMillis;
+    }
+
 }
