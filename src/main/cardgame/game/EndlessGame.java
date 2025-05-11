@@ -9,7 +9,6 @@ public class EndlessGame extends Game {
 
     public EndlessGame(GameBoard board, Player player) {
         super(board, player); // Pass GameBoard and Player to the Game constructor
-        this.isStopped = false;
     }
 
     public void stopGame() {
