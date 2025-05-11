@@ -5,28 +5,33 @@ import main.cardgame.model.Player;
 import main.cardgame.model.Card;
 
 public class EndlessGame extends Game {
-    private boolean isStopped;
-
     public EndlessGame(GameBoard board, Player player) {
         super(board, player); // Pass GameBoard and Player to the Game constructor
     }
 
-    public void stopGame() {
-        this.isStopped = true;
-    }
 
     @Override
     public boolean isGameOver() {
-        return isStopped || getBoard().allCardsMatched(); // Game ends if stopped by the player or all cards are matched
+        return !isActive() || getBoard().allCardsMatched(); // Game ends if stopped by the player or all cards are matched
     }
 
     // Add bonus points based on time and efficiency
     @Override
     public void endGame() {
-        super.endGame();
-        int timeElapsed = (int) getTimer().getElapsedTime();
+        // Calculate bonus before calling super.endGame() which sets isActive to false
+        int timeElapsed = (int) getTimer().getElapsedTime() / 1000;
         int movesBonus = Math.max(100 - getPlayer().getMoves(), 0);
+
+        // Call parent method which handles notifications and state of chage
+        super.endGame();
+
+        // Apply the bonus after calling super
         getPlayer().incrementScore(movesBonus);
+
+        // Notify observers about bonus points
+        setChanged();
+        notifyObservers("BONUS_POINTS_ADDED");
+
     }
 
     //
@@ -49,6 +54,10 @@ public class EndlessGame extends Game {
             int totalBonus = baseBonus + efficiencyBonus;
 
             getPlayer().incrementScore(totalBonus);
+
+            // Notify observers about bonus points
+            setChanged();
+            notifyObservers("MATCH_BONUS_ADDED");
         }
 
         return result;

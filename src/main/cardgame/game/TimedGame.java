@@ -32,6 +32,8 @@ public class TimedGame extends Game {
             int remainingSeconds = (int) getTimer().getRemainingTime() / 1000;
             getPlayer().incrementScore(remainingSeconds / 2);
         }
+
+        super.endGame();
     }
 
     public void startTimer() {
@@ -61,6 +63,10 @@ public class TimedGame extends Game {
             // Award bonus points (minimum of 2)
             int bonus = Math.max(timePressureBonus, 2);
             getPlayer().incrementScore(bonus);
+
+            // Notify observers about bonus points
+            setChanged();
+            notifyObservers("BONUS_POINTS_ADDED");
         }
 
         return result;
