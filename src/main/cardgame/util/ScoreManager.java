@@ -1,7 +1,7 @@
 package main.cardgame.util;
 
 import main.cardgame.model.Player;
-import main.cardgame.util.Timer;
+import main.cardgame.model.Timer;
 
 public class ScoreManager {
     private Player player;
