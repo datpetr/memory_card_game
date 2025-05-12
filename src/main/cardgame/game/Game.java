@@ -4,7 +4,7 @@ import main.cardgame.model.Card;
 import main.cardgame.model.GameBoard;
 import main.cardgame.model.Player;
 import main.cardgame.util.ScoreManager;
-import main.cardgame.util.Timer;
+import main.cardgame.model.Timer;
 
 import java.util.Observable;
 

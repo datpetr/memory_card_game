@@ -2,7 +2,6 @@ package main.cardgame.game;
 
 import main.cardgame.model.GameBoard;
 import main.cardgame.model.Player;
-import main.cardgame.util.Timer;
 import main.cardgame.model.Card;
 
 
