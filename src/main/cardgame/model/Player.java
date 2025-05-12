@@ -1,6 +1,8 @@
 package main.cardgame.model;
 
-public class Player {
+import java.util.Observable;
+
+public class Player extends Observable {
     private String name;
     private int score;
     private int moves;
@@ -24,16 +26,40 @@ public class Player {
         return name;
     }
 
+    public void setName(String name) {
+        if (name != null && !name.trim().isEmpty()) {
+            String oldName = this.name;
+            this.name = name;
+
+            if (!oldName.equals(this.name)) {
+                setChanged();
+                notifyObservers("NAME_CHANGED");
+            }
+        }
+    }
+
     public int getScore() {
         return score;
     }
 
     public void setScore(int newScore) {
-        this.score = newScore;
+        if (newScore >= 0) {
+            int oldScore = score;
+            this.score = newScore;
+
+            if (oldScore != this.score) {
+                setChanged();
+                notifyObservers("SCORE_CHANGED");
+            }
+        }
     }
 
     public void incrementScore(int points) {
-        this.score++;
+        if (points > 0) {
+            this.score += points;
+            setChanged();
+            notifyObservers("SCORE_INCREASED");
+        }
     }
 
     public int getMoves() {
@@ -42,7 +68,18 @@ public class Player {
 
     public void incrementMoves() {
         this.moves++;
+        setChanged();
+        notifyObservers("MOVES_MADE");
     }
 
-    // since there is no sence in decreasing the number of movements, we don't need a decrement method
+    /**
+     * reset player score for a new game
+     */
+    public void resetStats() {
+        this.score = 0;
+        this.moves = 0;
+
+        setChanged();
+        notifyObservers("PLAYER_RESET");
+    }
 }
