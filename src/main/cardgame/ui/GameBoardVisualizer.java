@@ -1,5 +1,7 @@
 package main.cardgame.ui;
-
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
+import javafx.geometry.Pos;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
@@ -19,14 +21,15 @@ import main.cardgame.model.Card;
 import main.cardgame.model.Deck;
 import main.cardgame.model.GameBoard;
 import main.cardgame.model.Player;
-
+import javafx.animation.ScaleTransition;
+import javafx.scene.control.DialogPane;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class GameBoardVisualizer extends Application {
-    private static final int BOARD_ROWS = 4;
-    private static final int BOARD_COLS = 4;
+    private static  int BOARD_ROWS = 4;
+    private static  int BOARD_COLS = 4;
     private static final double CARD_ASPECT_RATIO = 2.0 / 3.0;
     private static final double PADDING = 20;
     private static final double GAP = 10;
@@ -38,11 +41,97 @@ public class GameBoardVisualizer extends Application {
     private final Map<Card, ImageView> cardViews = new HashMap<>();
     private GridPane gridPane;
 
-    @Override
-    public void start(Stage primaryStage) {
-        initializeGame();
+    private void setupGreetingAndDifficultyScreen(Stage primaryStage) {
+        // Create greeting message
+        Label greetingLabel = new Label("Welcome to the Memory Card Game!");
+        greetingLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+
+        // Create buttons for difficulty levels
+        Button easyButton = new Button("Easy");
+        Button mediumButton = new Button("Medium");
+        Button hardButton = new Button("Hard");
+
+        // Create a start button
+        Button startButton = new Button("Start");
+        startButton.setDisable(true); // Initially disabled
+        startButton.setPrefSize(150,50);
+
+        easyButton.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-background-color: #4682b4; -fx-text-fill: white; -fx-background-radius: 10;");
+        mediumButton.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-background-color: #4682b4; -fx-text-fill: white; -fx-background-radius: 10;");
+        hardButton.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-background-color: #4682b4; -fx-text-fill: white; -fx-background-radius: 10;");
+        startButton.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-background-color: #32cd32; -fx-text-fill: white; -fx-background-radius: 10;");
+
+        // Difficulty selection logic
+        easyButton.setOnAction(e -> {
+            setDifficulty("easy");
+            startButton.setDisable(false);
+        });
+        mediumButton.setOnAction(e -> {
+            setDifficulty("medium");
+            startButton.setDisable(false);
+        });
+        hardButton.setOnAction(e -> {
+            setDifficulty("hard");
+            startButton.setDisable(false);
+        });
+
+        // Start button logic
+        startButton.setOnAction(e -> startGameWithDifficulty(primaryStage, selectedDifficulty));
+
+        // Arrange components in a VBox
+        VBox vbox = new VBox(20, greetingLabel, easyButton, mediumButton, hardButton, startButton);
+        vbox.setAlignment(Pos.CENTER);
+        vbox.setPadding(new Insets(PADDING));
+        vbox.setStyle("-fx-background-color: linear-gradient(to bottom, #f0f8ff, #87cefa);");
+
+        // Set up the scene
+        Scene scene = new Scene(vbox, 400, 300);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Welcome");
+        primaryStage.show();
+    }
+
+    // Helper method to store the selected difficulty
+    private String selectedDifficulty;
+
+    private void setDifficulty(String difficulty) {
+        selectedDifficulty = difficulty;
+    }
+
+    private void startGameWithDifficulty(Stage primaryStage, String difficulty) {
+        switch (difficulty) {
+            case "easy":
+                BOARD_ROWS = 4;
+                BOARD_COLS = 4;
+                break;
+            case "medium":
+                BOARD_ROWS = 6;
+                BOARD_COLS = 6;
+                break;
+            case "hard":
+                BOARD_ROWS = 8;
+                BOARD_COLS = 8;
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown difficulty: " + difficulty);
+        }
+
+        int totalCardsNeeded = BOARD_ROWS * BOARD_COLS;
+        int requiredPairs = totalCardsNeeded / 2;
+
+        Deck deck = new Deck().createDeck(requiredPairs);
+        this.board = new GameBoard(difficulty, deck.getCards());
+        Player player = new Player("Player1");
+        this.game = new EndlessGame(board, player);
+
         setupUI(primaryStage);
     }
+
+    @Override
+    public void start(Stage primaryStage) {
+        setupGreetingAndDifficultyScreen(primaryStage);
+    }
+
 
     private void initializeGame() {
         int totalCardsNeeded = BOARD_ROWS * BOARD_COLS;
@@ -99,6 +188,8 @@ public class GameBoardVisualizer extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
+
+
         game.play();
     }
 
@@ -119,8 +210,19 @@ public class GameBoardVisualizer extends Application {
     private void handleCardFlip(Card card, ImageView imageView) {
         if (card.isMatched() || card.isFaceUp() || secondFlippedCard != null) return;
 
-        card.flip();
-        updateCardImage(card, imageView);
+        ScaleTransition flipOut = new ScaleTransition(Duration.millis(200), imageView);
+        flipOut.setFromX(1.0);
+        flipOut.setToX(0.0); // Shrink horizontally
+        flipOut.setOnFinished(event -> {
+            card.flip(); // Flip the card's state
+            updateCardImage(card, imageView); // Update the image to show the other side
+
+            ScaleTransition flipIn = new ScaleTransition(Duration.millis(200), imageView);
+            flipIn.setFromX(0.0);
+            flipIn.setToX(1.0); // Expand back to full size
+            flipIn.play();
+        });
+        flipOut.play();
 
         if (firstFlippedCard == null) {
             firstFlippedCard = card;
@@ -193,12 +295,29 @@ public class GameBoardVisualizer extends Application {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Game Won!");
-            alert.setHeaderText("Congratulations!");
+            alert.setHeaderText(null); // Disable default header text
             alert.setContentText(
                     "All matches found!\n" +
                             "Score: " + game.getPlayer().getScore() + "\n" +
-                            "Time: " + game.getTimer().getElapsedTime() + " seconds"
+                            "Time: " + game.getTimer().getElapsedTime() + " seconds\n" +
+                            "Moves: " + game.getPlayer().getMoves()
             );
+
+            // Apply custom styling to the dialog
+            DialogPane dialogPane = alert.getDialogPane();
+            dialogPane.setStyle(
+                    "-fx-background-color: linear-gradient(to bottom, #f0f8ff, #87cefa); " +
+                            "-fx-border-color: gold; " +
+                            "-fx-border-width: 3; " +
+                            "-fx-border-radius: 10; " +
+                            "-fx-background-radius: 10;"
+            );
+
+            // Add a custom header label
+            Label headerLabel = new Label("Congratulations!");
+            headerLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #4682b4;");
+            dialogPane.setHeader(headerLabel);
+
             alert.showAndWait();
         });
     }
