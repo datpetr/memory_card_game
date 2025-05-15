@@ -144,7 +144,7 @@ public class Timer extends Observable {
         return countdownMillis;
     }
 
-    public void reset() {
+    public void resetTimer() {
         this.state = State.READY;
         this.startTime = 0;
 

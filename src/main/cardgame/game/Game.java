@@ -222,6 +222,32 @@ public abstract class Game extends Observable {
         secondSelection = null;
     }
 
+    /**
+     * Reset the game to the initial state
+     */
+    public void resetGame() {
+        // Reset game state
+        this.isActive = true;
+        this.isPaused = false;
+
+        // Reset player stats
+        this.player.resetStats();
+
+        // Reset the timer
+        this.timer.resetTimer();
+        this.timer.startTimer();
+
+        // Reset card selections
+        resetSelections();
+
+        // Reset the board (flip all cards face down and unmatch)
+        board.resetBoard();
+
+        // Notify observers that game has been reset
+        setChanged();
+        notifyObservers("GAME_RESET");
+    }
+
 
     public boolean isActive() {
         return isActive;
