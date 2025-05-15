@@ -1,325 +1,119 @@
 package main.cardgame.ui;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
-import javafx.geometry.Pos;
-import javafx.animation.FadeTransition;
-import javafx.animation.PauseTransition;
+
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
-import javafx.stage.Screen;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import main.cardgame.game.EndlessGame;
+import main.cardgame.game.Game;
+import main.cardgame.game.TimedGame;
 import main.cardgame.model.Card;
 import main.cardgame.model.Deck;
 import main.cardgame.model.GameBoard;
 import main.cardgame.model.Player;
-import javafx.animation.ScaleTransition;
-import javafx.scene.control.DialogPane;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-public class GameBoardVisualizer extends Application {
-    private static  int BOARD_ROWS = 4;
-    private static  int BOARD_COLS = 4;
-    private static final double CARD_ASPECT_RATIO = 2.0 / 3.0;
-    private static final double PADDING = 20;
-    private static final double GAP = 10;
+import java.util.Observable;
+import java.util.Observer;
 
-    private EndlessGame game;
+public class GameBoardVisualizer extends Application implements Observer {
+    // Game state
+    private Game game;
     private GameBoard board;
-    private Card firstFlippedCard;
-    private Card secondFlippedCard;
-    private final Map<Card, ImageView> cardViews = new HashMap<>();
-    private GridPane gridPane;
+    private int boardRows = 4;
+    private int boardCols = 4;
 
-    private void setupGreetingAndDifficultyScreen(Stage primaryStage) {
-        // Create greeting message
-        Label greetingLabel = new Label("Welcome to the Memory Card Game!");
-        greetingLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
-
-        // Create buttons for difficulty levels
-        Button easyButton = new Button("Easy");
-        Button mediumButton = new Button("Medium");
-        Button hardButton = new Button("Hard");
-
-        // Create a start button
-        Button startButton = new Button("Start");
-        startButton.setDisable(true); // Initially disabled
-        startButton.setPrefSize(150,50);
-
-        easyButton.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-background-color: #4682b4; -fx-text-fill: white; -fx-background-radius: 10;");
-        mediumButton.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-background-color: #4682b4; -fx-text-fill: white; -fx-background-radius: 10;");
-        hardButton.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-background-color: #4682b4; -fx-text-fill: white; -fx-background-radius: 10;");
-        startButton.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-background-color: #32cd32; -fx-text-fill: white; -fx-background-radius: 10;");
-
-        // Difficulty selection logic
-        easyButton.setOnAction(e -> {
-            setDifficulty("easy");
-            startButton.setDisable(false);
-        });
-        mediumButton.setOnAction(e -> {
-            setDifficulty("medium");
-            startButton.setDisable(false);
-        });
-        hardButton.setOnAction(e -> {
-            setDifficulty("hard");
-            startButton.setDisable(false);
-        });
-
-        // Start button logic
-        startButton.setOnAction(e -> startGameWithDifficulty(primaryStage, selectedDifficulty));
-
-        // Arrange components in a VBox
-        VBox vbox = new VBox(20, greetingLabel, easyButton, mediumButton, hardButton, startButton);
-        vbox.setAlignment(Pos.CENTER);
-        vbox.setPadding(new Insets(PADDING));
-        vbox.setStyle("-fx-background-color: linear-gradient(to bottom, #f0f8ff, #87cefa);");
-
-        // Set up the scene
-        Scene scene = new Scene(vbox, 400, 300);
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("Welcome");
-        primaryStage.show();
-    }
-
-    // Helper method to store the selected difficulty
-    private String selectedDifficulty;
-
-    private void setDifficulty(String difficulty) {
-        selectedDifficulty = difficulty;
-    }
-
-    private void startGameWithDifficulty(Stage primaryStage, String difficulty) {
-        switch (difficulty) {
-            case "easy":
-                BOARD_ROWS = 4;
-                BOARD_COLS = 4;
-                break;
-            case "medium":
-                BOARD_ROWS = 6;
-                BOARD_COLS = 6;
-                break;
-            case "hard":
-                BOARD_ROWS = 8;
-                BOARD_COLS = 8;
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown difficulty: " + difficulty);
-        }
-
-        int totalCardsNeeded = BOARD_ROWS * BOARD_COLS;
-        int requiredPairs = totalCardsNeeded / 2;
-
-        Deck deck = new Deck().createDeck(requiredPairs);
-        this.board = new GameBoard(difficulty, deck.getCards());
-        Player player = new Player("Player1");
-        this.game = new EndlessGame(board, player);
-
-        setupUI(primaryStage);
-    }
+    // UI Components
+    private GameUI gameUI;
+    private CardUI cardUI;
+    private ScoreAndTimerPanel statusPanel;
+    private ControlUI controlUI;
 
     @Override
     public void start(Stage primaryStage) {
-        setupGreetingAndDifficultyScreen(primaryStage);
+        gameUI = new GameUI(primaryStage, this);
+        gameUI.showWelcomeScreen();
     }
 
-
-    private void initializeGame() {
-        int totalCardsNeeded = BOARD_ROWS * BOARD_COLS;
-        int requiredPairs = totalCardsNeeded / 2;
-
-        Deck deck = new Deck().createDeck(requiredPairs);
-        List<Card> cards = deck.getCards();
-
-        if (cards.size() != totalCardsNeeded) {
-            throw new IllegalStateException(
-                    "Deck created " + cards.size() + " cards but need " + totalCardsNeeded
-            );
+    public void startGameWithSettings(Stage primaryStage, String mode, String difficulty) {
+        // Set board dimensions based on difficulty
+        switch (difficulty) {
+            case "easy": boardRows = 4; boardCols = 4; break;
+            case "medium": boardRows = 6; boardCols = 6; break;
+            case "hard": boardRows = 8; boardCols = 8; break;
+            default: throw new IllegalArgumentException("Unknown difficulty: " + difficulty);
         }
 
-        this.board = new GameBoard("easy", cards);
+        // Set up game components
+        int requiredPairs = (boardRows * boardCols) / 2;
+        Deck deck = new Deck().createDeck(requiredPairs);
+        this.board = new GameBoard(difficulty, deck.getCards());
         Player player = new Player("Player1");
-        this.game = new EndlessGame(board, player);
+        player.addObserver(this);
+
+        // Create appropriate game based on mode
+        if (mode.equals("Timed Mode")) {
+            int timeLimit;
+            switch (difficulty) {
+                case "easy": timeLimit = TimedGame.EASY_TIME; break;
+                case "medium": timeLimit = TimedGame.MEDIUM_TIME; break;
+                case "hard": timeLimit = TimedGame.HARD_TIME; break;
+                default: timeLimit = TimedGame.EASY_TIME;
+            }
+            this.game = new TimedGame(board, player, timeLimit);
+        } else {
+            this.game = new EndlessGame(board, player);
+        }
+        game.addObserver(this);
+
+        // Set up UI components
+        BorderPane mainLayout = new BorderPane();
+
+        // Initialize UI components
+        statusPanel = new ScoreAndTimerPanel(game);
+        cardUI = new CardUI(game, board, boardRows, boardCols);
+        controlUI = new ControlUI(game, primaryStage, this);
+
+        // Arrange UI components
+        mainLayout.setTop(statusPanel.getComponent());
+        mainLayout.setCenter(cardUI.getComponent());
+        mainLayout.setBottom(controlUI.getComponent());
+
+        // Create scene
+        Scene gameScene = gameUI.createGameScene(mainLayout, mode);
+        primaryStage.setScene(gameScene);
+
+        // Handle window resizing
+        gameScene.widthProperty().addListener((obs, old, newVal) ->
+                cardUI.updateCardSizes(newVal.doubleValue(), gameScene.getHeight()));
+        gameScene.heightProperty().addListener((obs, old, newVal) ->
+                cardUI.updateCardSizes(gameScene.getWidth(), newVal.doubleValue()));
+
+        // Start game
+        game.play();
+        statusPanel.startTimerUpdates();
     }
 
-    private void setupUI(Stage primaryStage) {
-        Screen screen = Screen.getPrimary();
-        double maxWidth = screen.getVisualBounds().getWidth() * 0.9;
-        double maxHeight = screen.getVisualBounds().getHeight() * 0.9;
+    public void restartGame() {
+        statusPanel.stopTimerUpdates();
+        game.resetGame();
+        cardUI.resetCards();
+        controlUI.resetControls();
+        statusPanel.startTimerUpdates();
+    }
 
-        double maxCardWidth = (maxWidth - 2 * PADDING - (BOARD_COLS - 1) * GAP) / BOARD_COLS;
-        double maxCardHeight = (maxHeight - 2 * PADDING - (BOARD_ROWS - 1) * GAP) / BOARD_ROWS;
-
-        double cardWidth = Math.min(maxCardWidth, maxCardHeight * CARD_ASPECT_RATIO);
-        double cardHeight = cardWidth / CARD_ASPECT_RATIO;
-
-        gridPane = new GridPane();
-        gridPane.setHgap(GAP);
-        gridPane.setVgap(GAP);
-        gridPane.setPadding(new Insets(PADDING));
-
-        for (int row = 0; row < BOARD_ROWS; row++) {
-            for (int col = 0; col < BOARD_COLS; col++) {
-                Card card = board.getCard(row, col);
-
-                if (card == null) { // Add null check
-                    throw new IllegalStateException(
-                            "No card found at position [" + row + "][" + col + "]"
-                    );
-                }
-
-                Button cardButton = createCardButton(card, cardWidth, cardHeight);
-                gridPane.add(cardButton, col, row);
-                cardViews.put(card, (ImageView) cardButton.getGraphic());
+    @Override
+    public void update(Observable observable, Object arg) {
+        if (observable instanceof Player) {
+            statusPanel.updateScoreDisplay();
+        } else if (arg != null) {
+            if ("GAME_OVER".equals(arg)) {
+                statusPanel.stopTimerUpdates();
+                gameUI.showGameOverMessage(true, game);
+            } else if ("TIME_UP".equals(arg)) {
+                statusPanel.stopTimerUpdates();
+                gameUI.showGameOverMessage(false, game);
             }
         }
-
-        Scene scene = new Scene(gridPane);
-        primaryStage.setTitle("Memory Card Game - Endless Mode");
-        primaryStage.setScene(scene);
-        primaryStage.show();
-
-
-
-        game.play();
-    }
-
-    private Button createCardButton(Card card, double cardWidth, double cardHeight) {
-        Button cardButton = new Button();
-        cardButton.setPrefSize(cardWidth, cardHeight);
-        cardButton.setPadding(Insets.EMPTY);
-
-        ImageView imageView = new ImageView(new Image(Card.getBackImagePath()));
-        imageView.setFitWidth(cardWidth);
-        imageView.setFitHeight(cardHeight);
-        cardButton.setGraphic(imageView);
-
-        cardButton.setOnAction(event -> handleCardFlip(card, imageView));
-        return cardButton;
-    }
-
-    private void handleCardFlip(Card card, ImageView imageView) {
-        if (card.isMatched() || card.isFaceUp() || secondFlippedCard != null) return;
-
-        ScaleTransition flipOut = new ScaleTransition(Duration.millis(200), imageView);
-        flipOut.setFromX(1.0);
-        flipOut.setToX(0.0); // Shrink horizontally
-        flipOut.setOnFinished(event -> {
-            card.flip(); // Flip the card's state
-            updateCardImage(card, imageView); // Update the image to show the other side
-
-            ScaleTransition flipIn = new ScaleTransition(Duration.millis(200), imageView);
-            flipIn.setFromX(0.0);
-            flipIn.setToX(1.0); // Expand back to full size
-            flipIn.play();
-        });
-        flipOut.play();
-
-        if (firstFlippedCard == null) {
-            firstFlippedCard = card;
-        } else {
-            secondFlippedCard = card;
-            boolean isMatch = game.processTurn(firstFlippedCard, secondFlippedCard);
-            checkForMatch(isMatch);
-        }
-    }
-
-    private void updateCardImage(Card card, ImageView imageView) {
-        String path = card.isFaceUp() ? card.getImagePath() : Card.getBackImagePath();
-        imageView.setImage(new Image(path));
-    }
-
-    private void checkForMatch(boolean isMatch) {
-        if (isMatch) {
-            handleMatch();
-        } else {
-            handleMismatch();
-        }
-        resetSelections();
-    }
-
-    private void handleMatch() {
-        animateMatch(firstFlippedCard, secondFlippedCard);
-        if (game.isGameOver()) {
-            game.endGame();
-            showWinMessage();
-        }
-    }
-
-    private void handleMismatch() {
-        animateMismatch(firstFlippedCard, secondFlippedCard);
-    }
-
-    private void resetSelections() {
-        firstFlippedCard = null;
-        secondFlippedCard = null;
-    }
-
-    private void animateMatch(Card card1, Card card2) {
-        FadeTransition ft = new FadeTransition(Duration.millis(500), cardViews.get(card1));
-        ft.setFromValue(1.0);
-        ft.setToValue(0.3);
-        ft.setCycleCount(2);
-        ft.setAutoReverse(true);
-        ft.play();
-
-        ft = new FadeTransition(Duration.millis(500), cardViews.get(card2));
-        ft.setFromValue(1.0);
-        ft.setToValue(0.3);
-        ft.setCycleCount(2);
-        ft.setAutoReverse(true);
-        ft.play();
-    }
-
-    private void animateMismatch(Card card1, Card card2) {
-        PauseTransition pause = new PauseTransition(Duration.seconds(1));
-        pause.setOnFinished(event -> Platform.runLater(() -> {
-            card1.flip();
-            card2.flip();
-            updateCardImage(card1, cardViews.get(card1));
-            updateCardImage(card2, cardViews.get(card2));
-        }));
-        pause.play();
-    }
-
-    private void showWinMessage() {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Game Won!");
-            alert.setHeaderText(null); // Disable default header text
-            alert.setContentText(
-                    "All matches found!\n" +
-                            "Score: " + game.getPlayer().getScore() + "\n" +
-                            "Time: " + game.getTimer().getElapsedTime() + " seconds\n" +
-                            "Moves: " + game.getPlayer().getMoves()
-            );
-
-            // Apply custom styling to the dialog
-            DialogPane dialogPane = alert.getDialogPane();
-            dialogPane.setStyle(
-                    "-fx-background-color: linear-gradient(to bottom, #f0f8ff, #87cefa); " +
-                            "-fx-border-color: gold; " +
-                            "-fx-border-width: 3; " +
-                            "-fx-border-radius: 10; " +
-                            "-fx-background-radius: 10;"
-            );
-
-            // Add a custom header label
-            Label headerLabel = new Label("Congratulations!");
-            headerLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #4682b4;");
-            dialogPane.setHeader(headerLabel);
-
-            alert.showAndWait();
-        });
     }
 
     public static void main(String[] args) {
