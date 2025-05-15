@@ -87,6 +87,16 @@ public class Card extends Observable implements CardBehavior{
         notifyObservers("CARD_RESET");
     }
 
+    /**
+     * Check if this card matches another card
+     * @param otherCard card to compare with
+     * @return true if the cards have the same image path
+     */
+    public boolean matches(Card otherCard) {
+        if (otherCard == null) return false;
+        return this.imagePath != null && this.imagePath.equals(otherCard.getImagePath());
+    }
+
     // Set the back image path for all cards (will be changed later)
     static{Card.setBackImagePath("file:src/main/resources/images/back2.jpg");}
 }

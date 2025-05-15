@@ -1,329 +1,221 @@
 package main.cardgame.ui;
 
-import javafx.animation.FadeTransition;
-import javafx.animation.PauseTransition;
-import javafx.animation.ScaleTransition;
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
-import javafx.util.Duration;
+import javafx.scene.layout.StackPane;
 import main.cardgame.game.Game;
 import main.cardgame.model.Card;
 import main.cardgame.model.GameBoard;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
+import java.util.Observer;
 
-public class CardUI extends Observable {
-    private final Game game;
-    private final GameBoard board;
-    private final int rows;
-    private final int cols;
-    private GridPane gridPane;
-    private final Map<Card, ImageView> cardViews = new HashMap<>();
-    private Card firstFlippedCard;
-    private Card secondFlippedCard;
+public class CardUI implements Observer {
+    private GridPane cardGrid;
+    private GameBoard gameBoard;
+    private Game game;
+    private List<ImageView> cardViews;
+    private int rows;
+    private int cols;
+    private Card firstSelectedCard;
+    private int firstSelectedRow;
+    private int firstSelectedCol;
+    private boolean processingMatch = false;
 
-    // Spacing parameters
-    private static final double CARD_SPACING_PERCENT = 0.5;
-
-    public CardUI(Game game, GameBoard board, int rows, int cols) {
+    public CardUI(Game game, GameBoard gameBoard, int rows, int cols) {
         this.game = game;
-        this.board = board;
+        this.gameBoard = gameBoard;
         this.rows = rows;
         this.cols = cols;
-        createCardGrid();
+        this.cardViews = new ArrayList<>();
+        
+        initializeUI();
     }
 
-    public GridPane getComponent() {
-        return gridPane;
-    }
-
-    // Set up resize listeners after the component is added to scene
-    public void setupResizeListeners() {
-        Platform.runLater(() -> {
-            if (gridPane.getScene() != null) {
-                ChangeListener<Number> sizeListener = (obs, oldVal, newVal) -> {
-                    updateCardSizes(gridPane.getScene().getWidth(), gridPane.getScene().getHeight());
-                };
-
-                gridPane.getScene().widthProperty().addListener(sizeListener);
-                gridPane.getScene().heightProperty().addListener(sizeListener);
-
-                // Initial sizing
-                updateCardSizes(gridPane.getScene().getWidth(), gridPane.getScene().getHeight());
-            }
-        });
-    }
-
-    private void createCardGrid() {
-        gridPane = new GridPane();
-        gridPane.setAlignment(Pos.CENTER);
-
-        // Calculate percentage-based spacing
-        double hGap = 10; // Will be adjusted in updateCardSizes
-        double vGap = 10; // Will be adjusted in updateCardSizes
-        gridPane.setHgap(hGap);
-        gridPane.setVgap(vGap);
-
-        // Initial card creation - sizes will be adjusted by updateCardSizes
+    private void initializeUI() {
+        cardGrid = new GridPane();
+        cardGrid.setAlignment(Pos.CENTER);
+        cardGrid.setHgap(10);
+        cardGrid.setVgap(10);
+        
+        // Create all card views
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
-                Card card = board.getCard(row, col);
-                Button cardButton = createCardButton(card, 100, 150); // Initial size, will be resized
-                gridPane.add(cardButton, col, row);
-                cardViews.put(card, (ImageView) cardButton.getGraphic());
+                Card card = gameBoard.getCard(row, col);
+                if (card == null) continue;
+                
+                // Make sure card is observed by this UI
+                card.addObserver(this);
+                
+                // Create ImageView for the card
+                ImageView cardView = new ImageView();
+                cardView.setPreserveRatio(true);
+                
+                // Adjust initial card size based on board dimensions
+                double initialSize = calculateCardSize();
+                cardView.setFitWidth(initialSize);
+                cardView.setFitHeight(initialSize);
+                
+                // Set the initial image (back of card)
+                updateCardImage(cardView, card);
+                
+                // Create a stack pane to hold the card view
+                StackPane cardContainer = new StackPane(cardView);
+                
+                // Store position as user data for easy retrieval
+                cardContainer.setUserData(new int[]{row, col});
+                
+                // Add click handler
+                final int finalRow = row;
+                final int finalCol = col;
+                cardContainer.setOnMouseClicked(event -> handleCardClick(finalRow, finalCol));
+                
+                // Add to grid
+                cardGrid.add(cardContainer, col, row);
+                cardViews.add(cardView);
             }
         }
     }
-
-//    public void updateCardSizes(double sceneWidth, double sceneHeight) {
-//        // Reserve space for top and bottom panels
-//        double topPanelHeight = sceneHeight * 0.1;     // 10% for score/timer
-//        double bottomPanelHeight = sceneHeight * 0.08; // 8% for control panel
-//
-//        // Calculate available space for card grid with margins
-//        double horizontalMargin = sceneWidth * 0.03;   // 3% margin on each side
-//        double verticalMargin = sceneHeight * 0.03;    // 3% margin on each side
-//
-//        double availableWidth = sceneWidth - (2 * horizontalMargin);
-//        double availableHeight = sceneHeight - topPanelHeight - bottomPanelHeight - (2 * verticalMargin);
-//
-//        // Calculate optimal spacing between cards (dynamically adjusted)
-//        double spacing = Math.min(availableWidth, availableHeight) * 0.02;
-//        gridPane.setHgap(spacing);
-//        gridPane.setVgap(spacing);
-//
-//        // Calculate maximum possible card dimensions
-//        double maxCardWidth = (availableWidth - ((cols - 1) * spacing)) / cols;
-//        double maxCardHeight = (availableHeight - ((rows - 1) * spacing)) / rows;
-//
-//        // Maintain card aspect ratio (standard playing cards use ~1.4-1.5 ratio)
-//        double aspectRatio = 0.75;
-//
-//        // Calculate optimal size to fit within constraints while maintaining aspect ratio
-//        double cardWidth, cardHeight;
-//        if (maxCardWidth / maxCardHeight > aspectRatio) {
-//            // Height is the limiting factor
-//            cardHeight = maxCardHeight;
-//            cardWidth = cardHeight / aspectRatio;
-//        } else {
-//            // Width is the limiting factor
-//            cardWidth = maxCardWidth;
-//            cardHeight = cardWidth * aspectRatio;
-//        }
-//
-//        // Set padding on grid pane to center it
-//        double leftRightPadding = (sceneWidth - (cols * cardWidth) - ((cols - 1) * spacing)) / 2;
-//        double topBottomPadding = (availableHeight - (rows * cardHeight) - ((rows - 1) * spacing)) / 2;
-//        gridPane.setPadding(new Insets(
-//                topBottomPadding + verticalMargin,
-//                leftRightPadding,
-//                topBottomPadding,
-//                leftRightPadding
-//        ));
-//
-//        // Update all card sizes
-//        cardViews.forEach((card, imageView) -> {
-//            imageView.setFitWidth(cardWidth);
-//            imageView.setFitHeight(cardHeight);
-//
-//            // Update parent button size
-//            Button button = (Button) imageView.getParent();
-//            if (button != null) {
-//                button.setPrefSize(cardWidth, cardHeight);
-//            }
-//        });
-//    }
-public void updateCardSizes(double sceneWidth, double sceneHeight) {
-    // Reserve space for top and bottom panels with more precise allocation
-    double topPanelHeight = sceneHeight * 0.12;    // 12% for score/timer panel
-    double bottomPanelHeight = sceneHeight * 0.08; // 8% for control panel
-
-    // Calculate available space with appropriate margins
-    double horizontalMargin = sceneWidth * 0.03;   // 3% margin on each side
-    double verticalMargin = sceneHeight * 0.02;    // 2% margin on top and bottom
-
-    double availableWidth = sceneWidth - (2 * horizontalMargin);
-    double availableHeight = sceneHeight - topPanelHeight - bottomPanelHeight - (2 * verticalMargin);
-
-    // Dynamic spacing based on grid size
-    double spacing = Math.min(availableWidth / (cols * 10), availableHeight / (rows * 10));
-    gridPane.setHgap(spacing);
-    gridPane.setVgap(spacing);
-
-    // Calculate maximum possible card dimensions
-    double maxCardWidth = (availableWidth - ((cols - 1) * spacing)) / cols;
-    double maxCardHeight = (availableHeight - ((rows - 1) * spacing)) / rows;
-
-    // Prioritize vertical fitting with a good playing card aspect ratio (2.5:3.5)
-    double aspectRatio = 2.5/3.5; // approximately 0.71
-
-    // Calculate optimal card size, prioritizing vertical fit
-    double cardWidth, cardHeight;
-
-    // Always prioritize height to ensure vertical fit
-    cardHeight = maxCardHeight;
-    cardWidth = cardHeight * aspectRatio;
-
-    // If cards would be too wide, recalculate based on width
-    if (cardWidth > maxCardWidth) {
-        cardWidth = maxCardWidth;
-        cardHeight = cardWidth / aspectRatio;
+    
+    private double calculateCardSize() {
+        // Calculate appropriate card size based on board dimensions
+        // Larger boards will have smaller cards
+        double baseSize = 100;
+        double scaleFactor = Math.max(1, Math.sqrt(rows * cols) / 8);
+        return baseSize / scaleFactor;
     }
-
-    // Apply a small reduction factor to ensure cards don't touch the edges
-    cardWidth *= 0.98;
-    cardHeight *= 0.98;
-
-    // Center the grid in the available space
-    double leftRightPadding = (sceneWidth - (cols * cardWidth) - ((cols - 1) * spacing)) / 2;
-    double topBottomPadding = (availableHeight - (rows * cardHeight) - ((rows - 1) * spacing)) / 2;
-
-    gridPane.setPadding(new Insets(
-            topBottomPadding + verticalMargin + topPanelHeight * 0.1, // Add extra space at top
-            leftRightPadding,
-            topBottomPadding,
-            leftRightPadding
-    ));
-
-    // Update all card sizes
-    double finalCardWidth = cardWidth;
-    double finalCardHeight = cardHeight;
-    cardViews.forEach((card, imageView) -> {
-        imageView.setFitWidth(finalCardWidth);
-        imageView.setFitHeight(finalCardHeight);
-        imageView.setPreserveRatio(true);
-
-        // Update parent button size
-        Button button = (Button) imageView.getParent();
-        if (button != null) {
-            button.setPrefSize(finalCardWidth, finalCardHeight);
-            // Set minimum size to prevent cards from becoming too small
-            button.setMinSize(finalCardWidth * 0.6, finalCardHeight * 0.6);
-        }
-    });
-}
-
-    private Button createCardButton(Card card, double cardWidth, double cardHeight) {
-        Button cardButton = new Button();
-        cardButton.setPrefSize(cardWidth, cardHeight);
-        cardButton.setPadding(Insets.EMPTY);
-        cardButton.setMinSize(10, 10); // Minimum size for responsiveness
-
-        ImageView imageView = new ImageView(new Image(Card.getBackImagePath()));
-        imageView.setFitWidth(cardWidth);
-        imageView.setFitHeight(cardHeight);
-        imageView.setPreserveRatio(true);
-        cardButton.setGraphic(imageView);
-
-        cardButton.setOnAction(event -> handleCardFlip(card, imageView));
-        return cardButton;
-    }
-
-    private void handleCardFlip(Card card, ImageView imageView) {
-        if (card.isMatched() || card.isFaceUp() || secondFlippedCard != null || !game.isActive()) return;
-
-        // Flip animation
-        ScaleTransition flipOut = new ScaleTransition(Duration.millis(200), imageView);
-        flipOut.setFromX(1.0);
-        flipOut.setToX(0.0); // Shrink horizontally
-        flipOut.setOnFinished(event -> {
-            card.flip(); // Flip the card's state in the model
-            updateCardImage(card, imageView); // Update the image to show the other side
-
-            ScaleTransition flipIn = new ScaleTransition(Duration.millis(200), imageView);
-            flipIn.setFromX(0.0);
-            flipIn.setToX(1.0); // Expand back to full size
-            flipIn.play();
-        });
-        flipOut.play();
-
-        // Game logic for handling card selection
-        if (firstFlippedCard == null) {
-            firstFlippedCard = card;
+    
+    private void handleCardClick(int row, int col) {
+        if (processingMatch) return;
+        
+        Card card = gameBoard.getCard(row, col);
+        if (card == null || card.isFaceUp() || card.isMatched()) return;
+        
+        // Flip the card in the model
+        gameBoard.flipCard(row, col);
+        
+        if (firstSelectedCard == null) {
+            // First card selected
+            firstSelectedCard = card;
+            firstSelectedRow = row;
+            firstSelectedCol = col;
         } else {
-            secondFlippedCard = card;
-            // Let animation finish before processing the turn
-            PauseTransition pause = new PauseTransition(Duration.millis(300));
-            pause.setOnFinished(event -> {
-                boolean isMatch = game.processTurn(firstFlippedCard, secondFlippedCard);
-                checkForMatch(isMatch);
-            });
-            pause.play();
+            // Second card selected - save references locally for use in runLater
+            final Card savedFirstCard = firstSelectedCard;
+            final int savedFirstRow = firstSelectedRow;
+            final int savedFirstCol = firstSelectedCol;
+            processingMatch = true;
+            
+            // Process the turn in the game
+            boolean isMatch = game.processTurn(savedFirstCard, card);
+            
+            // If not a match, schedule the cards to be flipped back
+            if (!isMatch) {
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(1000); // Delay before flipping back
+                        javafx.application.Platform.runLater(() -> {
+                            // Use the saved references to avoid null pointer
+                            if (savedFirstCard != null && !savedFirstCard.isMatched()) {
+                                gameBoard.flipCard(savedFirstRow, savedFirstCol);
+                            }
+                            if (card != null && !card.isMatched()) {
+                                gameBoard.flipCard(row, col);
+                            }
+                            processingMatch = false;
+                        });
+                    } catch (InterruptedException e) {
+                        javafx.application.Platform.runLater(() -> processingMatch = false);
+                    }
+                }).start();
+            } else {
+                processingMatch = false;
+            }
+            
+            // Reset first selection
+            firstSelectedCard = null;
+        }
+    }
+    
+    private void updateCardImage(ImageView cardView, Card card) {
+        try {
+            // Get the appropriate image based on card state
+            String imagePath = card.isFaceUp() ? card.getImagePath() : Card.getBackImagePath();
+            
+            // Ensure path exists - use empty string check since JavaFX will throw error otherwise
+            if (imagePath == null || imagePath.trim().isEmpty()) {
+                System.err.println("Warning: Invalid image path for card");
+                return;
+            }
+            
+            // Load and set the image
+            Image image = new Image(imagePath, true); // true = load in background
+            cardView.setImage(image);
+        } catch (Exception e) {
+            System.err.println("Error loading card image: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    private void updateCardImage(Card card, ImageView imageView) {
-        String path = card.isFaceUp() ? card.getImagePath() : Card.getBackImagePath();
-        imageView.setImage(new Image(path));
-    }
-
-    private void checkForMatch(boolean isMatch) {
-        if (isMatch) {
-            handleMatch();
-        } else {
-            handleMismatch();
-        }
-        resetSelections();
-    }
-
-    private void handleMatch() {
-        animateMatch(firstFlippedCard, secondFlippedCard);
-        if (game.isGameOver()) {
-            game.endGame();
-            setChanged();
-            notifyObservers("GAME_OVER");
+    public void updateCardSizes(double width, double height) {
+        // Calculate appropriate card size based on available space
+        // Add some padding to ensure the bottom controls are visible
+        double availableHeight = height * 0.8; // Use 80% of height to leave room for controls
+        double cardSize = Math.min((width - 20) / cols, (availableHeight - 20) / rows) - 10;
+        
+        // Apply size to card views
+        for (ImageView cardView : cardViews) {
+            cardView.setFitWidth(cardSize);
+            cardView.setFitHeight(cardSize);
         }
     }
-
-    private void handleMismatch() {
-        animateMismatch(firstFlippedCard, secondFlippedCard);
-    }
-
-    private void resetSelections() {
-        firstFlippedCard = null;
-        secondFlippedCard = null;
-    }
-
-    private void animateMatch(Card card1, Card card2) {
-        FadeTransition ft = new FadeTransition(Duration.millis(500), cardViews.get(card1));
-        ft.setFromValue(1.0);
-        ft.setToValue(0.3);
-        ft.setCycleCount(2);
-        ft.setAutoReverse(true);
-        ft.play();
-
-        ft = new FadeTransition(Duration.millis(500), cardViews.get(card2));
-        ft.setFromValue(1.0);
-        ft.setToValue(0.3);
-        ft.setCycleCount(2);
-        ft.setAutoReverse(true);
-        ft.play();
-    }
-
-    private void animateMismatch(Card card1, Card card2) {
-        PauseTransition pause = new PauseTransition(Duration.seconds(1));
-        pause.setOnFinished(event -> Platform.runLater(() -> {
-            card1.flip();
-            card2.flip();
-            updateCardImage(card1, cardViews.get(card1));
-            updateCardImage(card2, cardViews.get(card2));
-        }));
-        pause.play();
-    }
-
+    
     public void resetCards() {
-        // Reset UI state
-        for (Card card : cardViews.keySet()) {
-            updateCardImage(card, cardViews.get(card));
+        firstSelectedCard = null;
+        processingMatch = false;
+        
+        // Reset all card images to show backs
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                Card card = gameBoard.getCard(row, col);
+                if (card != null) {
+                    int index = row * cols + col;
+                    if (index < cardViews.size()) {
+                        updateCardImage(cardViews.get(index), card);
+                    }
+                }
+            }
         }
-        resetSelections();
+    }
+    
+    public GridPane getComponent() {
+        return cardGrid;
+    }
+    
+    @Override
+    public void update(Observable observable, Object arg) {
+        if (!(observable instanceof Card)) return;
+        
+        Card card = (Card) observable;
+        
+        // Find which index this card is at
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                if (gameBoard.getCard(row, col) == card) {
+                    int index = row * cols + col;
+                    if (index < cardViews.size()) {
+                        // Update the card view on the JavaFX thread
+                        javafx.application.Platform.runLater(() -> 
+                            updateCardImage(cardViews.get(index), card)
+                        );
+                    }
+                    break;
+                }
+            }
+        }
     }
 }

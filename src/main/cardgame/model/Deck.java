@@ -67,6 +67,7 @@ public class Deck extends Observable{
             int imageNumber = ((i - 1) % 32) + 1;
             String imagePath = "file:src/main/resources/images/card" + imageNumber + ".png";
 
+            // Create two cards with the same image path (they form a pair)
             deck.addCard(new Card(uniqueId++, imagePath));
             deck.addCard(new Card(uniqueId++, imagePath));
         }
@@ -94,6 +95,23 @@ public class Deck extends Observable{
         Deck deck = createDeck(pairs);
         deck.shuffle();
         return deck;
+    }
+
+    /**
+     * Find cards that match a given card (share the same image)
+     * @param card the card to find matches for
+     * @return list of cards with the same image path
+     */
+    public List<Card> findMatchingCards(Card card) {
+        if (card == null) return Collections.emptyList();
+        
+        List<Card> matches = new ArrayList<>();
+        for (Card c : cards) {
+            if (c != card && card.matches(c)) {
+                matches.add(c);
+            }
+        }
+        return matches;
     }
 
     /**
