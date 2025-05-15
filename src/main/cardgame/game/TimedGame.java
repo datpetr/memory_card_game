@@ -2,20 +2,37 @@ package main.cardgame.game;
 
 import main.cardgame.model.GameBoard;
 import main.cardgame.model.Player;
-import main.cardgame.util.Timer;
+import main.cardgame.model.Card;
+
 
 public class TimedGame extends Game {
     public static final int EASY_TIME = 5 * 60;   // 5 minutes
     public static final int MEDIUM_TIME = 3 * 60; // 3 minutes
-    public static final int HARD_TIME = 60;
+    public static final int HARD_TIME = 60; // 1 minute
 
     private boolean isStopped;
-    private Timer timer;// 1 minute
 
     public TimedGame(GameBoard board, Player player, int countdownSeconds) {
-        super(board, player); // Pass GameBoard and playerName to the Game constructor
-        this.timer = new Timer(countdownSeconds);
-        this.isStopped = false;// Initialize the timer
+        super(board, player, countdownSeconds); // Pass GameBoard and playerName to the Game constructor
+    }
+
+
+    @Override
+    public boolean isGameOver() {
+        return !isActive() || getBoard().allCardsMatched() || getTimer().isTimeUp();
+    }
+
+    @Override
+    public void endGame() {
+        super.endGame();
+
+        // Only add the time bonus if game was won (not timed out)
+        if (!getTimer().isTimeUp()) {
+            int remainingSeconds = (int) getTimer().getRemainingTime() / 1000;
+            getPlayer().incrementScore(remainingSeconds / 2);
+        }
+
+        super.endGame();
     }
 
     public void startTimer() {
@@ -24,20 +41,34 @@ public class TimedGame extends Game {
 
     public void stopGame() {
         this.isStopped = true;
+
     }
+    // creating the bonus points for remaining time
 
     @Override
-    public boolean isGameOver() {
-        if (isStopped) {
-            return true; // Game ends if stopped by the player
+    public boolean processTurn(Card card1, Card card2) {
+        boolean result = super.processTurn(card1, card2);
+
+        // Add time-based bonus points for matches
+        if (result) {
+            // Calculate bonus based on time pressure - more points when less time remains
+            long maxTime = getTimer().getMaxTime();
+            long remainingTime = getTimer().getRemainingTime();
+            double timeRatio = (double)remainingTime / maxTime;
+
+            // Time pressure bonus: higher points when less time remains
+            int timePressureBonus = (int)(8 * (1 - timeRatio));
+
+            // Award bonus points (minimum of 2)
+            int bonus = Math.max(timePressureBonus, 2);
+            getPlayer().incrementScore(bonus);
+
+            // Notify observers about bonus points
+            setChanged();
+            notifyObservers("BONUS_POINTS_ADDED");
         }
-        if (timer.isTimeUp()) {
-            return true; // Game ends when the timer is up
-        }
-        if (getBoard().allCardsMatched()) {
-            return true; // Game ends when all cards are matched
-        }
-        return false;
+
+        return result;
     }
 }
 

@@ -1,12 +1,13 @@
 package main.cardgame.model;
 
-public class Card implements CardBehavior{
+import java.util.Observable;
+
+public class Card extends Observable implements CardBehavior{
     private int id;
     private String imagePath;
     private boolean isMatched;
     private boolean isFaceUp;
     private static String backImagePath;
-
 
     public Card(int id, String imagePath) {
         this.id = id;
@@ -25,39 +26,67 @@ public class Card implements CardBehavior{
 
     public String getImagePath() {
         return imagePath;
-        // will be added more code later
     }
 
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
+
+        setChanged();
+        notifyObservers("IMAGE_CHANGED");
     }
 
 
     public boolean isMatched() {
         return isMatched;
-        // will be added more code later
     }
 
     public void setMatched(boolean matched) {
-        isMatched = matched;
-        // will be added more code later
+        boolean oldValue = this.isMatched;
+        this.isMatched = matched;
+
+        if (oldValue != this.isMatched) {
+            setChanged();
+            notifyObservers("MATCHED_STATUS_CHANGED");
+        }
     }
 
     public boolean isFaceUp() {
         return isFaceUp;
-        // will be added more code later
     }
 
     public void flip() {
-        isFaceUp = !isFaceUp;
-        // will be added more code later
+        this.isFaceUp = !this.isFaceUp;
+
+        setChanged();
+        notifyObservers("CARD_FLIPPED");
     }
 
     public int getId() {
         return id;
-        // will be added more code later
     }
 
-    // Set the back image path for all cards
-       static{Card.setBackImagePath("file:src/main/resources/images/back2.jpg");}
+    /**
+     * Gets the current display image path based on card state
+     * @return path to image that should be displayed
+     */
+    public String getCurrentImagePath() {
+        return isFaceUp ? imagePath : backImagePath;
+    }
+
+    /**
+     * Resets the card to its initial state (face down, not matched)
+     */
+    public void reset() {
+        if (isFaceUp) {
+            isFaceUp = false;
+        }
+        if (isMatched) {
+            isMatched = false;
+        }
+        setChanged();
+        notifyObservers("CARD_RESET");
+    }
+
+    // Set the back image path for all cards (will be changed later)
+    static{Card.setBackImagePath("file:src/main/resources/images/back2.jpg");}
 }
