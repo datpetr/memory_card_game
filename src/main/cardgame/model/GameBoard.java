@@ -127,6 +127,7 @@ public class GameBoard extends Observable {
         notifyObservers("BOARD_RESET");
     }
 
+
     public int getMatchedPairsCount() {
         return matchedPairsCount;
     }
