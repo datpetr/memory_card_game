@@ -83,64 +83,133 @@ public class CardUI extends Observable {
         }
     }
 
-    public void updateCardSizes(double sceneWidth, double sceneHeight) {
-        // Reserve space for top and bottom panels
-        double topPanelHeight = sceneHeight * 0.1;     // 10% for score/timer
-        double bottomPanelHeight = sceneHeight * 0.08; // 8% for control panel
+//    public void updateCardSizes(double sceneWidth, double sceneHeight) {
+//        // Reserve space for top and bottom panels
+//        double topPanelHeight = sceneHeight * 0.1;     // 10% for score/timer
+//        double bottomPanelHeight = sceneHeight * 0.08; // 8% for control panel
+//
+//        // Calculate available space for card grid with margins
+//        double horizontalMargin = sceneWidth * 0.03;   // 3% margin on each side
+//        double verticalMargin = sceneHeight * 0.03;    // 3% margin on each side
+//
+//        double availableWidth = sceneWidth - (2 * horizontalMargin);
+//        double availableHeight = sceneHeight - topPanelHeight - bottomPanelHeight - (2 * verticalMargin);
+//
+//        // Calculate optimal spacing between cards (dynamically adjusted)
+//        double spacing = Math.min(availableWidth, availableHeight) * 0.02;
+//        gridPane.setHgap(spacing);
+//        gridPane.setVgap(spacing);
+//
+//        // Calculate maximum possible card dimensions
+//        double maxCardWidth = (availableWidth - ((cols - 1) * spacing)) / cols;
+//        double maxCardHeight = (availableHeight - ((rows - 1) * spacing)) / rows;
+//
+//        // Maintain card aspect ratio (standard playing cards use ~1.4-1.5 ratio)
+//        double aspectRatio = 0.75;
+//
+//        // Calculate optimal size to fit within constraints while maintaining aspect ratio
+//        double cardWidth, cardHeight;
+//        if (maxCardWidth / maxCardHeight > aspectRatio) {
+//            // Height is the limiting factor
+//            cardHeight = maxCardHeight;
+//            cardWidth = cardHeight / aspectRatio;
+//        } else {
+//            // Width is the limiting factor
+//            cardWidth = maxCardWidth;
+//            cardHeight = cardWidth * aspectRatio;
+//        }
+//
+//        // Set padding on grid pane to center it
+//        double leftRightPadding = (sceneWidth - (cols * cardWidth) - ((cols - 1) * spacing)) / 2;
+//        double topBottomPadding = (availableHeight - (rows * cardHeight) - ((rows - 1) * spacing)) / 2;
+//        gridPane.setPadding(new Insets(
+//                topBottomPadding + verticalMargin,
+//                leftRightPadding,
+//                topBottomPadding,
+//                leftRightPadding
+//        ));
+//
+//        // Update all card sizes
+//        cardViews.forEach((card, imageView) -> {
+//            imageView.setFitWidth(cardWidth);
+//            imageView.setFitHeight(cardHeight);
+//
+//            // Update parent button size
+//            Button button = (Button) imageView.getParent();
+//            if (button != null) {
+//                button.setPrefSize(cardWidth, cardHeight);
+//            }
+//        });
+//    }
+public void updateCardSizes(double sceneWidth, double sceneHeight) {
+    // Reserve space for top and bottom panels with more precise allocation
+    double topPanelHeight = sceneHeight * 0.12;    // 12% for score/timer panel
+    double bottomPanelHeight = sceneHeight * 0.08; // 8% for control panel
 
-        // Calculate available space for card grid with margins
-        double horizontalMargin = sceneWidth * 0.03;   // 3% margin on each side
-        double verticalMargin = sceneHeight * 0.03;    // 3% margin on each side
+    // Calculate available space with appropriate margins
+    double horizontalMargin = sceneWidth * 0.03;   // 3% margin on each side
+    double verticalMargin = sceneHeight * 0.02;    // 2% margin on top and bottom
 
-        double availableWidth = sceneWidth - (2 * horizontalMargin);
-        double availableHeight = sceneHeight - topPanelHeight - bottomPanelHeight - (2 * verticalMargin);
+    double availableWidth = sceneWidth - (2 * horizontalMargin);
+    double availableHeight = sceneHeight - topPanelHeight - bottomPanelHeight - (2 * verticalMargin);
 
-        // Calculate optimal spacing between cards (dynamically adjusted)
-        double spacing = Math.min(availableWidth, availableHeight) * 0.02;
-        gridPane.setHgap(spacing);
-        gridPane.setVgap(spacing);
+    // Dynamic spacing based on grid size
+    double spacing = Math.min(availableWidth / (cols * 10), availableHeight / (rows * 10));
+    gridPane.setHgap(spacing);
+    gridPane.setVgap(spacing);
 
-        // Calculate maximum possible card dimensions
-        double maxCardWidth = (availableWidth - ((cols - 1) * spacing)) / cols;
-        double maxCardHeight = (availableHeight - ((rows - 1) * spacing)) / rows;
+    // Calculate maximum possible card dimensions
+    double maxCardWidth = (availableWidth - ((cols - 1) * spacing)) / cols;
+    double maxCardHeight = (availableHeight - ((rows - 1) * spacing)) / rows;
 
-        // Maintain card aspect ratio (standard playing cards use ~1.4-1.5 ratio)
-        double aspectRatio = 0.75;
+    // Prioritize vertical fitting with a good playing card aspect ratio (2.5:3.5)
+    double aspectRatio = 2.5/3.5; // approximately 0.71
 
-        // Calculate optimal size to fit within constraints while maintaining aspect ratio
-        double cardWidth, cardHeight;
-        if (maxCardWidth / maxCardHeight > aspectRatio) {
-            // Height is the limiting factor
-            cardHeight = maxCardHeight;
-            cardWidth = cardHeight / aspectRatio;
-        } else {
-            // Width is the limiting factor
-            cardWidth = maxCardWidth;
-            cardHeight = cardWidth * aspectRatio;
-        }
+    // Calculate optimal card size, prioritizing vertical fit
+    double cardWidth, cardHeight;
 
-        // Set padding on grid pane to center it
-        double leftRightPadding = (sceneWidth - (cols * cardWidth) - ((cols - 1) * spacing)) / 2;
-        double topBottomPadding = (availableHeight - (rows * cardHeight) - ((rows - 1) * spacing)) / 2;
-        gridPane.setPadding(new Insets(
-                topBottomPadding + verticalMargin,
-                leftRightPadding,
-                topBottomPadding,
-                leftRightPadding
-        ));
+    // Always prioritize height to ensure vertical fit
+    cardHeight = maxCardHeight;
+    cardWidth = cardHeight * aspectRatio;
 
-        // Update all card sizes
-        cardViews.forEach((card, imageView) -> {
-            imageView.setFitWidth(cardWidth);
-            imageView.setFitHeight(cardHeight);
-
-            // Update parent button size
-            Button button = (Button) imageView.getParent();
-            if (button != null) {
-                button.setPrefSize(cardWidth, cardHeight);
-            }
-        });
+    // If cards would be too wide, recalculate based on width
+    if (cardWidth > maxCardWidth) {
+        cardWidth = maxCardWidth;
+        cardHeight = cardWidth / aspectRatio;
     }
+
+    // Apply a small reduction factor to ensure cards don't touch the edges
+    cardWidth *= 0.98;
+    cardHeight *= 0.98;
+
+    // Center the grid in the available space
+    double leftRightPadding = (sceneWidth - (cols * cardWidth) - ((cols - 1) * spacing)) / 2;
+    double topBottomPadding = (availableHeight - (rows * cardHeight) - ((rows - 1) * spacing)) / 2;
+
+    gridPane.setPadding(new Insets(
+            topBottomPadding + verticalMargin + topPanelHeight * 0.1, // Add extra space at top
+            leftRightPadding,
+            topBottomPadding,
+            leftRightPadding
+    ));
+
+    // Update all card sizes
+    double finalCardWidth = cardWidth;
+    double finalCardHeight = cardHeight;
+    cardViews.forEach((card, imageView) -> {
+        imageView.setFitWidth(finalCardWidth);
+        imageView.setFitHeight(finalCardHeight);
+        imageView.setPreserveRatio(true);
+
+        // Update parent button size
+        Button button = (Button) imageView.getParent();
+        if (button != null) {
+            button.setPrefSize(finalCardWidth, finalCardHeight);
+            // Set minimum size to prevent cards from becoming too small
+            button.setMinSize(finalCardWidth * 0.6, finalCardHeight * 0.6);
+        }
+    });
+}
 
     private Button createCardButton(Card card, double cardWidth, double cardHeight) {
         Button cardButton = new Button();
