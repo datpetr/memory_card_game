@@ -109,6 +109,7 @@ public class Deck extends Observable{
         notifyObservers("DECK_RESET");
     }
 
+
     /**
      * Get Number of cards in the deck
      */

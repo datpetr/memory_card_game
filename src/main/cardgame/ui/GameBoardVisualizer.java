@@ -46,6 +46,7 @@ public class GameBoardVisualizer extends Application implements Observer {
         // Set up game components
         int requiredPairs = (boardRows * boardCols) / 2;
         Deck deck = new Deck().createDeck(requiredPairs);
+        deck.shuffle();
         this.board = new GameBoard(difficulty, deck.getCards());
         Player player = new Player("Player1");
         player.addObserver(this);
