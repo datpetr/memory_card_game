@@ -1,4 +1,4 @@
-package main.cardgame.model;
+package main.cardgame.ui;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.geometry.Pos;
