@@ -396,6 +396,9 @@ public class GameBoardVisualizer2 extends Application implements Observer {
     private Button pauseButton;
     private Button restartButton;
     private Timeline timerUpdateTimeline;
+    private String currentMode;
+    private String currentDifficulty;
+    private Button mainMenuButton;
 
     @Override
     public void start(Stage primaryStage) {
@@ -444,6 +447,8 @@ public class GameBoardVisualizer2 extends Application implements Observer {
     }
 
     private void startGameWithSettings(Stage primaryStage, String mode, String difficulty) {
+        this.currentMode = mode;
+        this.currentDifficulty = difficulty;
         // Set board dimensions based on difficulty
         switch (difficulty) {
             case "easy":
@@ -541,14 +546,28 @@ public class GameBoardVisualizer2 extends Application implements Observer {
 
         restartButton = new Button("Restart");
         restartButton.setStyle("-fx-font-size: 14px;");
-        restartButton.setOnAction(e -> restartGame());
+        restartButton.setOnAction(e -> {
+            if (showConfirmationDialog("Are you sure you want to restart the game?")) {
+                restartGame();
+            }
+        });
+
+        mainMenuButton = new Button("Main Menu");
+        mainMenuButton.setStyle("-fx-font-size: 14px;");
+        mainMenuButton.setOnAction(e -> {
+            if (showConfirmationDialog("Are you sure you want to return to the main menu?")) {
+                stopTimerUpdates();
+                setupSelectionScreen((Stage) mainMenuButton.getScene().getWindow());
+            }
+        });
+
 
         // Create layout for stats
         HBox statsBox = new HBox(20, scoreLabel, moveLabel, timeLabel);
         statsBox.setAlignment(Pos.CENTER_LEFT);
 
         // Create layout for buttons
-        HBox buttonsBox = new HBox(10, pauseButton, restartButton);
+        HBox buttonsBox = new HBox(10, pauseButton, restartButton, mainMenuButton);
         buttonsBox.setAlignment(Pos.CENTER_RIGHT);
 
         // Combine stats and buttons
@@ -686,6 +705,7 @@ public class GameBoardVisualizer2 extends Application implements Observer {
         ft.play();
     }
 
+
     private void animateMismatch(Card card1, Card card2) {
         PauseTransition pause = new PauseTransition(Duration.seconds(1));
         pause.setOnFinished(event -> Platform.runLater(() -> {
@@ -776,30 +796,41 @@ public class GameBoardVisualizer2 extends Application implements Observer {
     }
 
     private void togglePauseGame() {
-        if (game.isActive()) {
+        if (game.isActive() && !game.isPaused()) {
             game.pauseGame();
             pauseButton.setText("Resume");
-        } else {
+            stopTimerUpdates();
+        } else if (game.isActive() && game.isPaused()) {
             game.resumeGame();
             pauseButton.setText("Pause");
+            startTimerUpdates();
         }
     }
 
+    private boolean showConfirmationDialog(String message) {
+        // I think asking for confirmation when pressed restart and main menu buttons is a good idea
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, message, javafx.scene.control.ButtonType.YES, javafx.scene.control.ButtonType.NO);
+        alert.setTitle("Confirmation");
+        alert.setHeaderText(null);
+        alert.getDialogPane().lookupButton(javafx.scene.control.ButtonType.NO).requestFocus();
+        alert.getDialogPane().setStyle(
+                "-fx-background-color: linear-gradient(to bottom, #f0f8ff, #87cefa); " +
+                        "-fx-border-color: #4682b4; " +
+                        "-fx-border-width: 2; " +
+                        "-fx-border-radius: 10; " +
+                        "-fx-background-radius: 10;"
+        );
+        return alert.showAndWait().orElse(javafx.scene.control.ButtonType.NO) == javafx.scene.control.ButtonType.YES;
+    }
     private void restartGame() {
         stopTimerUpdates();
-        game.resetGame();
-
-        // Reset UI state
-        for (Card card : cardViews.keySet()) {
-            updateCardImage(card, cardViews.get(card));
-        }
-
-        pauseButton.setText("Pause");
-        firstFlippedCard = null;
-        secondFlippedCard = null;
-
-        // Restart timer updates
-        startTimerUpdates();
+        // Re-initialize everything as if starting fresh
+        Stage stage = (Stage) restartButton.getScene().getWindow();
+        startGameWithSettings(stage, currentMode, currentDifficulty);
+    }
+    private void returnToMainMenu(Stage primaryStage) {
+        stopTimerUpdates();
+        setupSelectionScreen(primaryStage);
     }
 
     @Override
