@@ -2,14 +2,14 @@ package main.cardgame.model;
 
 import java.util.List;
 import java.util.Observable;
+import java.util.Observer;
 
 public class GameBoard extends Observable {
     private Card[][] board;
     private int size;
     private int matchedPairsCount = 0;
     private final int totalPairs;
-
-
+    private Observer mainObserver; // Track the main observer for the board
 
     public GameBoard(String level, List<Card> cards) {
         this.size = determineSize(level);
@@ -18,7 +18,6 @@ public class GameBoard extends Observable {
 
         initializeBoard(cards);
     }
-
 
     private int determineSize(String level) {
         switch (level.toLowerCase()) {
@@ -127,7 +126,6 @@ public class GameBoard extends Observable {
         notifyObservers("BOARD_RESET");
     }
 
-
     public int getMatchedPairsCount() {
         return matchedPairsCount;
     }
@@ -135,5 +133,15 @@ public class GameBoard extends Observable {
     public int getGridSize() {
         return size;
     }
-
+    
+    // Store the observer for retrieval later
+    @Override
+    public synchronized void addObserver(Observer o) {
+        super.addObserver(o);
+        this.mainObserver = o;
+    }
+    
+    public Observer getObserver() {
+        return mainObserver;
+    }
 }
