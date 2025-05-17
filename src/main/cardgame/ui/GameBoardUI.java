@@ -108,6 +108,10 @@ public class GameBoardUI extends Application implements Observer {
         // Create deck and board (preserved logic)
         Deck deck = Deck.createDeckForLevel(difficulty);
         this.board = new GameBoard(difficulty, deck.getCards());
+        
+        // Register this UI as an observer to the game board
+        this.board.addObserver(this);
+        
         Player player = new Player("Player1");
 
         // Register as observer for player
@@ -196,7 +200,30 @@ public class GameBoardUI extends Application implements Observer {
      * Restarts the game with current settings
      */
     public void restartGame(Stage stage) {
-        statusPanel.stopTimerUpdates();
+        // Proper cleanup before restart
+        if (statusPanel != null) {
+            statusPanel.stopTimerUpdates();
+        }
+        
+        // Remove observers from old components
+        if (game != null && game.getTimer() instanceof Observable) {
+            ((Observable) game.getTimer()).deleteObserver(this);
+        }
+        
+        if (game != null && game.getPlayer() != null) {
+            game.getPlayer().deleteObserver(this);
+        }
+        
+        if (board != null) {
+            board.deleteObserver(this);
+        }
+        
+        // End the current game
+        if (game != null) {
+            game.endGame();
+        }
+        
+        // Start a new game with the same settings
         startGameWithSettings(stage, currentMode, currentDifficulty);
     }
 
