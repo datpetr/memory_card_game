@@ -38,7 +38,7 @@ public class GameBoardUI extends Application implements Observer {
     private GameBoard board;
     private String currentMode;
     private String currentDifficulty;
-    
+
     // Organized UI components
     private WelcomePanel welcomePanel;
     private ModeSelectionPanel modeSelectionPanel;
@@ -83,7 +83,7 @@ public class GameBoardUI extends Application implements Observer {
     public void startGameWithSettings(Stage primaryStage, String mode, String difficulty) {
         this.currentMode = mode;
         this.currentDifficulty = difficulty;
-        
+
         // Set board dimensions based on difficulty (preserved logic)
         switch (difficulty) {
             case "easy":
@@ -147,20 +147,30 @@ public class GameBoardUI extends Application implements Observer {
         mainLayout.setPadding(new Insets(PADDING));
         mainLayout.setStyle("-fx-background-color: linear-gradient(to bottom, #f0f8ff, #e6e6fa);");
 
-        // Create status panel for score, moves, and time
-        statusPanel = new GameStatusPanel(this.game);
-        controlPanel = new ControlPanel(this, primaryStage, game);
+        // Create components in correct order
+        // First create CardRenderer so it can be referenced by others
+        cardRenderer = new CardRenderer(this, game, board, BOARD_ROWS, BOARD_COLS, CARD_ASPECT_RATIO, GAP);
         
+        // Then create status panel
+        statusPanel = new GameStatusPanel(this.game);
+        
+        // Then create control panel with references to both
+        controlPanel = new ControlPanel(primaryStage, game);
+        
+        // Set component references explicitly (not through constructor)
+        controlPanel.setGameBoard(this);
+        controlPanel.setCardRenderer(cardRenderer);
+        controlPanel.setStatusPanel(statusPanel);
+
         // Combine status panel and control panel (identical to original)
         HBox statusBar = new HBox();
         statusBar.setPadding(new Insets(0, 0, 10, 0));
         statusBar.getChildren().addAll(statusPanel.getContainer(), controlPanel.getContainer());
         HBox.setHgrow(statusPanel.getContainer(), javafx.scene.layout.Priority.ALWAYS);
-        
+
         mainLayout.setTop(statusBar);
 
         // Create the game board
-        cardRenderer = new CardRenderer(this, game, board, BOARD_ROWS, BOARD_COLS, CARD_ASPECT_RATIO, GAP);
         boardCanvas = new BoardCanvas(board, cardRenderer.getGridPane());
 
         // Setup pause overlay (identical to original)
@@ -206,17 +216,17 @@ public class GameBoardUI extends Application implements Observer {
         Platform.runLater(() -> {
             // Handle updates from all observable objects
             // We delegate the updates to appropriate components
-            
+
             // Handle player updates
             if (observable instanceof Player && statusPanel != null) {
                 statusPanel.updatePlayerStats((Player)observable);
             }
-            
+
             // Handle card updates
             else if (observable instanceof Card && arg instanceof String && cardRenderer != null) {
                 cardRenderer.handleCardUpdate((Card)observable);
             }
-            
+
             // Handle timer updates
             else if (observable == game.getTimer() && "TIMER_STOPPED".equals(arg) && statusPanel != null) {
                 statusPanel.updateTimerDisplay();
