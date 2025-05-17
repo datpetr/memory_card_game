@@ -376,6 +376,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import javafx.scene.layout.StackPane;
 
 public class GameBoardVisualizer2 extends Application implements Observer {
     private static int BOARD_ROWS = 4;
@@ -399,43 +400,34 @@ public class GameBoardVisualizer2 extends Application implements Observer {
     private String currentMode;
     private String currentDifficulty;
     private Button mainMenuButton;
+    private Label gamePausedLabel;
+    private final Map<Card, Button> cardButtons = new HashMap<>();
 
     @Override
     public void start(Stage primaryStage) {
-        setupSelectionScreen(primaryStage);
+        setupWelcomeScreen(primaryStage);
     }
 
-    private void setupSelectionScreen(Stage primaryStage) {
+    // new welcome screen
+
+    private void setupWelcomeScreen(Stage primaryStage) {
         Label titleLabel = new Label("Memory Card Game");
-        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+        titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #4682b4;");
 
-        // Game mode selection
-        Label modeLabel = new Label("Select Game Mode:");
-        modeLabel.setStyle("-fx-font-size: 16px;");
+        Button playButton = new Button("Play");
+        playButton.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-background-color: #32cd32; -fx-text-fill: white; -fx-background-radius: 10;");
+        playButton.setPrefSize(180, 60);
+        addButtonHoverEffect(playButton);
 
-        ComboBox<String> modeComboBox = new ComboBox<>();
-        modeComboBox.getItems().addAll("Endless Mode", "Timed Mode");
-        modeComboBox.setValue("Endless Mode");
+        Button exitButton = new Button("Exit");
+        exitButton.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-background-color: #b22222; -fx-text-fill: white; -fx-background-radius: 10;");
+        exitButton.setPrefSize(180, 60);
+        addButtonHoverEffect(exitButton);
 
-        // Difficulty selection
-        Label difficultyLabel = new Label("Select Difficulty:");
-        difficultyLabel.setStyle("-fx-font-size: 16px;");
+        playButton.setOnAction(e -> setupModeSelectionScreen(primaryStage));
+        exitButton.setOnAction(e -> Platform.exit());
 
-        ComboBox<String> difficultyComboBox = new ComboBox<>();
-        difficultyComboBox.getItems().addAll("Easy", "Medium", "Hard");
-        difficultyComboBox.setValue("Easy");
-
-        Button startButton = new Button("Start Game");
-        startButton.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-background-color: #32cd32; -fx-text-fill: white; -fx-background-radius: 10;");
-        startButton.setPrefSize(150, 50);
-
-        startButton.setOnAction(e -> {
-            String mode = modeComboBox.getValue();
-            String difficulty = difficultyComboBox.getValue().toLowerCase();
-            startGameWithSettings(primaryStage, mode, difficulty);
-        });
-
-        VBox vbox = new VBox(20, titleLabel, modeLabel, modeComboBox, difficultyLabel, difficultyComboBox, startButton);
+        VBox vbox = new VBox(30, titleLabel, playButton, exitButton);
         vbox.setAlignment(Pos.CENTER);
         vbox.setPadding(new Insets(PADDING));
         vbox.setStyle("-fx-background-color: linear-gradient(to bottom, #f0f8ff, #87cefa);");
@@ -445,6 +437,84 @@ public class GameBoardVisualizer2 extends Application implements Observer {
         primaryStage.setTitle("Memory Card Game");
         primaryStage.show();
     }
+
+    // mode selection at the start
+    private void setupModeSelectionScreen(Stage primaryStage) {
+        Label modeLabel = new Label("Select Game Mode");
+        modeLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #4682b4;");
+
+        Button endlessButton = new Button("Endless Mode");
+        endlessButton.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-background-color: #4682b4; -fx-text-fill: white; -fx-background-radius: 10;");
+        endlessButton.setPrefSize(180, 60);
+        addButtonHoverEffect(endlessButton);
+
+        Button timedButton = new Button("Timed Mode");
+        timedButton.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-background-color: #4682b4; -fx-text-fill: white; -fx-background-radius: 10;");
+        timedButton.setPrefSize(180, 60);
+        addButtonHoverEffect(timedButton);
+
+        Button backButton = new Button("Back");
+        backButton.setStyle("-fx-font-size: 16px; -fx-background-color: #b22222; -fx-text-fill: white; -fx-background-radius: 10;");
+        backButton.setPrefSize(120, 40);
+        addButtonHoverEffect(backButton);
+
+        endlessButton.setOnAction(e -> setupDifficultySelectionScreen(primaryStage, "Endless Mode"));
+        timedButton.setOnAction(e -> setupDifficultySelectionScreen(primaryStage, "Timed Mode"));
+        backButton.setOnAction(e -> setupWelcomeScreen(primaryStage));
+
+        VBox vbox = new VBox(25, modeLabel, endlessButton, timedButton, backButton);
+        vbox.setAlignment(Pos.CENTER);
+        vbox.setPadding(new Insets(PADDING));
+        vbox.setStyle("-fx-background-color: linear-gradient(to bottom, #f0f8ff, #87cefa);");
+
+        Scene scene = new Scene(vbox, 400, 350);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Select Game Mode");
+        primaryStage.show();
+    }
+
+    // diff choosing at the start
+    private void setupDifficultySelectionScreen(Stage primaryStage, String mode) {
+        Label difficultyLabel = new Label("Select Difficulty");
+        difficultyLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #4682b4;");
+
+        Button easyButton = new Button("Easy");
+        easyButton.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-background-color: #4682b4; -fx-text-fill: white; -fx-background-radius: 10;");
+        easyButton.setPrefSize(180, 60);
+        addButtonHoverEffect(easyButton);
+
+        Button mediumButton = new Button("Medium");
+        mediumButton.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-background-color: #4682b4; -fx-text-fill: white; -fx-background-radius: 10;");
+        mediumButton.setPrefSize(180, 60);
+        addButtonHoverEffect(mediumButton);
+
+        Button hardButton = new Button("Hard");
+        hardButton.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-background-color: #4682b4; -fx-text-fill: white; -fx-background-radius: 10;");
+        hardButton.setPrefSize(180, 60);
+        addButtonHoverEffect(hardButton);
+
+        Button backButton = new Button("Back");
+        backButton.setStyle("-fx-font-size: 16px; -fx-background-color: #b22222; -fx-text-fill: white; -fx-background-radius: 10;");
+        backButton.setPrefSize(120, 40);
+        addButtonHoverEffect(backButton);
+
+        easyButton.setOnAction(e -> startGameWithSettings(primaryStage, mode, "easy"));
+        mediumButton.setOnAction(e -> startGameWithSettings(primaryStage, mode, "medium"));
+        hardButton.setOnAction(e -> startGameWithSettings(primaryStage, mode, "hard"));
+        backButton.setOnAction(e -> setupModeSelectionScreen(primaryStage));
+
+        VBox vbox = new VBox(25, difficultyLabel, easyButton, mediumButton, hardButton, backButton);
+        vbox.setAlignment(Pos.CENTER);
+        vbox.setPadding(new Insets(PADDING));
+        vbox.setStyle("-fx-background-color: linear-gradient(to bottom, #f0f8ff, #87cefa);");
+
+        Scene scene = new Scene(vbox, 400, 400);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Select Difficulty");
+        primaryStage.show();
+    }
+
+
 
     private void startGameWithSettings(Stage primaryStage, String mode, String difficulty) {
         this.currentMode = mode;
@@ -513,6 +583,18 @@ public class GameBoardVisualizer2 extends Application implements Observer {
         // Create the game board
         createGameBoard(mainLayout);
 
+        gamePausedLabel = new Label("Game Paused");
+        gamePausedLabel.setStyle(
+                "-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: #ffffff; " +
+                        "-fx-background-color: rgba(70,130,180,0.8); -fx-padding: 30px; -fx-background-radius: 15;"
+        );
+        gamePausedLabel.setVisible(false);
+        gamePausedLabel.setAlignment(Pos.CENTER);
+
+        // Overlay the label on top of the board using a StackPane
+        StackPane centerPane = new StackPane(gridPane, gamePausedLabel);
+        mainLayout.setCenter(centerPane);
+
         // Create the scene
         Screen screen = Screen.getPrimary();
         double maxWidth = screen.getVisualBounds().getWidth() * 0.9;
@@ -529,54 +611,71 @@ public class GameBoardVisualizer2 extends Application implements Observer {
     }
 
     private void createStatusPanel(BorderPane mainLayout, String mode) {
-        // Create labels for player stats
-        scoreLabel = new Label("Score: 0");
-        scoreLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+            // Create labels for player stats
+            scoreLabel = new Label("Score: 0");
+            scoreLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
-        moveLabel = new Label("Moves: 0");
-        moveLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+            moveLabel = new Label("Moves: 0");
+            moveLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
-        timeLabel = new Label(mode.equals("Timed Mode") ? "Time Left: 00:00" : "Time: 00:00");
-        timeLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+            timeLabel = new Label(mode.equals("Timed Mode") ? "Time Left: 00:00" : "Time: 00:00");
+            timeLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
-        // Create game control buttons
-        pauseButton = new Button("Pause");
-        pauseButton.setStyle("-fx-font-size: 14px;");
-        pauseButton.setOnAction(e -> togglePauseGame());
+            // Create game control buttons
+            pauseButton = new Button("Pause");
+            pauseButton.setStyle(
+                    "-fx-font-size: 16px; -fx-font-weight: bold; " +
+                            "-fx-background-color: #4682b4; -fx-text-fill: white; -fx-background-radius: 10;"
+            );
+            pauseButton.setPrefSize(120, 40);
+            addButtonHoverEffect(pauseButton);
 
-        restartButton = new Button("Restart");
-        restartButton.setStyle("-fx-font-size: 14px;");
-        restartButton.setOnAction(e -> {
-            if (showConfirmationDialog("Are you sure you want to restart the game?")) {
-                restartGame();
-            }
-        });
-
-        mainMenuButton = new Button("Main Menu");
-        mainMenuButton.setStyle("-fx-font-size: 14px;");
-        mainMenuButton.setOnAction(e -> {
-            if (showConfirmationDialog("Are you sure you want to return to the main menu?")) {
-                stopTimerUpdates();
-                setupSelectionScreen((Stage) mainMenuButton.getScene().getWindow());
-            }
-        });
+            pauseButton.setOnAction(e -> togglePauseGame());
 
 
-        // Create layout for stats
-        HBox statsBox = new HBox(20, scoreLabel, moveLabel, timeLabel);
-        statsBox.setAlignment(Pos.CENTER_LEFT);
+            restartButton = new Button("Restart");
+            restartButton.setStyle(
+                "-fx-font-size: 16px; -fx-font-weight: bold; " +
+                        "-fx-background-color: #4682b4; -fx-text-fill: white; -fx-background-radius: 10;"
+            );
+            restartButton.setPrefSize(120, 40);
+            addButtonHoverEffect(restartButton);
+            restartButton.setOnAction(e -> {
+                if (showConfirmationDialog("Are you sure you want to restart the game?")) {
+                    restartGame();
+                }
+            });
 
-        // Create layout for buttons
-        HBox buttonsBox = new HBox(10, pauseButton, restartButton, mainMenuButton);
-        buttonsBox.setAlignment(Pos.CENTER_RIGHT);
+            mainMenuButton = new Button("Main Menu");
+            mainMenuButton.setStyle(
+                "-fx-font-size: 16px; -fx-font-weight: bold; " +
+                        "-fx-background-color: #4682b4; -fx-text-fill: white; -fx-background-radius: 10;"
+            );
+            mainMenuButton.setPrefSize(120, 40);
+            addButtonHoverEffect(mainMenuButton);
+            mainMenuButton.setOnAction(e -> {
+                if (showConfirmationDialog("Are you sure you want to return to the main menu?")) {
+                    stopTimerUpdates();
+                    setupWelcomeScreen((Stage) mainMenuButton.getScene().getWindow());
+                }
+            });
 
-        // Combine stats and buttons
-        HBox statusBar = new HBox();
-        statusBar.setPadding(new Insets(0, 0, 10, 0));
-        statusBar.getChildren().addAll(statsBox, buttonsBox);
-        HBox.setHgrow(statsBox, javafx.scene.layout.Priority.ALWAYS);
 
-        mainLayout.setTop(statusBar);
+            // Create layout for stats
+            HBox statsBox = new HBox(20, scoreLabel, moveLabel, timeLabel);
+            statsBox.setAlignment(Pos.CENTER_LEFT);
+
+            // Create layout for buttons
+            HBox buttonsBox = new HBox(10, pauseButton, restartButton, mainMenuButton);
+            buttonsBox.setAlignment(Pos.CENTER_RIGHT);
+
+            // Combine stats and buttons
+            HBox statusBar = new HBox();
+            statusBar.setPadding(new Insets(0, 0, 10, 0));
+            statusBar.getChildren().addAll(statsBox, buttonsBox);
+            HBox.setHgrow(statsBox, javafx.scene.layout.Priority.ALWAYS);
+
+            mainLayout.setTop(statusBar);
     }
 
     private void createGameBoard(BorderPane mainLayout) {
@@ -609,6 +708,7 @@ public class GameBoardVisualizer2 extends Application implements Observer {
                 card.addObserver(this);
 
                 Button cardButton = createCardButton(card, cardWidth, cardHeight);
+                cardButtons.put(card, cardButton);
                 gridPane.add(cardButton, col, row);
                 cardViews.put(card, (ImageView) cardButton.getGraphic());
             }
@@ -629,6 +729,12 @@ public class GameBoardVisualizer2 extends Application implements Observer {
 
         cardButton.setOnAction(event -> handleCardFlip(card, imageView));
         return cardButton;
+    }
+
+    private void setCardButtonsDisabled(boolean disabled) {
+        for (Button btn : cardButtons.values()) {
+            btn.setDisable(disabled);
+        }
     }
 
     private void handleCardFlip(Card card, ImageView imageView) {
@@ -705,6 +811,19 @@ public class GameBoardVisualizer2 extends Application implements Observer {
         ft.play();
     }
 
+    // button click and hover effects
+    private void addButtonHoverEffect(Button button) {
+        // Store the original style
+        final String originalStyle = button.getStyle();
+
+        // Hover effect
+        button.setOnMouseEntered(e -> button.setStyle(originalStyle + "; -fx-effect: dropshadow(gaussian, #4682b4, 12, 0.5, 0, 0); -fx-translate-y: -2;"));
+        button.setOnMouseExited(e -> button.setStyle(originalStyle));
+
+        // Click effect
+        button.setOnMousePressed(e -> button.setStyle(originalStyle + "; -fx-background-color: #2e8b57; -fx-translate-y: 2;"));
+        button.setOnMouseReleased(e -> button.setStyle(originalStyle + "; -fx-effect: dropshadow(gaussian, #4682b4, 12, 0.5, 0, 0); -fx-translate-y: -2;"));
+    }
 
     private void animateMismatch(Card card1, Card card2) {
         PauseTransition pause = new PauseTransition(Duration.seconds(1));
@@ -718,6 +837,7 @@ public class GameBoardVisualizer2 extends Application implements Observer {
     }
 
     private void showGameOverMessage() {
+        Stage primaryStage = (Stage) gridPane.getScene().getWindow();
         Platform.runLater(() -> {
             boolean isWin = board.allCardsMatched();
 
@@ -756,6 +876,9 @@ public class GameBoardVisualizer2 extends Application implements Observer {
             dialogPane.setHeader(headerLabel);
 
             alert.showAndWait();
+            // Return to main menu after dialog closes
+            setupWelcomeScreen(primaryStage);
+
         });
     }
 
@@ -800,10 +923,14 @@ public class GameBoardVisualizer2 extends Application implements Observer {
             game.pauseGame();
             pauseButton.setText("Resume");
             stopTimerUpdates();
+            setCardButtonsDisabled(true);
+            gamePausedLabel.setVisible(true); // Show pause overlay
         } else if (game.isActive() && game.isPaused()) {
             game.resumeGame();
             pauseButton.setText("Pause");
             startTimerUpdates();
+            setCardButtonsDisabled(false);
+            gamePausedLabel.setVisible(false); // Hide pause overlay
         }
     }
 
@@ -842,7 +969,7 @@ public class GameBoardVisualizer2 extends Application implements Observer {
     }
     private void returnToMainMenu(Stage primaryStage) {
         stopTimerUpdates();
-        setupSelectionScreen(primaryStage);
+        setupWelcomeScreen(primaryStage);
     }
 
     @Override
