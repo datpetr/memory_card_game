@@ -55,7 +55,6 @@ public class EndlessGame extends Game {
 
             getPlayer().incrementScore(totalBonus);
 
-            // Notify observers about bonus points
             setChanged();
             notifyObservers("MATCH_BONUS_ADDED");
         }
