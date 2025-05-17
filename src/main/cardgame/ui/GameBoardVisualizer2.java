@@ -808,7 +808,12 @@ public class GameBoardVisualizer2 extends Application implements Observer {
     }
 
     private boolean showConfirmationDialog(String message) {
-        // I think asking for confirmation when pressed restart and main menu buttons is a good idea
+        // Pause game and timer before showing dialog (like Pause)
+        if (game.isActive() && !game.isPaused()) {
+            game.pauseGame();
+            stopTimerUpdates();
+        }
+
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, message, javafx.scene.control.ButtonType.YES, javafx.scene.control.ButtonType.NO);
         alert.setTitle("Confirmation");
         alert.setHeaderText(null);
@@ -820,7 +825,14 @@ public class GameBoardVisualizer2 extends Application implements Observer {
                         "-fx-border-radius: 10; " +
                         "-fx-background-radius: 10;"
         );
-        return alert.showAndWait().orElse(javafx.scene.control.ButtonType.NO) == javafx.scene.control.ButtonType.YES;
+        boolean result = alert.showAndWait().orElse(javafx.scene.control.ButtonType.NO) == javafx.scene.control.ButtonType.YES;
+
+        // Resume game and timer if cancelled (like Resume)
+        if (!result && game.isPaused()) {
+            game.resumeGame();
+            startTimerUpdates();
+        }
+        return result;
     }
     private void restartGame() {
         stopTimerUpdates();
