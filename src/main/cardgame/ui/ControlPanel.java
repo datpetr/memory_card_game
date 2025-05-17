@@ -1,5 +1,6 @@
 package main.cardgame.ui;
 
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -19,12 +20,27 @@ public class ControlPanel {
     private GameBoardUI gameBoard;
     private Stage primaryStage;
     private Game game;
+    // Direct references to required components
+    private CardRenderer cardRenderer;
+    private GameStatusPanel statusPanel;
 
-    public ControlPanel(GameBoardUI gameBoard, Stage primaryStage, Game game) {
-        this.gameBoard = gameBoard;
+    public ControlPanel(Stage primaryStage, Game game) {
         this.primaryStage = primaryStage;
         this.game = game;
         initialize();
+    }
+
+    // Separate setters for each dependency to avoid circular references
+    public void setGameBoard(GameBoardUI gameBoard) {
+        this.gameBoard = gameBoard;
+    }
+    
+    public void setCardRenderer(CardRenderer cardRenderer) {
+        this.cardRenderer = cardRenderer;
+    }
+    
+    public void setStatusPanel(GameStatusPanel statusPanel) {
+        this.statusPanel = statusPanel;
     }
 
     /**
@@ -40,8 +56,11 @@ public class ControlPanel {
         pauseButton.setPrefSize(120, 40);
         ButtonEffectManager.addButtonHoverEffect(pauseButton);
         
-        // Original pause button logic
-        pauseButton.setOnAction(e -> togglePauseGame());
+        // Improved pause button logic with synchronized handling
+        pauseButton.setOnAction(e -> {
+            // Don't use Platform.runLater here as it might cause the second-click issue
+            togglePauseGame();
+        });
 
         restartButton = new Button("Restart");
         restartButton.setStyle(
@@ -51,9 +70,9 @@ public class ControlPanel {
         restartButton.setPrefSize(120, 40);
         ButtonEffectManager.addButtonHoverEffect(restartButton);
         
-        // Original restart button logic
+        // Direct action handling without Platform.runLater
         restartButton.setOnAction(e -> {
-            if (DialogManager.showConfirmationDialog("Are you sure you want to restart the game?", game)) {
+            if (gameBoard != null && DialogManager.showConfirmationDialog("Are you sure you want to restart the game?", game)) {
                 gameBoard.restartGame(primaryStage);
             }
         });
@@ -66,9 +85,9 @@ public class ControlPanel {
         mainMenuButton.setPrefSize(120, 40);
         ButtonEffectManager.addButtonHoverEffect(mainMenuButton);
         
-        // Original main menu button logic
+        // Direct action handling without Platform.runLater
         mainMenuButton.setOnAction(e -> {
-            if (DialogManager.showConfirmationDialog("Are you sure you want to return to the main menu?", game)) {
+            if (gameBoard != null && DialogManager.showConfirmationDialog("Are you sure you want to return to the main menu?", game)) {
                 gameBoard.returnToMainMenu(primaryStage);
             }
         });
@@ -97,24 +116,40 @@ public class ControlPanel {
 
     /**
      * Toggles the pause state of the game
-     * Original implementation from GameBoardVisualizer2
+     * Fixed implementation to check requirements before action
      */
     private void togglePauseGame() {
-        CardRenderer cardRenderer = ((GameBoardUI)game.getBoard().getObserver()).cardRenderer;
-        GameStatusPanel statusPanel = ((GameBoardUI)game.getBoard().getObserver()).statusPanel;
+        // Before proceeding, verify we have all required components
+        if (gameBoard == null || game == null) {
+            System.err.println("Cannot toggle pause: GameBoardUI or Game is null");
+            return;
+        }
         
+        // First handle the game state change - this should always work
         if (game.isActive() && !game.isPaused()) {
             game.pauseGame();
             pauseButton.setText("Resume");
-            statusPanel.stopTimerUpdates();
-            cardRenderer.setCardButtonsDisabled(true);
-            cardRenderer.showPauseOverlay(true);
         } else if (game.isActive() && game.isPaused()) {
             game.resumeGame();
             pauseButton.setText("Pause");
-            statusPanel.startTimerUpdates();
-            cardRenderer.setCardButtonsDisabled(false);
-            cardRenderer.showPauseOverlay(false);
+        }
+        
+        // Then handle the UI updates - this might fail if references are missing
+        try {
+            if (statusPanel != null) {
+                if (game.isPaused()) {
+                    statusPanel.stopTimerUpdates();
+                } else {
+                    statusPanel.startTimerUpdates();
+                }
+            }
+            
+            if (cardRenderer != null) {
+                cardRenderer.setCardButtonsDisabled(game.isPaused());
+                cardRenderer.showPauseOverlay(game.isPaused());
+            }
+        } catch (Exception ex) {
+            System.err.println("Error updating UI for pause/resume: " + ex.getMessage());
         }
     }
 }
