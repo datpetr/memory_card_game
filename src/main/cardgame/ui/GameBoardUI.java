@@ -85,7 +85,7 @@ public class GameBoardUI extends Application implements Observer {
      */
 
     // Method to prompt and validate player name
-    private boolean promptForPlayerName(Stage primaryStage) {
+    boolean promptForPlayerName(Stage primaryStage) {
         Pattern validPattern = Pattern.compile("^[A-Za-z0-9_-]{3,12}$");
         while (true) {
             TextInputDialog dialog = new TextInputDialog();
@@ -121,14 +121,8 @@ public class GameBoardUI extends Application implements Observer {
     }
 
     public void showModeSelection(Stage primaryStage) {
-        if (promptForPlayerName(primaryStage)) {
-            modeSelectionPanel = new ModeSelectionPanel(primaryStage, this);
-            modeSelectionPanel.show();
-        } else {
-            // Stay on the welcome panel (main menu)
-            welcomePanel = new WelcomePanel(primaryStage, this);
-            welcomePanel.show();
-        }
+        modeSelectionPanel = new ModeSelectionPanel(primaryStage, this);
+        modeSelectionPanel.show();
     }
 
     public void startGameWithSettings(Stage primaryStage, String mode, String difficulty) {
@@ -218,7 +212,7 @@ public class GameBoardUI extends Application implements Observer {
         double maxHeight = screen.getVisualBounds().getHeight() * 0.9;
         Scene scene = new Scene(mainLayout, Math.min(maxWidth, 1024), Math.min(maxHeight, 768));
 
-        primaryStage.setTitle("Memory Card Game - " + mode);
+        primaryStage.setTitle("Memo - " + mode);
         primaryStage.setScene(scene);
         primaryStage.setOnCloseRequest(e -> statusPanel.stopTimerUpdates());
 
