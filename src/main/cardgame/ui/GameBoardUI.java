@@ -27,7 +27,7 @@ import java.util.Observer;
  */
 public class GameBoardUI extends Application implements Observer {
     // Constants preserved from GameBoardVisualizer2
-    private static int BOARD_ROWS = 4;
+    private static int BOARD_ROWS = 3;
     private static int BOARD_COLS = 4;
     private static final double CARD_ASPECT_RATIO = 2.0 / 3.0;
     private static final double PADDING = 20;
@@ -87,16 +87,16 @@ public class GameBoardUI extends Application implements Observer {
         // Set board dimensions based on difficulty (preserved logic)
         switch (difficulty) {
             case "easy":
-                BOARD_ROWS = 4;
+                BOARD_ROWS = 3;
                 BOARD_COLS = 4;
                 break;
             case "medium":
-                BOARD_ROWS = 6;
-                BOARD_COLS = 6;
+                BOARD_ROWS = 4;
+                BOARD_COLS = 5;
                 break;
             case "hard":
-                BOARD_ROWS = 8;
-                BOARD_COLS = 8;
+                BOARD_ROWS = 5;
+                BOARD_COLS = 6;
                 break;
             default:
                 throw new IllegalArgumentException("Unknown difficulty: " + difficulty);
@@ -150,7 +150,7 @@ public class GameBoardUI extends Application implements Observer {
 
         // Create components in correct order
         // First create CardRenderer so it can be referenced by others
-        cardRenderer = new CardRenderer(this, game, board, BOARD_ROWS, BOARD_COLS, CARD_ASPECT_RATIO, GAP);
+        cardRenderer = new CardRenderer(this, game, board, BOARD_ROWS, BOARD_COLS,  CARD_ASPECT_RATIO, GAP);
         
         // Then create status panel
         statusPanel = new GameStatusPanel(this.game);
