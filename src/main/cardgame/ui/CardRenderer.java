@@ -31,7 +31,7 @@ public class CardRenderer {
     private Game game;
     private GameBoard board;
     private int cols;  // Using cols first to match GridPane convention (col, row)
-    private int rows; 
+    private int rows;
     private double cardAspectRatio;
     private double gap;
     
@@ -47,8 +47,8 @@ public class CardRenderer {
         this.gameBoardUI = gameBoardUI;
         this.game = game;
         this.board = board;
-        this.cols = cols;
         this.rows = rows;
+        this.cols = cols;
         this.cardAspectRatio = cardAspectRatio;
         this.gap = gap;
         
@@ -136,34 +136,32 @@ public class CardRenderer {
      * @param card The card to flip
      * @param imageView The image view to update
      */
+    private void handleCardFlip(Card card, ImageView imageView) {
+        if (card.isMatched() || card.isFaceUp() || secondFlippedCard != null || !game.isActive()) return;
 
-    private void animateCardFlip(Card card, ImageView imageView, Runnable onFinished) {
+        // Original flip animation
         ScaleTransition flipOut = new ScaleTransition(Duration.millis(200), imageView);
         flipOut.setFromX(1.0);
         flipOut.setToX(0.0);
         flipOut.setOnFinished(event -> {
             card.flip();
             updateCardImage(card, imageView);
+
             ScaleTransition flipIn = new ScaleTransition(Duration.millis(200), imageView);
             flipIn.setFromX(0.0);
             flipIn.setToX(1.0);
-            if (onFinished != null) flipIn.setOnFinished(e -> onFinished.run());
             flipIn.play();
         });
         flipOut.play();
-    }
 
-    private void handleCardFlip(Card card, ImageView imageView) {
-        if (card.isMatched() || card.isFaceUp() || secondFlippedCard != null || !game.isActive()) return;
-        animateCardFlip(card, imageView, () -> {
-            if (firstFlippedCard == null) {
-                firstFlippedCard = card;
-            } else {
-                secondFlippedCard = card;
-                boolean isMatch = game.processTurn(firstFlippedCard, secondFlippedCard);
-                checkForMatch(isMatch);
-            }
-        });
+        // Original game logic
+        if (firstFlippedCard == null) {
+            firstFlippedCard = card;
+        } else {
+            secondFlippedCard = card;
+            boolean isMatch = game.processTurn(firstFlippedCard, secondFlippedCard);
+            checkForMatch(isMatch);
+        }
     }
 
     /**
@@ -224,7 +222,7 @@ public class CardRenderer {
     /**
      * Animates a match
      * Original implementation from GameBoardVisualizer2
-     * @param card1 The first card/
+     * @param card1 The first card
      * @param card2 The second card
      */
     private void animateMatch(Card card1, Card card2) {
@@ -250,10 +248,12 @@ public class CardRenderer {
      * @param card2 The second card
      */
     private void animateMismatch(Card card1, Card card2) {
-        PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
+        PauseTransition pause = new PauseTransition(Duration.seconds(1));
         pause.setOnFinished(event -> Platform.runLater(() -> {
-            animateCardFlip(card1, cardViews.get(card1), null);
-            animateCardFlip(card2, cardViews.get(card2), null);
+            card1.flip();
+            card2.flip();
+            updateCardImage(card1, cardViews.get(card1));
+            updateCardImage(card2, cardViews.get(card2));
         }));
         pause.play();
     }

@@ -11,6 +11,7 @@ public class GameBoard extends Observable {
     private int matchedPairsCount = 0;
     private final int totalPairs;
     private Observer mainObserver; // Track the main observer for the board
+    private Object observer;
 
     public GameBoard(String level, List<Card> cards) {
         this.rows = determineRows(level);
@@ -142,11 +143,11 @@ public class GameBoard extends Observable {
     public int getRows() {
         return rows;
     }
-    
+
     public int getCols() {
         return cols;
     }
-    
+
     // For backward compatibility
     public int getGridSize() {
         return Math.max(rows, cols);
@@ -158,8 +159,13 @@ public class GameBoard extends Observable {
         super.addObserver(o);
         this.mainObserver = o;
     }
-    
-    public Observer getObserver() {
-        return mainObserver;
+
+    public Object getObserver() {
+        return observer;
+    }
+
+
+    public void setObserver(Object observer) {
+        this.observer = observer;
     }
 }

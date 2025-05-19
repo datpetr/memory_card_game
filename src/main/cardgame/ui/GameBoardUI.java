@@ -1,5 +1,6 @@
 package main.cardgame.ui;
 
+import main.cardgame.stats.StatsManager;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -21,10 +22,8 @@ import javafx.scene.control.TextInputDialog;
 import java.util.regex.Pattern;
 import java.util.Optional;
 
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-import javafx.scene.control.TextInputDialog;
 
 /**
  * Main entry point for the Memory Card Game.
@@ -35,7 +34,7 @@ public class GameBoardUI extends Application implements Observer {
     // Constants preserved from GameBoardVisualizer2
     private static int BOARD_ROWS = 3;
     private static int BOARD_COLS = 4;
-    private static final double CARD_ASPECT_RATIO = 2.0 / 3.0;
+    private static final double CARD_ASPECT_RATIO = 2.0 / 2.0;
     private static final double PADDING = 20;
     private static final double GAP = 10;
 
@@ -44,7 +43,6 @@ public class GameBoardUI extends Application implements Observer {
     private GameBoard board;
     private String currentMode;
     private String currentDifficulty;
-    private String playerName = "Player1";
 
     // Organized UI components
     private WelcomePanel welcomePanel;
@@ -54,6 +52,8 @@ public class GameBoardUI extends Application implements Observer {
     public CardRenderer cardRenderer;
     private ControlPanel controlPanel;
     private BoardCanvas boardCanvas;
+
+    private String playerName;
 
     @Override
     public void start(Stage primaryStage) {
@@ -66,6 +66,10 @@ public class GameBoardUI extends Application implements Observer {
      * Shows the mode selection screen
      * @param primaryStage The primary stage
      */
+    //public void showModeSelection(Stage primaryStage) {
+    //    modeSelectionPanel = new ModeSelectionPanel(primaryStage, this);
+    //    modeSelectionPanel.show();
+    //}
 
     /**
      * Shows the difficulty selection screen
@@ -85,7 +89,7 @@ public class GameBoardUI extends Application implements Observer {
      */
 
     // Method to prompt and validate player name
-    boolean promptForPlayerName(Stage primaryStage) {
+    private boolean promptForPlayerName(Stage primaryStage) {
         Pattern validPattern = Pattern.compile("^[A-Za-z0-9_-]{3,12}$");
         while (true) {
             TextInputDialog dialog = new TextInputDialog();
@@ -121,14 +125,45 @@ public class GameBoardUI extends Application implements Observer {
     }
 
     public void showModeSelection(Stage primaryStage) {
-        modeSelectionPanel = new ModeSelectionPanel(primaryStage, this);
-        modeSelectionPanel.show();
+        if (promptForPlayerName(primaryStage)) {
+            modeSelectionPanel = new ModeSelectionPanel(primaryStage, this);
+            modeSelectionPanel.show();
+        } else {
+            // Stay on the welcome panel (main menu)
+            welcomePanel = new WelcomePanel(primaryStage, this);
+            welcomePanel.show();
+        }
     }
 
     public void startGameWithSettings(Stage primaryStage, String mode, String difficulty) {
         this.currentMode = mode;
         this.currentDifficulty = difficulty;
 
+        // Set board dimensions based on difficulty (preserved logic)
+        switch (difficulty) {
+            case "easy":
+                BOARD_ROWS = 4;
+                BOARD_COLS = 4;
+                Card.setBackImagePath("file:src/main/resources/images/backCards/easyback.png");
+                break;
+            case "medium":
+                BOARD_ROWS = 6;
+                BOARD_COLS = 6;
+                Card.setBackImagePath("file:src/main/resources/images/backCards/mediumback.png");
+                break;
+            case "hard":
+                BOARD_ROWS = 8;
+                BOARD_COLS = 8;
+                Card.setBackImagePath("file:src/main/resources/images/backCards/hardback.png");
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown difficulty: " + difficulty);
+        }
+
+        int totalCardsNeeded = BOARD_ROWS * BOARD_COLS;
+        int requiredPairs = totalCardsNeeded / 2;
+
+        // Create deck and board (preserved logic)
         // Create deck and board
         Deck deck = Deck.createDeckForLevel(difficulty);
         this.board = new GameBoard(difficulty, deck.getCards()) {};
@@ -212,7 +247,7 @@ public class GameBoardUI extends Application implements Observer {
         double maxHeight = screen.getVisualBounds().getHeight() * 0.9;
         Scene scene = new Scene(mainLayout, Math.min(maxWidth, 1024), Math.min(maxHeight, 768));
 
-        primaryStage.setTitle("Memo - " + mode);
+        primaryStage.setTitle("Memory Card Game - " + mode);
         primaryStage.setScene(scene);
         primaryStage.setOnCloseRequest(e -> statusPanel.stopTimerUpdates());
 
@@ -268,6 +303,14 @@ public class GameBoardUI extends Application implements Observer {
      * Shows the game over message
      */
     public void showGameOverMessage() {
+        // After the game ends, before returning to main menu
+        int timeInSeconds = game.getTimer().getElapsedSeconds(); // Adjust this to your timer's API
+        StatsManager.recordGame(
+                game.getMatches(),
+                game.getMoves(),
+                game.getTimer().getElapsedSeconds()
+        );
+
         GameOverDialog gameOverDialog = new GameOverDialog(game, board);
         gameOverDialog.show().thenRun(() -> {
             // Return to main menu after dialog closes
