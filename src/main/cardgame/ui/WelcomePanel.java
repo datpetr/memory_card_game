@@ -58,7 +58,12 @@ public class WelcomePanel {
         // Add statsButton to your main menu layout, e.g.:
         VBox menuBox = new VBox(playButton, statsButton, exitButton);
 
-        playButton.setOnAction(e -> gameBoard.showModeSelection(primaryStage));
+        playButton.setOnAction(e -> {
+            if (gameBoard.promptForPlayerName(primaryStage)) {
+                gameBoard.showModeSelection(primaryStage);
+            }
+            // If canceled, do nothing (stay on welcome panel)
+        });
         exitButton.setOnAction(e -> Platform.exit());
 
         // Create stats label
