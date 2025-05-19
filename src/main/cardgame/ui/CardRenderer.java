@@ -41,6 +41,8 @@ public class CardRenderer {
     private final Map<Card, Button> cardButtons = new HashMap<>();
     private GridPane gridPane;
     private Label gamePausedLabel;
+    private boolean cardClicksBlocked = false;
+    private boolean flippingFirstCard = false;
 
     public CardRenderer(GameBoardUI gameBoardUI, Game game, GameBoard board,
                         int cols, int rows, double cardAspectRatio, double gap) {
@@ -154,18 +156,24 @@ public class CardRenderer {
     }
 
     private void handleCardFlip(Card card, ImageView imageView) {
-        if (card.isMatched() || card.isFaceUp() || secondFlippedCard != null || !game.isActive()) return;
-        animateCardFlip(card, imageView, () -> {
-            if (firstFlippedCard == null) {
+        if (cardClicksBlocked || card.isMatched() || card.isFaceUp() || !game.isActive()) return;
+
+        // Allow two quick flips: do not block on first flip
+        if (firstFlippedCard == null && !flippingFirstCard) {
+            flippingFirstCard = true;
+            animateCardFlip(card, imageView, () -> {
                 firstFlippedCard = card;
-            } else {
+                flippingFirstCard = false;
+            });
+        } else if (secondFlippedCard == null && card != firstFlippedCard) {
+            cardClicksBlocked = true; // Block further clicks after second card
+            animateCardFlip(card, imageView, () -> {
                 secondFlippedCard = card;
                 boolean isMatch = game.processTurn(firstFlippedCard, secondFlippedCard);
                 checkForMatch(isMatch);
-            }
-        });
+            });
+        }
     }
-
     /**
      * Updates a card's image
      * Original implementation from GameBoardVisualizer2
@@ -183,12 +191,12 @@ public class CardRenderer {
      * @param isMatch Whether the cards match
      */
     private void checkForMatch(boolean isMatch) {
+        cardClicksBlocked = true;
         if (isMatch) {
             handleMatch();
         } else {
             handleMismatch();
         }
-        resetSelections();
     }
 
     /**
@@ -197,19 +205,31 @@ public class CardRenderer {
      */
     private void handleMatch() {
         animateMatch(firstFlippedCard, secondFlippedCard);
-        if (game.isGameOver()) {
-            game.endGame();
-            gameBoardUI.statusPanel.stopTimerUpdates();
-            gameBoardUI.showGameOverMessage();
-        }
+        PauseTransition pause = new PauseTransition(Duration.millis(300)); // Match animation total duration
+        pause.setOnFinished(e -> {
+            cardClicksBlocked = false;
+            resetSelections();
+            if (game.isGameOver()) {
+                game.endGame();
+                gameBoardUI.statusPanel.stopTimerUpdates();
+                gameBoardUI.showGameOverMessage();
+            }
+        });
+        pause.play();
     }
-
     /**
      * Handles a mismatch
      * Original implementation from GameBoardVisualizer2
      */
     private void handleMismatch() {
-        animateMismatch(firstFlippedCard, secondFlippedCard);
+        PauseTransition pause = new PauseTransition(Duration.seconds(0.35));
+        pause.setOnFinished(event -> Platform.runLater(() -> {
+            animateCardFlip(firstFlippedCard, cardViews.get(firstFlippedCard), null);
+            animateCardFlip(secondFlippedCard, cardViews.get(secondFlippedCard), null);
+            cardClicksBlocked = false;
+            resetSelections();
+        }));
+        pause.play();
     }
 
     /**
