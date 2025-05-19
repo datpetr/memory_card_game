@@ -5,6 +5,8 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -17,13 +19,11 @@ import main.cardgame.model.Card;
 import main.cardgame.model.Deck;
 import main.cardgame.model.GameBoard;
 import main.cardgame.model.Player;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TextInputDialog;
-import java.util.regex.Pattern;
-import java.util.Optional;
 
+import java.util.Optional;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.regex.Pattern;
 
 /**
  * Main entry point for the Memory Card Game.
@@ -93,14 +93,14 @@ public class GameBoardUI extends Application implements Observer {
             dialog.setTitle("Enter Player Name");
             dialog.setHeaderText(null);
             dialog.setContentText("Name:");
-            // Show and center the dialog
             dialog.initOwner(primaryStage);
-            Optional<String> result = dialog.showAndWait();
+            // Center the dialog after it is shown
             Platform.runLater(() -> {
                 Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
                 dialogStage.setX(primaryStage.getX() + (primaryStage.getWidth() - dialogStage.getWidth()) / 2);
                 dialogStage.setY(primaryStage.getY() + (primaryStage.getHeight() - dialogStage.getHeight()) / 2);
             });
+            Optional<String> result = dialog.showAndWait();
             if (result.isPresent()) {
                 String input = result.get().trim();
                 try {
@@ -121,12 +121,14 @@ public class GameBoardUI extends Application implements Observer {
                     alert.setHeaderText("Invalid player name.");
                     alert.setContentText(ex.getMessage());
                     alert.initOwner(primaryStage);
-                    alert.show();
+                    // Center the alert after it is shown
                     Platform.runLater(() -> {
                         Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
                         alertStage.setX(primaryStage.getX() + (primaryStage.getWidth() - alertStage.getWidth()) / 2);
                         alertStage.setY(primaryStage.getY() + (primaryStage.getHeight() - alertStage.getHeight()) / 2);
                     });
+                    alert.showAndWait(); // Wait for user to click OK before looping to show dialog again
+                    // Loop continues, so prompt dialog will show again
                 }
             } else {
                 return false; // Cancel pressed
@@ -256,6 +258,9 @@ public class GameBoardUI extends Application implements Observer {
         primaryStage.setScene(scene);
         primaryStage.setOnCloseRequest(e -> statusPanel.stopTimerUpdates());
 
+        // Center the game window on the screen
+        primaryStage.centerOnScreen();
+
         // Start the game
         game.play();
         statusPanel.startTimerUpdates();
@@ -330,3 +335,4 @@ public class GameBoardUI extends Application implements Observer {
             launch(args);
         }
 }
+

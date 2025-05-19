@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
+import javafx.stage.Stage;
 import main.cardgame.game.Game;
 import main.cardgame.model.GameBoard;
 
@@ -68,9 +69,13 @@ public class GameOverDialog {
             dialogPane.setHeader(headerLabel);
 
             alert.showAndWait();
+            Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+            alertStage.setX(alertStage.getOwner().getX() + (alertStage.getOwner().getWidth() - alertStage.getWidth()) / 2);
+            alertStage.setY(alertStage.getOwner().getY() + (alertStage.getOwner().getHeight() - alertStage.getHeight()) / 2);
             future.complete(null);
         });
         
         return future;
     }
 }
+
