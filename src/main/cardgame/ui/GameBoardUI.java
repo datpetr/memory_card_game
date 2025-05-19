@@ -215,7 +215,6 @@ public class GameBoardUI extends Application implements Observer {
     public void update(Observable observable, Object arg) {
         Platform.runLater(() -> {
             // Handle updates from all observable objects
-            // We delegate the updates to appropriate components
 
             // Handle player updates
             if (observable instanceof Player && statusPanel != null) {
@@ -230,6 +229,7 @@ public class GameBoardUI extends Application implements Observer {
             // Handle timer updates
             else if (observable == game.getTimer() && "TIMER_STOPPED".equals(arg) && statusPanel != null) {
                 statusPanel.updateTimerDisplay();
+                showGameOverMessage(); // <-- Add this line
             }
         });
     }

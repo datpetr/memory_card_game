@@ -1,6 +1,9 @@
 package main.cardgame.model;
 
 import java.util.Observable;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
 
 public class Timer extends Observable {
     // timer states to prevent incorrect triggering
@@ -16,6 +19,7 @@ public class Timer extends Observable {
     private long countdownMillis;
     private boolean isCountdown;
     private State state;
+    private Timeline countdownTimeline;
 
     // Constructor for countdown timer
     public Timer(int countdownSeconds) {
@@ -40,6 +44,20 @@ public class Timer extends Observable {
 
             setChanged();
             notifyObservers("TIMER_STARTED");
+
+            // Only for countdown (timed) mode
+            if (isCountdown) {
+                if (countdownTimeline != null) {
+                    countdownTimeline.stop();
+                }
+                countdownTimeline = new Timeline(new KeyFrame(Duration.millis(200), e -> {
+                    if (getRemainingTime() <= 0 && state == State.RUNNING) {
+                        stopTimer();
+                    }
+                }));
+                countdownTimeline.setCycleCount(Timeline.INDEFINITE);
+                countdownTimeline.play();
+            }
         }
     }
 
@@ -66,6 +84,11 @@ public class Timer extends Observable {
     public void stopTimer() {
         if (state == State.RUNNING || state == State.PAUSED) {
             this.state = State.STOPPED;
+
+            // Only for countdown (timed) mode
+            if (isCountdown && countdownTimeline != null) {
+                countdownTimeline.stop();
+            }
 
             setChanged();
             notifyObservers("TIMER_STOPPED");
