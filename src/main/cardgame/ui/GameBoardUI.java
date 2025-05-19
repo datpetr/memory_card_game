@@ -17,6 +17,7 @@ import main.cardgame.model.Deck;
 import main.cardgame.model.GameBoard;
 import main.cardgame.model.Player;
 
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -84,31 +85,15 @@ public class GameBoardUI extends Application implements Observer {
         this.currentMode = mode;
         this.currentDifficulty = difficulty;
 
-        // Set board dimensions based on difficulty (preserved logic)
-        switch (difficulty) {
-            case "easy":
-                BOARD_ROWS = 3;
-                BOARD_COLS = 4;
-                break;
-            case "medium":
-                BOARD_ROWS = 4;
-                BOARD_COLS = 5;
-                break;
-            case "hard":
-                BOARD_ROWS = 5;
-                BOARD_COLS = 6;
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown difficulty: " + difficulty);
-        }
-
-        int totalCardsNeeded = BOARD_ROWS * BOARD_COLS;
-        int requiredPairs = totalCardsNeeded / 2;
-
-        // Create deck and board (preserved logic)
+        // Create deck and board
         Deck deck = Deck.createDeckForLevel(difficulty);
-        this.board = new GameBoard(difficulty, deck.getCards());
+        this.board = new GameBoard(difficulty, deck.getCards()) {};
         this.board.addObserver(this);
+        
+        // Get the actual dimensions from the created board
+        BOARD_ROWS = board.getRows();
+        BOARD_COLS = board.getCols();
+
         Player player = new Player("Player1");
 
         // Register as observer for player
@@ -148,9 +133,8 @@ public class GameBoardUI extends Application implements Observer {
         mainLayout.setPadding(new Insets(PADDING));
         mainLayout.setStyle("-fx-background-color: linear-gradient(to bottom, #f0f8ff, #e6e6fa);");
 
-        // Create components in correct order
-        // First create CardRenderer so it can be referenced by others
-        cardRenderer = new CardRenderer(this, game, board, BOARD_ROWS, BOARD_COLS,  CARD_ASPECT_RATIO, GAP);
+        // Create CardRenderer with rows and cols from the board
+        cardRenderer = new CardRenderer(this, game, board, board.getCols(), board.getRows(), CARD_ASPECT_RATIO, GAP);
         
         // Then create status panel
         statusPanel = new GameStatusPanel(this.game);
@@ -251,3 +235,4 @@ public class GameBoardUI extends Application implements Observer {
         launch(args);
     }
 }
+

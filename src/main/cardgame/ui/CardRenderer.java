@@ -30,8 +30,8 @@ public class CardRenderer {
     private GameBoardUI gameBoardUI;
     private Game game;
     private GameBoard board;
-    private int rows;
-    private int cols;
+    private int cols;  // Using cols first to match GridPane convention (col, row)
+    private int rows; 
     private double cardAspectRatio;
     private double gap;
     
@@ -43,12 +43,12 @@ public class CardRenderer {
     private Label gamePausedLabel;
 
     public CardRenderer(GameBoardUI gameBoardUI, Game game, GameBoard board, 
-                        int rows, int cols, double cardAspectRatio, double gap) {
+                       int cols, int rows, double cardAspectRatio, double gap) {
         this.gameBoardUI = gameBoardUI;
         this.game = game;
         this.board = board;
-        this.rows = rows;
         this.cols = cols;
+        this.rows = rows;
         this.cardAspectRatio = cardAspectRatio;
         this.gap = gap;
         

@@ -76,21 +76,29 @@ public class Deck extends Observable{
     }
 
     public static Deck createDeckForLevel(String level) {
-        int pairs;
+        int rows, cols;
 
         switch (level.toLowerCase()) {
             case "easy":
-                pairs = 8;  // 16 cards (4x4 grid)
+                rows = 4;
+                cols = 3;
                 break;
             case "medium":
-                pairs = 18; // 36 cards (6x6 grid)
+                rows = 5;
+                cols = 4;
                 break;
             case "hard":
-                pairs = 32; // 64 cards (8x8 grid)
+                rows = 6;
+                cols = 5;
                 break;
             default:
-                throw new IllegalArgumentException("Invalid difficulty level: " + level);
+                rows = 4;
+                cols = 3;
+                break;
         }
+
+        int totalCards = rows * cols;
+        int pairs = totalCards / 2;
 
         Deck deck = createDeck(pairs);
         deck.shuffle();
