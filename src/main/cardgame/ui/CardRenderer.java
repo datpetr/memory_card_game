@@ -26,7 +26,7 @@ import java.util.Map;
 public class CardRenderer {
     private static final double PADDING = 20;
     private static final double GAP = 10;
-    
+
     private GameBoardUI gameBoardUI;
     private Game game;
     private GameBoard board;
@@ -34,7 +34,7 @@ public class CardRenderer {
     private int rows;
     private double cardAspectRatio;
     private double gap;
-    
+
     private Card firstFlippedCard;
     private Card secondFlippedCard;
     private final Map<Card, ImageView> cardViews = new HashMap<>();
@@ -42,16 +42,16 @@ public class CardRenderer {
     private GridPane gridPane;
     private Label gamePausedLabel;
 
-    public CardRenderer(GameBoardUI gameBoardUI, Game game, GameBoard board, 
-                       int cols, int rows, double cardAspectRatio, double gap) {
+    public CardRenderer(GameBoardUI gameBoardUI, Game game, GameBoard board,
+                        int cols, int rows, double cardAspectRatio, double gap) {
         this.gameBoardUI = gameBoardUI;
         this.game = game;
         this.board = board;
-        this.rows = rows;
         this.cols = cols;
+        this.rows = rows;
         this.cardAspectRatio = cardAspectRatio;
         this.gap = gap;
-        
+
         initialize();
     }
 
@@ -64,7 +64,7 @@ public class CardRenderer {
         gridPane.setHgap(gap);
         gridPane.setVgap(gap);
         gridPane.setAlignment(Pos.CENTER);
-        
+
         // Calculate card dimensions
         javafx.stage.Screen screen = javafx.stage.Screen.getPrimary();
         double maxWidth = screen.getVisualBounds().getWidth() * 0.9;
@@ -75,7 +75,7 @@ public class CardRenderer {
 
         double cardWidth = Math.min(maxCardWidth, maxCardHeight * cardAspectRatio);
         double cardHeight = cardWidth / cardAspectRatio;
-        
+
         // Create cards
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
@@ -96,7 +96,7 @@ public class CardRenderer {
                 cardViews.put(card, (ImageView) cardButton.getGraphic());
             }
         }
-        
+
         // Create pause overlay (identical to original)
         gamePausedLabel = new Label("Game Paused");
         gamePausedLabel.setStyle(
@@ -136,32 +136,34 @@ public class CardRenderer {
      * @param card The card to flip
      * @param imageView The image view to update
      */
-    private void handleCardFlip(Card card, ImageView imageView) {
-        if (card.isMatched() || card.isFaceUp() || secondFlippedCard != null || !game.isActive()) return;
 
-        // Original flip animation
+    private void animateCardFlip(Card card, ImageView imageView, Runnable onFinished) {
         ScaleTransition flipOut = new ScaleTransition(Duration.millis(200), imageView);
         flipOut.setFromX(1.0);
         flipOut.setToX(0.0);
         flipOut.setOnFinished(event -> {
             card.flip();
             updateCardImage(card, imageView);
-
             ScaleTransition flipIn = new ScaleTransition(Duration.millis(200), imageView);
             flipIn.setFromX(0.0);
             flipIn.setToX(1.0);
+            if (onFinished != null) flipIn.setOnFinished(e -> onFinished.run());
             flipIn.play();
         });
         flipOut.play();
+    }
 
-        // Original game logic
-        if (firstFlippedCard == null) {
-            firstFlippedCard = card;
-        } else {
-            secondFlippedCard = card;
-            boolean isMatch = game.processTurn(firstFlippedCard, secondFlippedCard);
-            checkForMatch(isMatch);
-        }
+    private void handleCardFlip(Card card, ImageView imageView) {
+        if (card.isMatched() || card.isFaceUp() || secondFlippedCard != null || !game.isActive()) return;
+        animateCardFlip(card, imageView, () -> {
+            if (firstFlippedCard == null) {
+                firstFlippedCard = card;
+            } else {
+                secondFlippedCard = card;
+                boolean isMatch = game.processTurn(firstFlippedCard, secondFlippedCard);
+                checkForMatch(isMatch);
+            }
+        });
     }
 
     /**
@@ -222,7 +224,7 @@ public class CardRenderer {
     /**
      * Animates a match
      * Original implementation from GameBoardVisualizer2
-     * @param card1 The first card
+     * @param card1 The first card/
      * @param card2 The second card
      */
     private void animateMatch(Card card1, Card card2) {
@@ -248,12 +250,10 @@ public class CardRenderer {
      * @param card2 The second card
      */
     private void animateMismatch(Card card1, Card card2) {
-        PauseTransition pause = new PauseTransition(Duration.seconds(1));
+        PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
         pause.setOnFinished(event -> Platform.runLater(() -> {
-            card1.flip();
-            card2.flip();
-            updateCardImage(card1, cardViews.get(card1));
-            updateCardImage(card2, cardViews.get(card2));
+            animateCardFlip(card1, cardViews.get(card1), null);
+            animateCardFlip(card2, cardViews.get(card2), null);
         }));
         pause.play();
     }
