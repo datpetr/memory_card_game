@@ -41,26 +41,32 @@ public class WelcomePanel {
 
         Button playButton = new Button("Play");
         playButton.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-background-color: #32cd32; -fx-text-fill: white; -fx-background-radius: 10;");
-        playButton.setPrefSize(180, 60);
+        playButton.setMaxWidth(Double.MAX_VALUE);
+        playButton.setPrefHeight(60);
         ButtonEffectManager.addButtonHoverEffect(playButton);
 
         Button statisticsButton = new Button("Statistics");
         statisticsButton.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-background-color: #4682b4; -fx-text-fill: white; -fx-background-radius: 10;");
-        statisticsButton.setPrefSize(180, 60);
+        statisticsButton.setMaxWidth(Double.MAX_VALUE);
+        statisticsButton.setPrefHeight(60);
         ButtonEffectManager.addButtonHoverEffect(statisticsButton);
 
         Button exitButton = new Button("Exit");
         exitButton.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-background-color: #b22222; -fx-text-fill: white; -fx-background-radius: 10;");
-        exitButton.setPrefSize(180, 60);
+        exitButton.setMaxWidth(Double.MAX_VALUE);
+        exitButton.setPrefHeight(60);
         ButtonEffectManager.addButtonHoverEffect(exitButton);
 
         statisticsButton.setOnAction(e -> {
             StatisticsDialog statsDialog = new StatisticsDialog();
-            statsDialog.showAndWait();
+            statsDialog.show();
+            // Center the dialog after it is shown
+            Platform.runLater(() -> {
+                Stage dialogStage = (Stage) statsDialog.getDialogPane().getScene().getWindow();
+                dialogStage.setX(primaryStage.getX() + (primaryStage.getWidth() - dialogStage.getWidth()) / 2);
+                dialogStage.setY(primaryStage.getY() + (primaryStage.getHeight() - dialogStage.getHeight()) / 2);
+            });
         });
-
-        // Add statsButton to your main menu layout, e.g.:
-        VBox menuBox = new VBox(playButton, statisticsButton, exitButton);
 
         playButton.setOnAction(e -> {
             if (gameBoard.promptForPlayerName(primaryStage)) {
@@ -68,23 +74,28 @@ public class WelcomePanel {
             }
             // If canceled, do nothing (stay on welcome panel)
         });
-        // Java
-        playButton.setOnAction(e -> {
-            if (gameBoard.promptForPlayerName(primaryStage)) {
-                gameBoard.showModeSelection(primaryStage);
-            }
-            // If canceled, do nothing (stay on welcome panel)
-        });
+
         exitButton.setOnAction(e -> Platform.exit());
 
         VBox vbox = new VBox(30, titleLabel, playButton, statisticsButton, exitButton);
         vbox.setAlignment(Pos.CENTER);
         vbox.setPadding(new Insets(PADDING));
         vbox.setStyle("-fx-background-color: linear-gradient(to bottom, #f0f8ff, #87cefa);");
+        vbox.setFillWidth(true);
 
         Scene scene = new Scene(vbox, 400, 350);
+
+        // Make the VBox and buttons responsive to window resizing
+        vbox.prefWidthProperty().bind(scene.widthProperty());
+        vbox.prefHeightProperty().bind(scene.heightProperty());
+        playButton.prefWidthProperty().bind(vbox.widthProperty().multiply(0.7));
+        statisticsButton.prefWidthProperty().bind(vbox.widthProperty().multiply(0.7));
+        exitButton.prefWidthProperty().bind(vbox.widthProperty().multiply(0.7));
+
         primaryStage.setScene(scene);
         primaryStage.setTitle("Memory Card Game");
+        primaryStage.centerOnScreen();
         primaryStage.show();
     }
 }
+

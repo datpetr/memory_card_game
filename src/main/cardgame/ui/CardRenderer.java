@@ -67,18 +67,14 @@ public class CardRenderer {
         gridPane.setVgap(gap);
         gridPane.setAlignment(Pos.CENTER);
 
-        // Calculate card dimensions
-        javafx.stage.Screen screen = javafx.stage.Screen.getPrimary();
-        double maxWidth = screen.getVisualBounds().getWidth() * 0.9;
-        double maxHeight = screen.getVisualBounds().getHeight() * 0.9;
+        // Responsive card sizing: bind to parent grid size
+        gridPane.widthProperty().addListener((obs, oldVal, newVal) -> resizeCards());
+        gridPane.heightProperty().addListener((obs, oldVal, newVal) -> resizeCards());
 
-        double maxCardWidth = (maxWidth - 2 * PADDING - (cols - 1) * gap) / cols;
-        double maxCardHeight = (maxHeight - 2 * PADDING - (rows - 1) * gap - 60) / rows; // 60 for status panel
+        // Initial card creation with placeholder size (will be resized)
+        double initialCardWidth = 100;
+        double initialCardHeight = 100 / cardAspectRatio;
 
-        double cardWidth = Math.min(maxCardWidth, maxCardHeight * cardAspectRatio);
-        double cardHeight = cardWidth / cardAspectRatio;
-
-        // Create cards
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 Card card = board.getCard(row, col);
@@ -89,10 +85,9 @@ public class CardRenderer {
                     );
                 }
 
-                // Register as observer for each card
                 card.addObserver(gameBoardUI);
 
-                Button cardButton = createCardButton(card, cardWidth, cardHeight);
+                Button cardButton = createCardButton(card, initialCardWidth, initialCardHeight);
                 cardButtons.put(card, cardButton);
                 gridPane.add(cardButton, col, row);
                 cardViews.put(card, (ImageView) cardButton.getGraphic());
@@ -107,6 +102,30 @@ public class CardRenderer {
         );
         gamePausedLabel.setVisible(false);
         gamePausedLabel.setAlignment(Pos.CENTER);
+    }
+
+    // Responsive resizing for cards
+    private void resizeCards() {
+        double gridWidth = gridPane.getWidth();
+        double gridHeight = gridPane.getHeight();
+
+        if (gridWidth <= 0 || gridHeight <= 0) return;
+
+        double availableWidth = gridWidth - (cols - 1) * gap - 2 * PADDING;
+        double availableHeight = gridHeight - (rows - 1) * gap - 2 * PADDING;
+
+        double cardWidth = Math.min(availableWidth / cols, (availableHeight / rows) * cardAspectRatio);
+        double cardHeight = cardWidth / cardAspectRatio;
+
+        for (Card card : cardButtons.keySet()) {
+            Button btn = cardButtons.get(card);
+            btn.setPrefSize(cardWidth, cardHeight);
+            ImageView iv = cardViews.get(card);
+            if (iv != null) {
+                iv.setFitWidth(cardWidth);
+                iv.setFitHeight(cardHeight);
+            }
+        }
     }
 
     /**
@@ -323,3 +342,4 @@ public class CardRenderer {
         gamePausedLabel.setVisible(visible);
     }
 }
+
