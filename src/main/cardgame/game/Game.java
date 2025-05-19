@@ -1,5 +1,7 @@
 package main.cardgame.game;
 
+import main.cardgame.stats.GameStatistics;
+
 import main.cardgame.model.Card;
 import main.cardgame.model.GameBoard;
 import main.cardgame.model.Player;
@@ -15,6 +17,7 @@ public abstract class Game extends Observable {
     private boolean isPaused;
     private Card firstCard;
     private Card secondCard;
+    protected GameStatistics statistics = GameStatistics.loadFromDisk();
 
     /**
      * Constructor for standard game without countdown
@@ -42,14 +45,25 @@ public abstract class Game extends Observable {
         this.secondCard = null;
     }
 
+    private long startTime; // Add this field
+
     public void play() {
+        this.isActive = true;
+        this.isPaused = false;
+        this.startTime = System.currentTimeMillis(); // Start timing
+        this.timer.startTimer();
+        setChanged();
+        notifyObservers("GAME_STARTED");
+    }
+    // This method is commented out to avoid confusion with the new play() method
+    /*public void play() {
         this.isActive = true;
         this.isPaused = false;  // Make sure game is not paused when started
         this.timer.startTimer();
 
         setChanged();
         notifyObservers("GAME_STARTED");
-    }
+    }*/
 
     public void pause() {
         if (isActive) {
@@ -94,9 +108,23 @@ public abstract class Game extends Observable {
     public void endGame() {
         this.isActive = false;
         this.timer.stopTimer();
+
+        long duration = System.currentTimeMillis() - startTime;
+        int matches = board.getMatchedPairsCount();  // or count how many matches were made
+        int moves = player.getMoves();
+
+        statistics.updateGameStats(matches, moves, duration);
+
         setChanged();
         notifyObservers("GAME_OVER");
     }
+    // This method is commented out to avoid confusion with the new endGame() method
+    /*public void endGame() {
+        this.isActive = false;
+        this.timer.stopTimer();
+        setChanged();
+        notifyObservers("GAME_OVER");
+    }*/
 
     public boolean processTurn(Card card1, Card card2) {
         if (card1 == null || card2 == null || !isActive) {
@@ -174,7 +202,16 @@ public abstract class Game extends Observable {
     public Card getFirstCard() {
         return firstCard;
     }
-    
+
+    public int getMoves() {
+        return player.getMoves();
+    }
+
+    public int getMatches() {
+        // Replace 'matches' with the actual field or logic that tracks matches
+        return board.getMatchedPairsCount();
+    }
+
     public Card getSecondCard() {
         return secondCard;
     }
@@ -232,4 +269,9 @@ public abstract class Game extends Observable {
         
         return false;
     }
+
+    public GameStatistics getStatistics() {
+        return statistics;
+    }
+
 }

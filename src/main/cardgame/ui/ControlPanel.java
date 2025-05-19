@@ -1,5 +1,11 @@
 package main.cardgame.ui;
 
+import main.cardgame.stats.GameStatistics;
+import javafx.scene.layout.VBox;
+import javafx.scene.control.Label;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -20,6 +26,7 @@ public class ControlPanel {
     private GameBoardUI gameBoard;
     private Stage primaryStage;
     private Game game;
+    private Button statsButton;
     // Direct references to required components
     private CardRenderer cardRenderer;
     private GameStatusPanel statusPanel;
@@ -92,8 +99,19 @@ public class ControlPanel {
             }
         });
 
+        statsButton = new Button("Show Stats");
+        statsButton.setStyle(
+                "-fx-font-size: 16px; -fx-font-weight: bold; " +
+                        "-fx-background-color: #556b2f; -fx-text-fill: white; -fx-background-radius: 10;"
+        );
+        statsButton.setPrefSize(120, 40);
+        ButtonEffectManager.addButtonHoverEffect(statsButton);
+
+        // Handle click: show stats popup using GameStatistics
+        statsButton.setOnAction(e -> showStatsWindow());
         // Original layout for buttons
-        buttonsBox = new HBox(10, pauseButton, restartButton, mainMenuButton);
+        //buttonsBox = new HBox(10, pauseButton, restartButton, mainMenuButton);
+        buttonsBox = new HBox(10, pauseButton, restartButton, mainMenuButton, statsButton);
         buttonsBox.setAlignment(Pos.CENTER_RIGHT);
         buttonsBox.setPadding(new Insets(0));
     }
@@ -152,4 +170,26 @@ public class ControlPanel {
             System.err.println("Error updating UI for pause/resume: " + ex.getMessage());
         }
     }
+    private void showStatsWindow() {
+        if (game == null) return;
+
+        var stats = game.getStatistics();
+        javafx.scene.layout.VBox content = new javafx.scene.layout.VBox(10);
+        content.setPadding(new Insets(15));
+        content.getChildren().addAll(
+                new javafx.scene.control.Label("Games Played: " + stats.getTotalGames()),
+                new javafx.scene.control.Label("Total Matches: " + stats.getTotalMatches()),
+                new javafx.scene.control.Label("Total Moves: " + stats.getTotalMoves()),
+                new javafx.scene.control.Label("Best Score: " + stats.getBestScore()),
+                new javafx.scene.control.Label("Best Time: " + stats.getBestTime() / 1000 + " sec"),
+                new javafx.scene.control.Label(String.format("Average Moves: %.2f", stats.getAverageMoves())),
+                new javafx.scene.control.Label(String.format("Average Time: %.2f sec", stats.getAverageTime() / 1000))
+        );
+
+        javafx.stage.Stage statsStage = new javafx.stage.Stage();
+        statsStage.setTitle("Game Statistics");
+        statsStage.setScene(new javafx.scene.Scene(content));
+        statsStage.show();
+    }
+
 }

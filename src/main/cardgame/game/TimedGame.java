@@ -6,7 +6,7 @@ import main.cardgame.model.Card;
 
 
 public class TimedGame extends Game {
-    public static final int EASY_TIME = 2 * 2;   // 2 minutes
+    public static final int EASY_TIME = 2 * 60;   // 2 minutes
     public static final int MEDIUM_TIME = 4 * 60; // 4 minutes
     public static final int HARD_TIME = 5 * 60; // 5 minute
 
@@ -24,16 +24,17 @@ public class TimedGame extends Game {
 
     @Override
     public void endGame() {
-        super.endGame();
-
-        // Only add the time bonus if game was won (not timed out)
         if (!getTimer().isTimeUp()) {
             int remainingSeconds = (int) getTimer().getRemainingTime() / 1000;
             getPlayer().incrementScore(remainingSeconds / 2);
         }
 
-        super.endGame();
+        // Prevent duplicate end logic
+        if (isActive()) {
+            super.endGame();
+        }
     }
+
 
     public void startTimer() {
         getTimer().startTimer();

@@ -73,7 +73,7 @@ public class GameStatusPanel {
 
         // Original timer update logic
         timerUpdateTimeline = new Timeline(
-                new KeyFrame(Duration.seconds(0.5), event -> updateTimerDisplay())
+                new KeyFrame(Duration.seconds(1), event -> updateTimerDisplay())
         );
         timerUpdateTimeline.setCycleCount(Timeline.INDEFINITE);
         timerUpdateTimeline.play();

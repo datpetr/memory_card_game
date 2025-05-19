@@ -29,6 +29,18 @@ public class Timer extends Observable {
         this.startTime = 0;
     }
 
+    // In main.cardgame.model.Timer.java
+    public int getElapsedSeconds() {
+        if (state == State.READY) return 0;
+        long elapsedMillis;
+        if (state == State.PAUSED) {
+            elapsedMillis = pausedAt - startTime - totalPausedTime;
+        } else {
+            elapsedMillis = System.currentTimeMillis() - startTime - totalPausedTime;
+        }
+        return (int) (elapsedMillis / 1000);
+    }
+
     // Constructor for elapsed time tracking
     public Timer() {
         this.isCountdown = false;
