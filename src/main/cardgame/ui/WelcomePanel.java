@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import main.cardgame.stats.StatsManager;
+
 /**
  * Welcome screen for the Memory Card Game
  * Preserves the original UI components and behavior from GameBoardVisualizer2
@@ -58,7 +59,22 @@ public class WelcomePanel {
             statsDialog.showAndWait();
         });
 
-        playButton.setOnAction(e -> gameBoard.showModeSelection(primaryStage));
+        // Add statsButton to your main menu layout, e.g.:
+        VBox menuBox = new VBox(playButton, statisticsButton, exitButton);
+
+        playButton.setOnAction(e -> {
+            if (gameBoard.promptForPlayerName(primaryStage)) {
+                gameBoard.showModeSelection(primaryStage);
+            }
+            // If canceled, do nothing (stay on welcome panel)
+        });
+        // Java
+        playButton.setOnAction(e -> {
+            if (gameBoard.promptForPlayerName(primaryStage)) {
+                gameBoard.showModeSelection(primaryStage);
+            }
+            // If canceled, do nothing (stay on welcome panel)
+        });
         exitButton.setOnAction(e -> Platform.exit());
 
         VBox vbox = new VBox(30, titleLabel, playButton, statisticsButton, exitButton);
