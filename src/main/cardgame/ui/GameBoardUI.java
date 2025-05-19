@@ -16,10 +16,15 @@ import main.cardgame.model.Card;
 import main.cardgame.model.Deck;
 import main.cardgame.model.GameBoard;
 import main.cardgame.model.Player;
+import javafx.scene.control.Alert;
+import javafx.scene.control.TextInputDialog;
+import java.util.regex.Pattern;
+import java.util.Optional;
 
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import javafx.scene.control.TextInputDialog;
 
 /**
  * Main entry point for the Memory Card Game.
@@ -39,6 +44,7 @@ public class GameBoardUI extends Application implements Observer {
     private GameBoard board;
     private String currentMode;
     private String currentDifficulty;
+    private String playerName = "Player1";
 
     // Organized UI components
     private WelcomePanel welcomePanel;
@@ -60,10 +66,6 @@ public class GameBoardUI extends Application implements Observer {
      * Shows the mode selection screen
      * @param primaryStage The primary stage
      */
-    public void showModeSelection(Stage primaryStage) {
-        modeSelectionPanel = new ModeSelectionPanel(primaryStage, this);
-        modeSelectionPanel.show();
-    }
 
     /**
      * Shows the difficulty selection screen
@@ -81,6 +83,54 @@ public class GameBoardUI extends Application implements Observer {
      * @param mode The game mode
      * @param difficulty The game difficulty
      */
+
+    // Method to prompt and validate player name
+    private boolean promptForPlayerName(Stage primaryStage) {
+        Pattern validPattern = Pattern.compile("^[A-Za-z0-9_-]{3,12}$");
+        while (true) {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Enter Player Name");
+            dialog.setHeaderText(null);
+            dialog.setContentText("Name:");
+            Optional<String> result = dialog.showAndWait();
+            if (result.isPresent()) {
+                String input = result.get().trim();
+                try {
+                    if (input.contains(" ")) {
+                        throw new IllegalArgumentException("Name cannot contain spaces.");
+                    }
+                    if (input.length() < 3 || input.length() > 12) {
+                        throw new IllegalArgumentException("Name must be 3-12 characters.");
+                    }
+                    if (!validPattern.matcher(input).matches()) {
+                        throw new IllegalArgumentException("Name can only contain latin letters, digits, _ and -.");
+                    }
+                    playerName = input;
+                    return true; // Success
+                } catch (IllegalArgumentException ex) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Invalid Name");
+                    alert.setHeaderText("Invalid player name.");
+                    alert.setContentText(ex.getMessage());
+                    alert.showAndWait();
+                }
+            } else {
+                return false; // Cancel pressed
+            }
+        }
+    }
+
+    public void showModeSelection(Stage primaryStage) {
+        if (promptForPlayerName(primaryStage)) {
+            modeSelectionPanel = new ModeSelectionPanel(primaryStage, this);
+            modeSelectionPanel.show();
+        } else {
+            // Stay on the welcome panel (main menu)
+            welcomePanel = new WelcomePanel(primaryStage, this);
+            welcomePanel.show();
+        }
+    }
+
     public void startGameWithSettings(Stage primaryStage, String mode, String difficulty) {
         this.currentMode = mode;
         this.currentDifficulty = difficulty;
@@ -89,7 +139,7 @@ public class GameBoardUI extends Application implements Observer {
         Deck deck = Deck.createDeckForLevel(difficulty);
         this.board = new GameBoard(difficulty, deck.getCards()) {};
         this.board.addObserver(this);
-        
+
         // Get the actual dimensions from the created board
         BOARD_ROWS = board.getRows();
         BOARD_COLS = board.getCols();
@@ -135,13 +185,13 @@ public class GameBoardUI extends Application implements Observer {
 
         // Create CardRenderer with rows and cols from the board
         cardRenderer = new CardRenderer(this, game, board, board.getCols(), board.getRows(), CARD_ASPECT_RATIO, GAP);
-        
+
         // Then create status panel
         statusPanel = new GameStatusPanel(this.game);
-        
+
         // Then create control panel with references to both
         controlPanel = new ControlPanel(primaryStage, game);
-        
+
         // Set component references explicitly (not through constructor)
         controlPanel.setGameBoard(this);
         controlPanel.setCardRenderer(cardRenderer);
@@ -215,6 +265,7 @@ public class GameBoardUI extends Application implements Observer {
             // Handle timer updates
             else if (observable == game.getTimer() && "TIMER_STOPPED".equals(arg) && statusPanel != null) {
                 statusPanel.updateTimerDisplay();
+                showGameOverMessage(); // <-- Add this line
             }
         });
     }
@@ -235,4 +286,3 @@ public class GameBoardUI extends Application implements Observer {
         launch(args);
     }
 }
-
