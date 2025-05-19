@@ -16,14 +16,9 @@ import main.cardgame.model.Card;
 import main.cardgame.model.Deck;
 import main.cardgame.model.GameBoard;
 import main.cardgame.model.Player;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TextInputDialog;
-import java.util.regex.Pattern;
-import java.util.Optional;
 
 import java.util.Observable;
 import java.util.Observer;
-import javafx.scene.control.TextInputDialog;
 
 /**
  * Main entry point for the Memory Card Game.
@@ -43,7 +38,6 @@ public class GameBoardUI extends Application implements Observer {
     private GameBoard board;
     private String currentMode;
     private String currentDifficulty;
-    private String playerName = "Player1";
 
     // Organized UI components
     private WelcomePanel welcomePanel;
@@ -66,7 +60,6 @@ public class GameBoardUI extends Application implements Observer {
      * @param primaryStage The primary stage
      */
     public void showModeSelection(Stage primaryStage) {
-        promptForPlayerName(primaryStage);
         modeSelectionPanel = new ModeSelectionPanel(primaryStage, this);
         modeSelectionPanel.show();
     }
@@ -87,44 +80,6 @@ public class GameBoardUI extends Application implements Observer {
      * @param mode The game mode
      * @param difficulty The game difficulty
      */
-
-    // Method to prompt and validate player name
-    private void promptForPlayerName(Stage primaryStage) {
-        Pattern validPattern = Pattern.compile("^[A-Za-z0-9_-]{3,12}$");
-        while (true) {
-            TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle("Enter Player Name");
-            dialog.setHeaderText(null); // No requirements shown
-            dialog.setContentText("Name:");
-            Optional<String> result = dialog.showAndWait();
-            if (result.isPresent()) {
-                String input = result.get().trim();
-                try {
-                    if (input.contains(" ")) {
-                        throw new IllegalArgumentException("Name cannot contain spaces.");
-                    }
-                    if (input.length() < 3 || input.length() > 12) {
-                        throw new IllegalArgumentException("Name must be 3-12 characters.");
-                    }
-                    if (!validPattern.matcher(input).matches()) {
-                        throw new IllegalArgumentException("Name can only contain letters, digits, _ and -.");
-                    }
-                    playerName = input;
-                    break;
-                } catch (IllegalArgumentException ex) {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Invalid Name");
-                    alert.setHeaderText("Invalid player name.");
-                    alert.setContentText(ex.getMessage());
-                    alert.showAndWait();
-                }
-            } else {
-                Platform.exit();
-                return;
-            }
-        }
-    }
-
     public void startGameWithSettings(Stage primaryStage, String mode, String difficulty) {
         this.currentMode = mode;
         this.currentDifficulty = difficulty;
@@ -153,7 +108,8 @@ public class GameBoardUI extends Application implements Observer {
         // Create deck and board (preserved logic)
         Deck deck = Deck.createDeckForLevel(difficulty);
         this.board = new GameBoard(difficulty, deck.getCards());
-        Player player = new Player(playerName);
+        this.board.addObserver(this);
+        Player player = new Player("Player1");
 
         // Register as observer for player
         player.addObserver(this);
@@ -237,7 +193,6 @@ public class GameBoardUI extends Application implements Observer {
         statusPanel.startTimerUpdates();
     }
 
-
     /**
      * Restarts the game with current settings
      */
@@ -261,6 +216,7 @@ public class GameBoardUI extends Application implements Observer {
     public void update(Observable observable, Object arg) {
         Platform.runLater(() -> {
             // Handle updates from all observable objects
+            // We delegate the updates to appropriate components
 
             // Handle player updates
             if (observable instanceof Player && statusPanel != null) {
@@ -275,7 +231,6 @@ public class GameBoardUI extends Application implements Observer {
             // Handle timer updates
             else if (observable == game.getTimer() && "TIMER_STOPPED".equals(arg) && statusPanel != null) {
                 statusPanel.updateTimerDisplay();
-                showGameOverMessage(); // <-- Add this line
             }
         });
     }
