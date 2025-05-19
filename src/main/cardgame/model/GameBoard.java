@@ -6,27 +6,42 @@ import java.util.Observer;
 
 public class GameBoard extends Observable {
     private Card[][] board;
-    private int size;
+    private int rows;
+    private int cols;
     private int matchedPairsCount = 0;
     private final int totalPairs;
     private Observer mainObserver; // Track the main observer for the board
 
     public GameBoard(String level, List<Card> cards) {
-        this.size = determineSize(level);
-        this.board = new Card[size][size];
-        this.totalPairs = (size * size) / 2;
+        this.rows = determineRows(level);
+        this.cols = determineCols(level);
+        this.board = new Card[rows][cols];
+        this.totalPairs = (rows * cols) / 2;
 
         initializeBoard(cards);
     }
 
-    private int determineSize(String level) {
+    public int determineRows(String level) {
+        switch (level.toLowerCase()) {
+            case "easy":
+                return 3;
+            case "medium":
+                return 4;
+            case "hard":
+                return 5;
+            default:
+                throw new IllegalArgumentException("Invalid level: " + level);
+        }
+    }
+
+    public int determineCols(String level) {
         switch (level.toLowerCase()) {
             case "easy":
                 return 4;
             case "medium":
-                return 6;
+                return 5;
             case "hard":
-                return 8;
+                return 6;
             default:
                 throw new IllegalArgumentException("Invalid level: " + level);
         }
@@ -40,7 +55,7 @@ public class GameBoard extends Observable {
     }
 
     private boolean isValidPosition(int row, int col) {
-        return row >= 0 && row < size && col >= 0 && col < size;
+        return row >= 0 && row < rows && col >= 0 && col < cols;
     }
 
     public boolean allCardsMatched() {
@@ -55,12 +70,6 @@ public class GameBoard extends Observable {
             setChanged();
             notifyObservers("CARD_FLIPPED");
         }
-    }
-
-    public void setGridSize(int gridSize) {
-        this.size = gridSize;
-        this.board = new Card[size][size]; // Reinitialize the board with the new size
-        // will be added more code later
     }
 
     public boolean checkMatch(Card card1, Card card2) {
@@ -87,16 +96,16 @@ public class GameBoard extends Observable {
             throw new IllegalArgumentException("Cards list cannot be null");
         }
 
-        if (cards.size() != size * size) {
+        if (cards.size() != rows * cols) {
             throw new IllegalArgumentException(
-                    "Invalid number of cards. Expected " + (size * size) +
+                    "Invalid number of cards. Expected " + (rows * cols) +
                             " but got " + cards.size()
             );
         }
 
         int index = 0;
-        for (int row = 0; row < size; row++) {
-            for (int col = 0; col < size; col++) {
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
                 board[row][col] = cards.get(index++);
             }
         }
@@ -109,8 +118,8 @@ public class GameBoard extends Observable {
     }
 
     public void resetBoard() {
-        for (int row = 0; row < size; row++) {
-            for (int col = 0; col < size; col++) {
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
                 Card card = board[row][col];
                 if (card != null) {
                     card.flip(); // Flip the card back
@@ -130,8 +139,17 @@ public class GameBoard extends Observable {
         return matchedPairsCount;
     }
 
+    public int getRows() {
+        return rows;
+    }
+    
+    public int getCols() {
+        return cols;
+    }
+    
+    // For backward compatibility
     public int getGridSize() {
-        return size;
+        return Math.max(rows, cols);
     }
     
     // Store the observer for retrieval later
