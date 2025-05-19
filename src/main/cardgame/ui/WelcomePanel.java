@@ -41,20 +41,17 @@ public class WelcomePanel {
 
         Button playButton = new Button("Play");
         playButton.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-background-color: #32cd32; -fx-text-fill: white; -fx-background-radius: 10;");
-        playButton.setMaxWidth(Double.MAX_VALUE);
-        playButton.setPrefHeight(60);
+        playButton.setPrefSize(220, 60);
         ButtonEffectManager.addButtonHoverEffect(playButton);
 
         Button statisticsButton = new Button("Statistics");
         statisticsButton.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-background-color: #4682b4; -fx-text-fill: white; -fx-background-radius: 10;");
-        statisticsButton.setMaxWidth(Double.MAX_VALUE);
-        statisticsButton.setPrefHeight(60);
+        statisticsButton.setPrefSize(220, 60);
         ButtonEffectManager.addButtonHoverEffect(statisticsButton);
 
         Button exitButton = new Button("Exit");
         exitButton.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-background-color: #b22222; -fx-text-fill: white; -fx-background-radius: 10;");
-        exitButton.setMaxWidth(Double.MAX_VALUE);
-        exitButton.setPrefHeight(60);
+        exitButton.setPrefSize(220, 60);
         ButtonEffectManager.addButtonHoverEffect(exitButton);
 
         statisticsButton.setOnAction(e -> {
@@ -81,16 +78,12 @@ public class WelcomePanel {
         vbox.setAlignment(Pos.CENTER);
         vbox.setPadding(new Insets(PADDING));
         vbox.setStyle("-fx-background-color: linear-gradient(to bottom, #f0f8ff, #87cefa);");
-        vbox.setFillWidth(true);
+        vbox.setFillWidth(false); // Don't stretch children
+
+        vbox.setPrefWidth(400);
+        vbox.setPrefHeight(350);
 
         Scene scene = new Scene(vbox, 400, 350);
-
-        // Make the VBox and buttons responsive to window resizing
-        vbox.prefWidthProperty().bind(scene.widthProperty());
-        vbox.prefHeightProperty().bind(scene.heightProperty());
-        playButton.prefWidthProperty().bind(vbox.widthProperty().multiply(0.7));
-        statisticsButton.prefWidthProperty().bind(vbox.widthProperty().multiply(0.7));
-        exitButton.prefWidthProperty().bind(vbox.widthProperty().multiply(0.7));
 
         primaryStage.setScene(scene);
         primaryStage.setTitle("Memory Card Game");
@@ -98,4 +91,3 @@ public class WelcomePanel {
         primaryStage.show();
     }
 }
-
