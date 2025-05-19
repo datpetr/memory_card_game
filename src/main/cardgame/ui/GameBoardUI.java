@@ -93,7 +93,14 @@ public class GameBoardUI extends Application implements Observer {
             dialog.setTitle("Enter Player Name");
             dialog.setHeaderText(null);
             dialog.setContentText("Name:");
+            // Show and center the dialog
+            dialog.initOwner(primaryStage);
             Optional<String> result = dialog.showAndWait();
+            Platform.runLater(() -> {
+                Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
+                dialogStage.setX(primaryStage.getX() + (primaryStage.getWidth() - dialogStage.getWidth()) / 2);
+                dialogStage.setY(primaryStage.getY() + (primaryStage.getHeight() - dialogStage.getHeight()) / 2);
+            });
             if (result.isPresent()) {
                 String input = result.get().trim();
                 try {
@@ -113,7 +120,13 @@ public class GameBoardUI extends Application implements Observer {
                     alert.setTitle("Invalid Name");
                     alert.setHeaderText("Invalid player name.");
                     alert.setContentText(ex.getMessage());
-                    alert.showAndWait();
+                    alert.initOwner(primaryStage);
+                    alert.show();
+                    Platform.runLater(() -> {
+                        Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+                        alertStage.setX(primaryStage.getX() + (primaryStage.getWidth() - alertStage.getWidth()) / 2);
+                        alertStage.setY(primaryStage.getY() + (primaryStage.getHeight() - alertStage.getHeight()) / 2);
+                    });
                 }
             } else {
                 return false; // Cancel pressed
