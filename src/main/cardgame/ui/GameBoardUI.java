@@ -66,11 +66,6 @@ public class GameBoardUI extends Application implements Observer {
      * Shows the mode selection screen
      * @param primaryStage The primary stage
      */
-    public void showModeSelection(Stage primaryStage) {
-        promptForPlayerName(primaryStage);
-        modeSelectionPanel = new ModeSelectionPanel(primaryStage, this);
-        modeSelectionPanel.show();
-    }
 
     /**
      * Shows the difficulty selection screen
@@ -90,12 +85,12 @@ public class GameBoardUI extends Application implements Observer {
      */
 
     // Method to prompt and validate player name
-    private void promptForPlayerName(Stage primaryStage) {
+    private boolean promptForPlayerName(Stage primaryStage) {
         Pattern validPattern = Pattern.compile("^[A-Za-z0-9_-]{3,12}$");
         while (true) {
             TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle("Enter Player Name");
-            dialog.setHeaderText(null); // No requirements shown
+            dialog.setHeaderText(null);
             dialog.setContentText("Name:");
             Optional<String> result = dialog.showAndWait();
             if (result.isPresent()) {
@@ -108,10 +103,10 @@ public class GameBoardUI extends Application implements Observer {
                         throw new IllegalArgumentException("Name must be 3-12 characters.");
                     }
                     if (!validPattern.matcher(input).matches()) {
-                        throw new IllegalArgumentException("Name can only contain letters, digits, _ and -.");
+                        throw new IllegalArgumentException("Name can only contain latin letters, digits, _ and -.");
                     }
                     playerName = input;
-                    break;
+                    return true; // Success
                 } catch (IllegalArgumentException ex) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Invalid Name");
@@ -120,9 +115,19 @@ public class GameBoardUI extends Application implements Observer {
                     alert.showAndWait();
                 }
             } else {
-                Platform.exit();
-                return;
+                return false; // Cancel pressed
             }
+        }
+    }
+
+    public void showModeSelection(Stage primaryStage) {
+        if (promptForPlayerName(primaryStage)) {
+            modeSelectionPanel = new ModeSelectionPanel(primaryStage, this);
+            modeSelectionPanel.show();
+        } else {
+            // Stay on the welcome panel (main menu)
+            welcomePanel = new WelcomePanel(primaryStage, this);
+            welcomePanel.show();
         }
     }
 
@@ -180,13 +185,13 @@ public class GameBoardUI extends Application implements Observer {
 
         // Create CardRenderer with rows and cols from the board
         cardRenderer = new CardRenderer(this, game, board, board.getCols(), board.getRows(), CARD_ASPECT_RATIO, GAP);
-        
+
         // Then create status panel
         statusPanel = new GameStatusPanel(this.game);
-        
+
         // Then create control panel with references to both
         controlPanel = new ControlPanel(primaryStage, game);
-        
+
         // Set component references explicitly (not through constructor)
         controlPanel.setGameBoard(this);
         controlPanel.setCardRenderer(cardRenderer);
