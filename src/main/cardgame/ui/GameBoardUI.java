@@ -67,10 +67,6 @@ public class GameBoardUI extends Application implements Observer {
      * Shows the mode selection screen
      * @param primaryStage The primary stage
      */
-    //public void showModeSelection(Stage primaryStage) {
-    //    modeSelectionPanel = new ModeSelectionPanel(primaryStage, this);
-    //    modeSelectionPanel.show();
-    //}
 
     /**
      * Shows the difficulty selection screen
