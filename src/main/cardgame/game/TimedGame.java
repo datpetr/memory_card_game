@@ -6,7 +6,7 @@ import main.cardgame.model.Card;
 
 
 public class TimedGame extends Game {
-    public static final int EASY_TIME = 2 * 60;   // 2 minutes
+    public static final int EASY_TIME = 2 * 2;   // 2 minutes
     public static final int MEDIUM_TIME = 4 * 60; // 4 minutes
     public static final int HARD_TIME = 5 * 60; // 5 minute
 
