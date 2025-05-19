@@ -197,7 +197,7 @@ public class CardRenderer {
         animateMatch(firstFlippedCard, secondFlippedCard);
         if (game.isGameOver()) {
             game.endGame();
-            ((GameBoardUI)game.getBoard().getObserver()).statusPanel.stopTimerUpdates();
+            gameBoardUI.statusPanel.stopTimerUpdates();
             gameBoardUI.showGameOverMessage();
         }
     }

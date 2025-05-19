@@ -17,11 +17,18 @@ public class DialogManager {
      * @param game The current game
      * @return True if the user confirmed, false otherwise
      */
+
     public static boolean showConfirmationDialog(String message, Game game) {
         // Pause game and timer before showing dialog (like Pause)
         if (game.isActive() && !game.isPaused()) {
             game.pauseGame();
-            ((GameBoardUI)game.getBoard().getObserver()).statusPanel.stopTimerUpdates();
+            Object observer = game.getBoard() != null ? game.getBoard().getObserver() : null;
+            if (observer instanceof GameBoardUI) {
+                GameBoardUI ui = (GameBoardUI) observer;
+                if (ui.statusPanel != null) {
+                    ui.statusPanel.stopTimerUpdates();
+                }
+            }
         }
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, message, ButtonType.YES, ButtonType.NO);
@@ -40,7 +47,13 @@ public class DialogManager {
         // Resume game and timer if cancelled (like Resume)
         if (!result && game.isPaused()) {
             game.resumeGame();
-            ((GameBoardUI)game.getBoard().getObserver()).statusPanel.startTimerUpdates();
+            Object observer = game.getBoard() != null ? game.getBoard().getObserver() : null;
+            if (observer instanceof GameBoardUI) {
+                GameBoardUI ui = (GameBoardUI) observer;
+                if (ui.statusPanel != null) {
+                    ui.statusPanel.startTimerUpdates();
+                }
+            }
         }
         return result;
     }
