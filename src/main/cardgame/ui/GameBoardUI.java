@@ -54,6 +54,7 @@ public class GameBoardUI extends Application implements Observer {
     private BoardCanvas boardCanvas;
 
     private String playerName;
+    private boolean gameOverShown = false;
 
     @Override
     public void start(Stage primaryStage) {
@@ -305,6 +306,8 @@ public class GameBoardUI extends Application implements Observer {
     public void showGameOverMessage() {
         // After the game ends, before returning to main menu
         int timeInSeconds = game.getTimer().getElapsedSeconds(); // Adjust this to your timer's API
+        if (gameOverShown) return; // Prevent double-counting
+        gameOverShown = true;
         StatsManager.recordGame(
                 game.getMatches(),
                 game.getMoves(),
