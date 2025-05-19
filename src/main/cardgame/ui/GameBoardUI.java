@@ -108,6 +108,7 @@ public class GameBoardUI extends Application implements Observer {
         // Create deck and board (preserved logic)
         Deck deck = Deck.createDeckForLevel(difficulty);
         this.board = new GameBoard(difficulty, deck.getCards());
+        this.board.addObserver(this);
         Player player = new Player("Player1");
 
         // Register as observer for player
