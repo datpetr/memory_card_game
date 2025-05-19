@@ -43,34 +43,25 @@ public class WelcomePanel {
         playButton.setPrefSize(180, 60);
         ButtonEffectManager.addButtonHoverEffect(playButton);
 
+        Button statisticsButton = new Button("Statistics");
+        statisticsButton.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-background-color: #4682b4; -fx-text-fill: white; -fx-background-radius: 10;");
+        statisticsButton.setPrefSize(180, 60);
+        ButtonEffectManager.addButtonHoverEffect(statisticsButton);
+
         Button exitButton = new Button("Exit");
         exitButton.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-background-color: #b22222; -fx-text-fill: white; -fx-background-radius: 10;");
         exitButton.setPrefSize(180, 60);
         ButtonEffectManager.addButtonHoverEffect(exitButton);
 
-        // In WelcomePanel.java
-        Button statsButton = new Button("Stats");
-        statsButton.setOnAction(e -> {
-            StatsDialog statsDialog = new StatsDialog();
+        statisticsButton.setOnAction(e -> {
+            StatisticsDialog statsDialog = new StatisticsDialog();
             statsDialog.showAndWait();
         });
 
-        // Add statsButton to your main menu layout, e.g.:
-        VBox menuBox = new VBox(playButton, statsButton, exitButton);
-
-        playButton.setOnAction(e -> {
-            if (gameBoard.promptForPlayerName(primaryStage)) {
-                gameBoard.showModeSelection(primaryStage);
-            }
-            // If canceled, do nothing (stay on welcome panel)
-        });
+        playButton.setOnAction(e -> gameBoard.showModeSelection(primaryStage));
         exitButton.setOnAction(e -> Platform.exit());
 
-        // Create stats label
-        statsLabel = new Label(getStatsText());
-        statsLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #4682b4;");
-
-        VBox vbox = new VBox(30, titleLabel, playButton, exitButton, statsLabel);
+        VBox vbox = new VBox(30, titleLabel, playButton, statisticsButton, exitButton);
         vbox.setAlignment(Pos.CENTER);
         vbox.setPadding(new Insets(PADDING));
         vbox.setStyle("-fx-background-color: linear-gradient(to bottom, #f0f8ff, #87cefa);");
