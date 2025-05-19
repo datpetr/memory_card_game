@@ -318,7 +318,7 @@ public class GameBoardUI extends Application implements Observer {
                 game.getTimer().getElapsedSeconds()
         );
 
-        GameOverDialog gameOverDialog = new GameOverDialog(game, board);
+        GameOverDialog gameOverDialog = new GameOverDialog(game, board); // <-- Only two arguments
         gameOverDialog.show().thenRun(() -> {
             // Return to main menu after dialog closes
             returnToMainMenu((Stage)controlPanel.getMainMenuButton().getScene().getWindow());
