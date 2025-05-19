@@ -28,7 +28,7 @@ public class WelcomePanel {
      */
     public void show() {
         // Original welcome screen UI components from GameBoardVisualizer2
-        Label titleLabel = new Label("Memory Card Game");
+        Label titleLabel = new Label("Welcome to Memo!");
         titleLabel.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #4682b4;");
 
         Button playButton = new Button("Play");
@@ -42,7 +42,11 @@ public class WelcomePanel {
         ButtonEffectManager.addButtonHoverEffect(exitButton);
 
         // Original event handlers
-        playButton.setOnAction(e -> gameBoard.showModeSelection(primaryStage));
+        playButton.setOnAction(e -> {
+            if (gameBoard.promptForPlayerName(primaryStage)) {
+                gameBoard.showModeSelection(primaryStage);
+            }
+        });
         exitButton.setOnAction(e -> Platform.exit());
 
         // Original layout
@@ -53,7 +57,7 @@ public class WelcomePanel {
 
         Scene scene = new Scene(vbox, 400, 350);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Memory Card Game");
+        primaryStage.setTitle("Memo");
         primaryStage.show();
     }
 }

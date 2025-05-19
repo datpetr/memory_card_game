@@ -222,7 +222,7 @@ public class CardRenderer {
     /**
      * Animates a match
      * Original implementation from GameBoardVisualizer2
-     * @param card1 The first card
+     * @param card1 The first card/
      * @param card2 The second card
      */
     private void animateMatch(Card card1, Card card2) {
