@@ -90,7 +90,7 @@ public class GameBoardUI extends Application implements Observer {
      */
 
     // Method to prompt and validate player name
-    private boolean promptForPlayerName(Stage primaryStage) {
+    boolean promptForPlayerName(Stage primaryStage) {
         Pattern validPattern = Pattern.compile("^[A-Za-z0-9_-]{3,12}$");
         while (true) {
             TextInputDialog dialog = new TextInputDialog();
@@ -126,17 +126,12 @@ public class GameBoardUI extends Application implements Observer {
     }
 
     public void showModeSelection(Stage primaryStage) {
-        if (promptForPlayerName(primaryStage)) {
-            modeSelectionPanel = new ModeSelectionPanel(primaryStage, this);
-            modeSelectionPanel.show();
-        } else {
-            // Stay on the welcome panel (main menu)
-            welcomePanel = new WelcomePanel(primaryStage, this);
-            welcomePanel.show();
-        }
+        modeSelectionPanel = new ModeSelectionPanel(primaryStage, this);
+        modeSelectionPanel.show();
     }
 
     public void startGameWithSettings(Stage primaryStage, String mode, String difficulty) {
+        this.gameOverShown = false;
         this.currentMode = mode;
         this.currentDifficulty = difficulty;
 
@@ -321,8 +316,8 @@ public class GameBoardUI extends Application implements Observer {
         });
     }
 
-    public static void main(String[] args) {
-        Card.setBackImagePath("file:src/main/resources/images/back2.jpg");
-        launch(args);
-    }
+        public static void main(String[] args) {
+            Card.setBackImagePath("file:src/main/resources/images/back2.jpg");
+            launch(args);
+        }
 }
