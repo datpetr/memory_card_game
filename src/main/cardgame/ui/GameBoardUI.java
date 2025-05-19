@@ -21,6 +21,7 @@ import javafx.scene.control.TextInputDialog;
 import java.util.regex.Pattern;
 import java.util.Optional;
 
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import javafx.scene.control.TextInputDialog;
@@ -32,7 +33,7 @@ import javafx.scene.control.TextInputDialog;
  */
 public class GameBoardUI extends Application implements Observer {
     // Constants preserved from GameBoardVisualizer2
-    private static int BOARD_ROWS = 4;
+    private static int BOARD_ROWS = 3;
     private static int BOARD_COLS = 4;
     private static final double CARD_ASPECT_RATIO = 2.0 / 3.0;
     private static final double PADDING = 20;
@@ -129,31 +130,16 @@ public class GameBoardUI extends Application implements Observer {
         this.currentMode = mode;
         this.currentDifficulty = difficulty;
 
-        // Set board dimensions based on difficulty (preserved logic)
-        switch (difficulty) {
-            case "easy":
-                BOARD_ROWS = 4;
-                BOARD_COLS = 4;
-                break;
-            case "medium":
-                BOARD_ROWS = 6;
-                BOARD_COLS = 6;
-                break;
-            case "hard":
-                BOARD_ROWS = 8;
-                BOARD_COLS = 8;
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown difficulty: " + difficulty);
-        }
-
-        int totalCardsNeeded = BOARD_ROWS * BOARD_COLS;
-        int requiredPairs = totalCardsNeeded / 2;
-
-        // Create deck and board (preserved logic)
+        // Create deck and board
         Deck deck = Deck.createDeckForLevel(difficulty);
-        this.board = new GameBoard(difficulty, deck.getCards());
-        Player player = new Player(playerName);
+        this.board = new GameBoard(difficulty, deck.getCards()) {};
+        this.board.addObserver(this);
+
+        // Get the actual dimensions from the created board
+        BOARD_ROWS = board.getRows();
+        BOARD_COLS = board.getCols();
+
+        Player player = new Player("Player1");
 
         // Register as observer for player
         player.addObserver(this);
@@ -192,9 +178,8 @@ public class GameBoardUI extends Application implements Observer {
         mainLayout.setPadding(new Insets(PADDING));
         mainLayout.setStyle("-fx-background-color: linear-gradient(to bottom, #f0f8ff, #e6e6fa);");
 
-        // Create components in correct order
-        // First create CardRenderer so it can be referenced by others
-        cardRenderer = new CardRenderer(this, game, board, BOARD_ROWS, BOARD_COLS, CARD_ASPECT_RATIO, GAP);
+        // Create CardRenderer with rows and cols from the board
+        cardRenderer = new CardRenderer(this, game, board, board.getCols(), board.getRows(), CARD_ASPECT_RATIO, GAP);
         
         // Then create status panel
         statusPanel = new GameStatusPanel(this.game);
@@ -237,7 +222,6 @@ public class GameBoardUI extends Application implements Observer {
         statusPanel.startTimerUpdates();
     }
 
-
     /**
      * Restarts the game with current settings
      */
@@ -261,6 +245,7 @@ public class GameBoardUI extends Application implements Observer {
     public void update(Observable observable, Object arg) {
         Platform.runLater(() -> {
             // Handle updates from all observable objects
+            // We delegate the updates to appropriate components
 
             // Handle player updates
             if (observable instanceof Player && statusPanel != null) {
