@@ -9,21 +9,31 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
- * Mode selection screen for the Memory Card Game
- * Preserves the original UI components and behavior from GameBoardVisualizer2
+ * Mode selection screen for the Memory Card Game.
+ * Allows players to choose between Endless and Timed game modes.
+ * Preserves the original UI components and behavior from GameBoardVisualizer2.
  */
 public class ModeSelectionPanel {
+    /** Default padding for UI elements */
     private static final double PADDING = 20;
+    /** Reference to the primary stage */
     private Stage primaryStage;
+    /** Reference to the parent game board UI */
     private GameBoardUI gameBoard;
 
+    /**
+     * Creates a new mode selection panel
+     * @param primaryStage The primary stage
+     * @param gameBoard The parent game board UI
+     */
     public ModeSelectionPanel(Stage primaryStage, GameBoardUI gameBoard) {
         this.primaryStage = primaryStage;
         this.gameBoard = gameBoard;
     }
 
     /**
-     * Shows the mode selection screen
+     * Shows the mode selection screen with options for Endless and Timed modes.
+     * Sets up the UI with styled buttons and attaches event handlers.
      */
     public void show() {
         // Original mode selection UI components from GameBoardVisualizer2

@@ -24,34 +24,56 @@ import java.util.Map;
  * Combines card rendering, animations, and board layout functionality
  */
 public class CardRenderer {
+    /** Default padding for card layout */
     private static final double PADDING = 20;
+    /** Default gap between cards */
     private static final double GAP = 10;
 
-    // Game components
+    /** Reference to the parent GameBoardUI */
     private GameBoardUI gameBoardUI;
+    /** Current game instance */
     private Game game;
+    /** Game board model */
     private GameBoard board;
 
-    // Layout properties
+    /** Number of columns in the grid */
     private int cols;
+    /** Number of rows in the grid */
     private int rows;
+    /** Aspect ratio for cards (width/height) */
     private double cardAspectRatio;
+    /** Gap between cards */
     private double gap;
+    /** Grid pane containing all card buttons */
     private GridPane gridPane;
 
-    // Card state management
+    /** First card selected in a turn */
     private Card firstFlippedCard;
+    /** Second card selected in a turn */
     private Card secondFlippedCard;
+    /** Map of cards to their ImageView representations */
     private final Map<Card, ImageView> cardViews = new HashMap<>();
+    /** Map of cards to their Button containers */
     private final Map<Card, Button> cardButtons = new HashMap<>();
 
-    // UI elements
+    /** Label displayed when game is paused */
     private Label gamePausedLabel;
 
-    // Game state flags
+    /** Flag indicating if cards are currently flipping */
     private boolean cardClicksBlocked = false;
+    /** Flag indicating if the first card is being flipped */
     private boolean flippingFirstCard = false;
 
+    /**
+     * Creates a new card renderer
+     * @param gameBoardUI Parent GameBoardUI instance
+     * @param game Current game instance
+     * @param board Game board model
+     * @param cols Number of columns
+     * @param rows Number of rows
+     * @param cardAspectRatio Card aspect ratio
+     * @param gap Gap between cards
+     */
     public CardRenderer(GameBoardUI gameBoardUI, Game game, GameBoard board, int cols, int rows,
                         double cardAspectRatio, double gap) {
         this.gameBoardUI = gameBoardUI;
@@ -122,6 +144,10 @@ public class CardRenderer {
 
     /**
      * Creates a styled card button with click handler
+     * @param card The card to create a button for
+     * @param cardWidth The width of the card
+     * @param cardHeight The height of the card
+     * @return The created card button
      */
     private Button createCardButton(Card card, double cardWidth, double cardHeight) {
         Button cardButton = new Button();
@@ -165,6 +191,8 @@ public class CardRenderer {
 
     /**
      * Handles card flip animation and game logic
+     * @param card The card to flip
+     * @param imageView The ImageView of the card
      */
     private void handleCardFlip(Card card, ImageView imageView) {
         if (cardClicksBlocked || card.isMatched() || card.isFaceUp() || !game.isActive()) return;
@@ -191,6 +219,9 @@ public class CardRenderer {
 
     /**
      * Animates a card flip with optional completion handler
+     * @param card The card to flip
+     * @param imageView The ImageView of the card
+     * @param onFinished The completion handler to run after the flip
      */
     private void animateCardFlip(Card card, ImageView imageView, Runnable onFinished) {
         ScaleTransition flipOut = new ScaleTransition(Duration.millis(200), imageView);
@@ -210,6 +241,8 @@ public class CardRenderer {
 
     /**
      * Updates the displayed image for a card
+     * @param card The card to update
+     * @param imageView The ImageView of the card
      */
     private void updateCardImage(Card card, ImageView imageView) {
         String path = card.isFaceUp() ? card.getImagePath() : Card.getBackImagePath();
@@ -218,6 +251,7 @@ public class CardRenderer {
 
     /**
      * Handles match checking logic
+     * @param isMatch True if the cards match, false otherwise
      */
     private void checkForMatch(boolean isMatch) {
         cardClicksBlocked = true;
@@ -262,6 +296,8 @@ public class CardRenderer {
 
     /**
      * Animates a successful match
+     * @param card1 The first card in the match
+     * @param card2 The second card in the match
      */
     private void animateMatch(Card card1, Card card2) {
         if (card1 == null || card2 == null || card1 == card2) return;
@@ -293,6 +329,7 @@ public class CardRenderer {
 
     /**
      * Gets the game board grid pane
+     * @return The grid pane
      */
     public GridPane getGridPane() {
         return gridPane;
@@ -300,6 +337,7 @@ public class CardRenderer {
 
     /**
      * Gets the pause overlay label
+     * @return The pause overlay label
      */
     public Label getPauseOverlay() {
         return gamePausedLabel;
@@ -307,6 +345,7 @@ public class CardRenderer {
 
     /**
      * Shows or hides the pause overlay
+     * @param visible True to show the overlay, false to hide it
      */
     public void showPauseOverlay(boolean visible) {
         gamePausedLabel.setVisible(visible);
@@ -314,6 +353,7 @@ public class CardRenderer {
 
     /**
      * Enables/disables all card buttons
+     * @param disabled True to disable buttons, false to enable them
      */
     public void setCardButtonsDisabled(boolean disabled) {
         for (Button btn : cardButtons.values()) {
@@ -323,6 +363,7 @@ public class CardRenderer {
 
     /**
      * Updates a card's display after state change
+     * @param card The card to update
      */
     public void handleCardUpdate(Card card) {
         ImageView imageView = cardViews.get(card);
@@ -331,3 +372,4 @@ public class CardRenderer {
         }
     }
 }
+

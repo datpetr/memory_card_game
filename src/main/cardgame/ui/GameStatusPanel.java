@@ -16,13 +16,23 @@ import main.cardgame.model.Player;
  * Preserves the original UI components and logic from GameBoardVisualizer2
  */
 public class GameStatusPanel {
+    /** Label displaying the current score */
     private Label scoreLabel;
+    /** Label displaying the number of moves */
     private Label moveLabel;
+    /** Label displaying the remaining or elapsed time */
     private Label timeLabel;
+    /** Timeline for regular timer updates */
     private Timeline timerUpdateTimeline;
+    /** Reference to the current game */
     private Game game;
+    /** Container for all status components */
     private HBox statsBox;
 
+    /**
+     * Creates a new game status panel for the specified game
+     * @param game The game to display status for
+     */
     public GameStatusPanel(Game game) {
         this.game = game;
         initialize();
@@ -59,6 +69,7 @@ public class GameStatusPanel {
 
     /**
      * Updates player statistics display
+     * @param player The player whose stats to display
      */
     public void updatePlayerStats(Player player) {
         scoreLabel.setText("Score: " + player.getScore());

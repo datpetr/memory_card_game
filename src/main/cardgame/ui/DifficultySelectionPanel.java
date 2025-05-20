@@ -9,15 +9,26 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
- * Difficulty selection screen for the Memory Card Game
- * Preserves the original UI components and behavior from GameBoardVisualizer2
+ * Difficulty selection screen for the Memory Card Game.
+ * Provides options for Easy, Medium, and Hard difficulty levels.
+ * Preserves the original UI components and behavior from GameBoardVisualizer2.
  */
 public class DifficultySelectionPanel {
+    /** Default padding for UI elements */
     private static final double PADDING = 20;
+    /** Reference to the primary stage */
     private Stage primaryStage;
+    /** Reference to the parent game board UI */
     private GameBoardUI gameBoard;
+    /** Selected game mode */
     private String mode;
 
+    /**
+     * Creates a new difficulty selection panel
+     * @param primaryStage The primary stage
+     * @param gameBoard The parent game board UI
+     * @param mode The selected game mode
+     */
     public DifficultySelectionPanel(Stage primaryStage, GameBoardUI gameBoard, String mode) {
         this.primaryStage = primaryStage;
         this.gameBoard = gameBoard;
@@ -25,7 +36,8 @@ public class DifficultySelectionPanel {
     }
 
     /**
-     * Shows the difficulty selection screen
+     * Shows the difficulty selection screen with options for Easy, Medium, and Hard.
+     * Sets up the UI with styled buttons and attaches event handlers.
      */
     public void show() {
         // Original difficulty selection UI components from GameBoardVisualizer2

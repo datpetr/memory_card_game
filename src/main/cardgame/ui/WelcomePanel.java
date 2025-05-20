@@ -10,27 +10,41 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import main.cardgame.profile.ProfileStatsDialog;
 import main.cardgame.stats.StatsManager;
-import javafx.stage.Stage;
 import main.cardgame.profile.ProfileSelectionDialog;
 import main.cardgame.profile.GlobalProfileContext;
 import main.cardgame.profile.UserProfile;
 
 
 /**
- * Welcome screen for the Memory Card Game
- * Preserves the original UI components and behavior from GameBoardVisualizer2
+ * Welcome screen for the Memory Card Game.
+ * This is the initial screen shown when the game starts.
+ * Provides options to play the game, view statistics, and manage user profiles.
+ * Preserves the original UI components and behavior from GameBoardVisualizer2.
  */
 public class WelcomePanel {
+    /** Default padding for UI elements */
     private static final double PADDING = 20;
+    /** Reference to the primary stage */
     private Stage primaryStage;
+    /** Reference to the parent game board UI */
     private GameBoardUI gameBoard;
+    /** Label for displaying game statistics */
     private Label statsLabel;
 
+    /**
+     * Creates a new welcome panel
+     * @param primaryStage The primary stage
+     * @param gameBoard The parent game board UI
+     */
     public WelcomePanel(Stage primaryStage, GameBoardUI gameBoard) {
         this.primaryStage = primaryStage;
         this.gameBoard = gameBoard;
     }
 
+    /**
+     * Gets the text to display in the statistics label
+     * @return A formatted string containing games played and best time statistics
+     */
     private String getStatsText() {
         // Replace with actual stats retrieval logic
         int gamesPlayed = StatsManager.getGamesPlayed();
@@ -39,7 +53,9 @@ public class WelcomePanel {
     }
 
     /**
-     * Shows the welcome screen
+     * Shows the welcome screen with game title, play button, profile management,
+     * and statistics.
+     * Sets up the UI with styled buttons and attaches event handlers.
      */
     public void show() {
         Label titleLabel = new Label("Memory Card Game");
