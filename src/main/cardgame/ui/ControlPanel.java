@@ -19,33 +19,58 @@ import main.cardgame.game.Game;
  * Preserves the original UI components and logic from GameBoardVisualizer2
  */
 public class ControlPanel {
+    /** Button to pause/resume the game */
     private Button pauseButton;
+    /** Button to restart the game */
     private Button restartButton;
+    /** Button to return to main menu */
     private Button mainMenuButton;
+    /** Container for all buttons */
     private HBox buttonsBox;
+    /** Reference to the game board UI */
     private GameBoardUI gameBoard;
+    /** Reference to the primary stage */
     private Stage primaryStage;
+    /** Reference to the current game */
     private Game game;
+    /** Button to show statistics */
     private Button statsButton;
-    // Direct references to required components
+    /** Reference to the card renderer */
     private CardRenderer cardRenderer;
+    /** Reference to the status panel */
     private GameStatusPanel statusPanel;
 
+    /**
+     * Creates a new control panel for the specified game
+     * @param primaryStage The primary stage
+     * @param game The game to control
+     */
     public ControlPanel(Stage primaryStage, Game game) {
         this.primaryStage = primaryStage;
         this.game = game;
         initialize();
     }
 
-    // Separate setters for each dependency to avoid circular references
+    /**
+     * Sets the reference to the game board UI
+     * @param gameBoard The game board UI
+     */
     public void setGameBoard(GameBoardUI gameBoard) {
         this.gameBoard = gameBoard;
     }
     
+    /**
+     * Sets the reference to the card renderer
+     * @param cardRenderer The card renderer
+     */
     public void setCardRenderer(CardRenderer cardRenderer) {
         this.cardRenderer = cardRenderer;
     }
     
+    /**
+     * Sets the reference to the status panel
+     * @param statusPanel The status panel
+     */
     public void setStatusPanel(GameStatusPanel statusPanel) {
         this.statusPanel = statusPanel;
     }
@@ -100,7 +125,6 @@ public class ControlPanel {
         });
 
         // Original layout for buttons
-        //buttonsBox = new HBox(10, pauseButton, restartButton, mainMenuButton);
         buttonsBox = new HBox(10, pauseButton, restartButton, mainMenuButton);
         buttonsBox.setAlignment(Pos.CENTER_RIGHT);
         buttonsBox.setPadding(new Insets(0));
@@ -160,6 +184,10 @@ public class ControlPanel {
             System.err.println("Error updating UI for pause/resume: " + ex.getMessage());
         }
     }
+
+    /**
+     * Shows the statistics window
+     */
     private void showStatsWindow() {
         if (game == null) return;
 

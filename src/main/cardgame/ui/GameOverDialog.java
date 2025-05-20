@@ -7,21 +7,31 @@ import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import main.cardgame.game.Game;
 import main.cardgame.model.GameBoard;
-import java.util.concurrent.CompletableFuture; // Add this import
+import java.util.concurrent.CompletableFuture;
 
 import main.cardgame.profile.GlobalProfileContext;
 import main.cardgame.profile.ProfileManager;
 import java.io.IOException;
 
 /**
- * Game over dialog
- * Preserves the original dialog implementation from GameBoardVisualizer2
+ * Game over dialog that displays the final results when a game ends.
+ * Shows different messages based on whether the player won or ran out of time.
+ * Preserves the original dialog implementation from GameBoardVisualizer2.
  */
 public class GameOverDialog {
+    /** The game instance that has ended */
     private Game game;
+    /** The game board model */
     private GameBoard board;
+    /** The parent game board UI */
     private GameBoardUI gameBoardUI;
 
+    /**
+     * Creates a new game over dialog
+     * @param game The game instance that has ended
+     * @param board The game board model
+     * @param gameBoardUI The parent game board UI
+     */
     public GameOverDialog(Game game, GameBoard board, GameBoardUI gameBoardUI) {
         this.game = game;
         this.board = board;
@@ -29,8 +39,10 @@ public class GameOverDialog {
     }
 
     /**
-     * Shows the game over dialog
-     * Original implementation from GameBoardVisualizer2
+     * Shows the game over dialog with the final game statistics.
+     * Displays different messages based on whether the player won or ran out of time.
+     * Updates the statistics using the matched pairs, time, and moves from the completed game.
+     *
      * @return A CompletableFuture that completes when the dialog is closed
      */
     public CompletableFuture<Void> show() {

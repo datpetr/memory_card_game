@@ -32,31 +32,46 @@ import java.util.regex.Pattern;
  * while maintaining identical UI components and behavior.
  */
 public class GameBoardUI extends Application implements Observer {
-    // Constants preserved from GameBoardVisualizer2
+    /** Default number of rows in the game board */
     private static int BOARD_ROWS = 3;
+    /** Default number of columns in the game board */
     private static int BOARD_COLS = 4;
+    /** Aspect ratio for cards (width/height) */
     private static final double CARD_ASPECT_RATIO = 2.0 / 2.0;
+    /** Padding around the game board */
     private static final double PADDING = 20;
+    /** Gap between cards */
     private static final double GAP = 10;
 
-    // Core game components (preserved from GameBoardVisualizer2)
+    /** Current game instance */
     private Game game;
+    /** Game board model */
     private GameBoard board;
+    /** Current game mode (e.g., "endless", "timed") */
     private String currentMode;
+    /** Current difficulty level (e.g., "easy", "medium", "hard") */
     private String currentDifficulty;
 
     // Organized UI components
+    /** Welcome screen panel */
     private WelcomePanel welcomePanel;
+    /** Game mode selection panel */
     private ModeSelectionPanel modeSelectionPanel;
+    /** Difficulty level selection panel */
     private DifficultySelectionPanel difficultySelectionPanel;
+    /** Game status panel */
     public GameStatusPanel statusPanel;
+    /** Card renderer for displaying cards */
     public CardRenderer cardRenderer;
+    /** Control panel for game controls */
     private ControlPanel controlPanel;
 
-
+    /** Player's name */
     private String playerName;
+    /** Flag to indicate if game over message has been shown */
     private boolean gameOverShown = false;
 
+    /** Primary stage of the application */
     private Stage primaryStage; // Add this field to store the primary stage
 
     @Override
