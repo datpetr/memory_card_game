@@ -1,10 +1,10 @@
 {
-  "totalGames": 11,
-  "totalMatches": 780,
-  "totalMoves": 173,
-  "totalTime": 300829,
-  "bestScore": 20,
-  "bestTime": 31,
-  "bestTimedScore": 155,
-  "bestEndlessScore": 0
+  "totalGames": 8,
+  "totalMatches": 360,
+  "totalMoves": 134,
+  "totalTime": 225540,
+  "bestScore": 19,
+  "bestTime": 38,
+  "bestTimedScore": 87,
+  "bestEndlessScore": 207
 }

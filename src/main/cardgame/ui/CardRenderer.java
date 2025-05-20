@@ -138,17 +138,17 @@ public class CardRenderer {
      * Initializes the pause overlay
      */
     private void initializePauseOverlay() {
-        // Create a semi-transparent rectangle to gray out the board
+        // Create a semi-transparent white rectangle to gray out the board
         Rectangle dim = new Rectangle();
-        dim.setFill(Color.rgb(70, 130, 180, 0.45));
+        dim.setFill(Color.rgb(255, 255, 255, 0.45)); // White, subtle opacity
         dim.widthProperty().bind(gridPane.widthProperty());
         dim.heightProperty().bind(gridPane.heightProperty());
 
         // Create the pause label
         gamePausedLabel = new Label("Game Paused");
         gamePausedLabel.setStyle(
-                "-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: #ffffff; " +
-                        "-fx-background-color: rgba(70,130,180,0.8); -fx-padding: 30px; -fx-background-radius: 15;"
+                "-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: #fff; " +
+                        "-fx-background-color: rgba(70,130,180,0.85); -fx-padding: 30px; -fx-background-radius: 15;"
         );
         gamePausedLabel.setAlignment(Pos.CENTER);
 
