@@ -7,7 +7,7 @@ import main.cardgame.game.Game;
 
 /**
  * Utility class for managing dialogs
- * Preserves the original dialog implementations from GameBoardVisualizer2
+ * Preserves the original dialog implementations from GameBoardUI
  */
 public class DialogManager {
     /**

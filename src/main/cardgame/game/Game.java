@@ -21,6 +21,8 @@ public abstract class Game extends Observable {
     private Card secondCard;
     //protected GameStatistics statistics = GameStatistics.loadFromDisk();
     protected GameStatistics statistics;
+    private long startTime;
+
     /**
      * Constructor for standard game without countdown
      */
@@ -33,7 +35,7 @@ public abstract class Game extends Observable {
         this.firstCard = null;
         this.secondCard = null;
     }
-    
+
     /**
      * Constructor for game with countdown timer
      */
@@ -51,8 +53,6 @@ public abstract class Game extends Observable {
         UserProfile profile = GlobalProfileContext.getActiveProfile();
         this.statistics = (profile != null) ? profile.getStatistics() : new GameStatistics();
     }
-
-    private long startTime; // Add this field
 
     public void play() {
         initializeStatistics();
@@ -106,6 +106,10 @@ public abstract class Game extends Observable {
     }
 
 
+    /**
+     * Check if the game is currently paused
+     * return true if the game is paused
+     */
     public void endGame() {
         this.isActive = false;
         this.timer.stopTimer();
@@ -180,18 +184,6 @@ public abstract class Game extends Observable {
     public Timer getTimer() {
         return timer;
     }
-    
-    public void setFirstCard(Card card) {
-        this.firstCard = card;
-    }
-    
-    public void setSecondCard(Card card) {
-        this.secondCard = card;
-    }
-    
-    public Card getFirstCard() {
-        return firstCard;
-    }
 
     public int getMoves() {
         return player.getMoves();
@@ -200,10 +192,6 @@ public abstract class Game extends Observable {
     public int getMatches() {
         // Replace 'matches' with the actual field or logic that tracks matches
         return board.getMatchedPairsCount();
-    }
-
-    public Card getSecondCard() {
-        return secondCard;
     }
 
     public GameStatistics getStatistics() {

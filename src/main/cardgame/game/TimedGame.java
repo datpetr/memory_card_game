@@ -6,9 +6,9 @@ import main.cardgame.model.Card;
 
 
 public class TimedGame extends Game {
-    public static final int EASY_TIME = 60;   // 2 minutes
-    public static final int MEDIUM_TIME = 2 * 60; // 4 minutes
-    public static final int HARD_TIME = 3 * 60; // 5 minute
+    public static final int EASY_TIME = 60;   // 1 minute
+    public static final int MEDIUM_TIME = 2 * 60; // 2 minutes
+    public static final int HARD_TIME = 3 * 60; // 3 minute
 
     private boolean isStopped;
 
@@ -35,17 +35,6 @@ public class TimedGame extends Game {
             super.endGame();
         }
     }
-
-
-    public void startTimer() {
-        getTimer().startTimer();
-    }
-
-    public void stopGame() {
-        this.isStopped = true;
-
-    }
-    // creating the bonus points for remaining time
 
     @Override
     public boolean processTurn(Card card1, Card card2) {
