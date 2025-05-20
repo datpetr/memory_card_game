@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import main.cardgame.profile.ProfileStatsDialog;
 import main.cardgame.stats.StatsManager;
 import javafx.stage.Stage;
 import main.cardgame.profile.ProfileSelectionDialog;
@@ -59,7 +60,7 @@ public class WelcomePanel {
         exitButton.setPrefSize(220, 60);
         ButtonEffectManager.addButtonHoverEffect(exitButton);
 
-        statisticsButton.setOnAction(e -> {
+        /*statisticsButton.setOnAction(e -> {
             StatisticsDialog statsDialog = new StatisticsDialog();
             statsDialog.show();
             // Center the dialog after it is shown
@@ -68,8 +69,30 @@ public class WelcomePanel {
                 dialogStage.setX(primaryStage.getX() + (primaryStage.getWidth() - dialogStage.getWidth()) / 2);
                 dialogStage.setY(primaryStage.getY() + (primaryStage.getHeight() - dialogStage.getHeight()) / 2);
             });
+        });*/
+        statisticsButton.setOnAction(e -> {
+            new ProfileStatsDialog().showAndWait();
         });
+        /*
+        statisticsButton.setOnAction(e -> {
+            ProfileSelectionDialog dialog = new ProfileSelectionDialog(primaryStage, () -> {
+                var selectedProfile = GlobalProfileContext.getActiveProfile();
+                if (selectedProfile != null) {
+                    StatisticsDialog statsDialog = new StatisticsDialog(selectedProfile);
+                    statsDialog.show();
 
+                    // Optional: center dialog
+                    Platform.runLater(() -> {
+                        Stage dialogStage = (Stage) statsDialog.getDialogPane().getScene().getWindow();
+                        dialogStage.setX(primaryStage.getX() + (primaryStage.getWidth() - dialogStage.getWidth()) / 2);
+                        dialogStage.setY(primaryStage.getY() + (primaryStage.getHeight() - dialogStage.getHeight()) / 2);
+                    });
+                }
+            });
+
+            dialog.showAndWait();
+        });
+        */
         /*playButton.setOnAction(e -> {
             if (gameBoard.promptForPlayerName(primaryStage)) {
                 gameBoard.showModeSelection(primaryStage);

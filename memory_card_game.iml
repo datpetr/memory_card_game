@@ -19,7 +19,6 @@
     </orderEntry>
     <orderEntry type="library" name="lib1" level="project" />
     <orderEntry type="library" exported="" name="java_fx" level="project" />
-    <orderEntry type="library" name="gson-2.10.2" level="project" />
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
@@ -30,5 +29,6 @@
         <jarDirectory url="file://$MODULE_DIR$/../../openjfx-24.0.1_windows-x64_bin-sdk/javafx-sdk-24.0.1/lib" recursive="false" />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="gson-2.10.2" level="project" />
   </component>
 </module>
