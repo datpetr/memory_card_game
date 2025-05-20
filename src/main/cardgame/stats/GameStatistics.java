@@ -31,7 +31,7 @@ public class GameStatistics implements Serializable {
     private int bestEndlessScore; // Highest score in endless mode
 
     /** Path where statistics are saved */
-    private static final String FILE_PATH = "statistics.json";
+    private static final String FILE_PATH = "src/main/resources/statistics.json";
 
     /**
      * Creates a new empty statistics object
@@ -236,3 +236,4 @@ public class GameStatistics implements Serializable {
         }
     }
 }
+
