@@ -177,15 +177,19 @@ public class CardRenderer {
     private void handleCardFlip(Card card, ImageView imageView) {
         if (cardClicksBlocked || card.isMatched() || card.isFaceUp() || !game.isActive()) return;
 
-        // Allow two quick flips: do not block on first flip
+        // Prevent clicking the same card again
+        if (firstFlippedCard != null && card == firstFlippedCard) return;
+
         if (firstFlippedCard == null && !flippingFirstCard) {
+            cardClicksBlocked = true; // Block all clicks during animation
             flippingFirstCard = true;
             animateCardFlip(card, imageView, () -> {
                 firstFlippedCard = card;
                 flippingFirstCard = false;
+                cardClicksBlocked = false; // Allow next click after animation
             });
-        } else if (secondFlippedCard == null && card != firstFlippedCard) {
-            cardClicksBlocked = true; // Block further clicks after second card
+        } else if (secondFlippedCard == null) {
+            cardClicksBlocked = true;
             animateCardFlip(card, imageView, () -> {
                 secondFlippedCard = card;
                 boolean isMatch = game.processTurn(firstFlippedCard, secondFlippedCard);
@@ -266,20 +270,22 @@ public class CardRenderer {
      * @param card1 The first card/
      * @param card2 The second card
      */
-    private void animateMatch(Card card1, Card card2) {
-        FadeTransition ft = new FadeTransition(Duration.millis(500), cardViews.get(card1));
-        ft.setFromValue(1.0);
-        ft.setToValue(0.3);
-        ft.setCycleCount(2);
-        ft.setAutoReverse(true);
-        ft.play();
 
-        ft = new FadeTransition(Duration.millis(500), cardViews.get(card2));
-        ft.setFromValue(1.0);
-        ft.setToValue(0.3);
-        ft.setCycleCount(2);
-        ft.setAutoReverse(true);
-        ft.play();
+    private void animateMatch(Card card1, Card card2) {
+        if (card1 == null || card2 == null || card1 == card2) return; // Only animate if cards are different
+        FadeTransition ft1 = new FadeTransition(Duration.millis(500), cardViews.get(card1));
+        ft1.setFromValue(1.0);
+        ft1.setToValue(0.3);
+        ft1.setCycleCount(2);
+        ft1.setAutoReverse(true);
+        ft1.play();
+
+        FadeTransition ft2 = new FadeTransition(Duration.millis(500), cardViews.get(card2));
+        ft2.setFromValue(1.0);
+        ft2.setToValue(0.3);
+        ft2.setCycleCount(2);
+        ft2.setAutoReverse(true);
+        ft2.play();
     }
 
     /**
