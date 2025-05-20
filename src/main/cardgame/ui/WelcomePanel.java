@@ -60,45 +60,12 @@ public class WelcomePanel {
         exitButton.setPrefSize(220, 60);
         ButtonEffectManager.addButtonHoverEffect(exitButton);
 
-        /*statisticsButton.setOnAction(e -> {
-            StatisticsDialog statsDialog = new StatisticsDialog();
-            statsDialog.show();
-            // Center the dialog after it is shown
-            Platform.runLater(() -> {
-                Stage dialogStage = (Stage) statsDialog.getDialogPane().getScene().getWindow();
-                dialogStage.setX(primaryStage.getX() + (primaryStage.getWidth() - dialogStage.getWidth()) / 2);
-                dialogStage.setY(primaryStage.getY() + (primaryStage.getHeight() - dialogStage.getHeight()) / 2);
-            });
-        });*/
+
         statisticsButton.setOnAction(e -> {
             new ProfileStatsDialog().showAndWait();
-        });
-        /*
-        statisticsButton.setOnAction(e -> {
-            ProfileSelectionDialog dialog = new ProfileSelectionDialog(primaryStage, () -> {
-                var selectedProfile = GlobalProfileContext.getActiveProfile();
-                if (selectedProfile != null) {
-                    StatisticsDialog statsDialog = new StatisticsDialog(selectedProfile);
-                    statsDialog.show();
 
-                    // Optional: center dialog
-                    Platform.runLater(() -> {
-                        Stage dialogStage = (Stage) statsDialog.getDialogPane().getScene().getWindow();
-                        dialogStage.setX(primaryStage.getX() + (primaryStage.getWidth() - dialogStage.getWidth()) / 2);
-                        dialogStage.setY(primaryStage.getY() + (primaryStage.getHeight() - dialogStage.getHeight()) / 2);
-                    });
-                }
-            });
-
-            dialog.showAndWait();
         });
-        */
-        /*playButton.setOnAction(e -> {
-            if (gameBoard.promptForPlayerName(primaryStage)) {
-                gameBoard.showModeSelection(primaryStage);
-            }
-            // If canceled, do nothing (stay on welcome panel)
-        });*/
+
 
         playButton.setOnAction(e -> {
             ProfileSelectionDialog dialog = new ProfileSelectionDialog(primaryStage, () -> {
