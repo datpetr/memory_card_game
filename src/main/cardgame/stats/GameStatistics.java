@@ -5,7 +5,8 @@ import java.io.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public class GameStatistics {
+public class GameStatistics implements Serializable{
+    private static final long serialVersionUID = 1L;
     private int totalGames;
     private int totalMatches;
     private int totalMoves;
