@@ -44,8 +44,7 @@ public class CardRenderer {
     private boolean cardClicksBlocked = false;
     private boolean flippingFirstCard = false;
 
-    public CardRenderer(GameBoardUI gameBoardUI, Game game, GameBoard board,
-                        int cols, int rows, double cardAspectRatio, double gap) {
+    public CardRenderer(GameBoardUI gameBoardUI, Game game, GameBoard board, int cols, int rows, double cardAspectRatio, double gap) {
         this.gameBoardUI = gameBoardUI;
         this.game = game;
         this.board = board;
