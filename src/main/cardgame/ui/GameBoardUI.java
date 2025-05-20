@@ -7,7 +7,6 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -201,10 +200,7 @@ public class GameBoardUI extends Application implements Observer {
 
         mainLayout.setTop(statusBar);
 
-        // Create the game board
-        cardRenderer = new CardRenderer(this, game, board, board.getCols(), board.getRows(), CARD_ASPECT_RATIO, GAP);
-
-        // Setup pause overlay (identical to original)
+        // Create the game board and pause overlay (use only one CardRenderer instance)
         StackPane centerPane = new StackPane(cardRenderer.getGridPane(), cardRenderer.getPauseOverlay());
         mainLayout.setCenter(centerPane);
 
