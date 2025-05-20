@@ -28,6 +28,7 @@ public class TimedGame extends Game {
             int remainingSeconds = (int) getTimer().getRemainingTime() / 1000;
             getPlayer().incrementScore(remainingSeconds / 2);
         }
+        getTimer().stopTimer(); // Always stop the timer
 
         // Prevent duplicate end logic
         if (isActive()) {

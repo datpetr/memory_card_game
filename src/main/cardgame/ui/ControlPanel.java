@@ -99,19 +99,9 @@ public class ControlPanel {
             }
         });
 
-        statsButton = new Button("Show Stats");
-        statsButton.setStyle(
-                "-fx-font-size: 16px; -fx-font-weight: bold; " +
-                        "-fx-background-color: #556b2f; -fx-text-fill: white; -fx-background-radius: 10;"
-        );
-        statsButton.setPrefSize(120, 40);
-        ButtonEffectManager.addButtonHoverEffect(statsButton);
-
-        // Handle click: show stats popup using GameStatistics
-        statsButton.setOnAction(e -> showStatsWindow());
         // Original layout for buttons
         //buttonsBox = new HBox(10, pauseButton, restartButton, mainMenuButton);
-        buttonsBox = new HBox(10, pauseButton, restartButton, mainMenuButton, statsButton);
+        buttonsBox = new HBox(10, pauseButton, restartButton, mainMenuButton);
         buttonsBox.setAlignment(Pos.CENTER_RIGHT);
         buttonsBox.setPadding(new Insets(0));
     }

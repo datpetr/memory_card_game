@@ -133,7 +133,12 @@ public abstract class Game extends Observable {
         // Final stats
         int matches = board.getMatchedPairsCount(); // or player.getMatchedPairs()
         int moves = player.getMoves();
-        long duration = timer.getElapsedTime(); // Use consistent timing method
+        long duration;
+        if (timer.isCountdown()) {
+            duration = timer.getMaxTime() - timer.getRemainingTime();
+        } else {
+            duration = timer.getElapsedTime();
+        } // Use consistent timing method
 
         // Update and save statistics
         if (statistics != null) {
