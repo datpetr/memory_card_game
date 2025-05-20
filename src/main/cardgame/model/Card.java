@@ -97,6 +97,4 @@ public class Card extends Observable implements CardBehavior{
         return this.imagePath != null && this.imagePath.equals(otherCard.getImagePath());
     }
 
-    // Set the back image path for all cards (will be changed later)
-    static{Card.setBackImagePath("file:src/main/resources/images/back2.jpg");}
 }
