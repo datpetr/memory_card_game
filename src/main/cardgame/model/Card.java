@@ -66,14 +66,6 @@ public class Card extends Observable implements CardBehavior{
     }
 
     /**
-     * Gets the current display image path based on card state
-     * @return path to image that should be displayed
-     */
-    public String getCurrentImagePath() {
-        return isFaceUp ? imagePath : backImagePath;
-    }
-
-    /**
      * Resets the card to its initial state (face down, not matched)
      */
     public void reset() {
