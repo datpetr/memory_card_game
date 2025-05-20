@@ -68,6 +68,8 @@ public class ProfileSelectionDialog extends Stage {
                     statusLabel.setText("Error loading profile.");
                     ex.printStackTrace();
                 }
+            } else {
+                statusLabel.setText("Please choose a profile first.");
             }
         });
 

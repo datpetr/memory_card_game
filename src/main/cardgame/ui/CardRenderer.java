@@ -228,7 +228,7 @@ public class CardRenderer {
      */
     private void handleMatch() {
         animateMatch(firstFlippedCard, secondFlippedCard);
-        PauseTransition pause = new PauseTransition(Duration.millis(300)); // Match animation total duration
+        PauseTransition pause = new PauseTransition(Duration.millis(250)); // Match animation total duration
         pause.setOnFinished(e -> {
             cardClicksBlocked = false;
             resetSelections();
