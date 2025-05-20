@@ -56,11 +56,19 @@ public class GameBoardUI extends Application implements Observer {
     private String playerName;
     private boolean gameOverShown = false;
 
+    private Stage primaryStage; // Add this field to store the primary stage
+
     @Override
     public void start(Stage primaryStage) {
+        this.primaryStage = primaryStage; // Store the primary stage
         // Setup welcome screen (identical to original implementation)
         welcomePanel = new WelcomePanel(primaryStage, this);
         welcomePanel.show();
+    }
+
+    // Add a getter for the primary stage
+    public Stage getPrimaryStage() {
+        return primaryStage;
     }
 
     /**
@@ -258,6 +266,8 @@ public class GameBoardUI extends Application implements Observer {
         primaryStage.setScene(scene);
         primaryStage.setOnCloseRequest(e -> statusPanel.stopTimerUpdates());
 
+        primaryStage.setUserData(this); // Set GameBoardUI as user data for the stage
+
         // Center the game window on the screen
         primaryStage.centerOnScreen();
 
@@ -323,10 +333,10 @@ public class GameBoardUI extends Application implements Observer {
                 game.getTimer().getElapsedSeconds()
         );
 
-        GameOverDialog gameOverDialog = new GameOverDialog(game, board); // <-- Only two arguments
+        GameOverDialog gameOverDialog = new GameOverDialog(game, board, this); // Pass GameBoardUI instance
         gameOverDialog.show().thenRun(() -> {
             // Return to main menu after dialog closes
-            returnToMainMenu((Stage)controlPanel.getMainMenuButton().getScene().getWindow());
+            returnToMainMenu((Stage) controlPanel.getMainMenuButton().getScene().getWindow());
         });
     }
 

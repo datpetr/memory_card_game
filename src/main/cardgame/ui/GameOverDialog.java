@@ -7,8 +7,7 @@ import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import main.cardgame.game.Game;
 import main.cardgame.model.GameBoard;
-
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletableFuture; // Add this import
 
 /**
  * Game over dialog
@@ -17,10 +16,12 @@ import java.util.concurrent.CompletableFuture;
 public class GameOverDialog {
     private Game game;
     private GameBoard board;
+    private GameBoardUI gameBoardUI;
 
-    public GameOverDialog(Game game, GameBoard board) {
+    public GameOverDialog(Game game, GameBoard board, GameBoardUI gameBoardUI) {
         this.game = game;
         this.board = board;
+        this.gameBoardUI = gameBoardUI;
     }
 
     /**
@@ -69,13 +70,13 @@ public class GameOverDialog {
             dialogPane.setHeader(headerLabel);
 
             alert.showAndWait();
-            Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
-            alertStage.setX(alertStage.getOwner().getX() + (alertStage.getOwner().getWidth() - alertStage.getWidth()) / 2);
-            alertStage.setY(alertStage.getOwner().getY() + (alertStage.getOwner().getHeight() - alertStage.getHeight()) / 2);
+
+            // Notify GameBoardUI to return to the main menu
+            gameBoardUI.returnToMainMenu(gameBoardUI.getPrimaryStage());
+
             future.complete(null);
         });
         
         return future;
     }
 }
-
