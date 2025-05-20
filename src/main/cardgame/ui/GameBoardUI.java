@@ -89,8 +89,6 @@ public class GameBoardUI extends Application implements Observer {
     /**
      * Starts the game with the selected settings
      * @param primaryStage The primary stage
-     * @param mode The game mode
-     * @param difficulty The game difficulty
      */
 
     // Method to prompt and validate player name
@@ -154,21 +152,15 @@ public class GameBoardUI extends Application implements Observer {
         this.currentMode = mode;
         this.currentDifficulty = difficulty;
 
-        // Set board dimensions based on difficulty (preserved logic)
+        // Set card's background based on difficulty (preserved logic)
         switch (difficulty) {
             case "easy":
-                BOARD_ROWS = 4;
-                BOARD_COLS = 4;
                 Card.setBackImagePath("file:src/main/resources/images/backCards/easyback.png");
                 break;
             case "medium":
-                BOARD_ROWS = 6;
-                BOARD_COLS = 6;
                 Card.setBackImagePath("file:src/main/resources/images/backCards/mediumback.png");
                 break;
             case "hard":
-                BOARD_ROWS = 8;
-                BOARD_COLS = 8;
                 Card.setBackImagePath("file:src/main/resources/images/backCards/hardback.png");
                 break;
             default:
