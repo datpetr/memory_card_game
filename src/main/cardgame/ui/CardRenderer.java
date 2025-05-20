@@ -11,6 +11,9 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import main.cardgame.game.Game;
 import main.cardgame.model.Card;
@@ -56,6 +59,8 @@ public class CardRenderer {
     /** Map of cards to their Button containers */
     private final Map<Card, Button> cardButtons = new HashMap<>();
 
+    /** Overlay pane for pause (blocks input and grays out) */
+    private StackPane pauseOverlay;
     /** Label displayed when game is paused */
     private Label gamePausedLabel;
 
@@ -133,13 +138,25 @@ public class CardRenderer {
      * Initializes the pause overlay
      */
     private void initializePauseOverlay() {
+        // Create a semi-transparent rectangle to gray out the board
+        Rectangle dim = new Rectangle();
+        dim.setFill(Color.rgb(70, 130, 180, 0.45));
+        dim.widthProperty().bind(gridPane.widthProperty());
+        dim.heightProperty().bind(gridPane.heightProperty());
+
+        // Create the pause label
         gamePausedLabel = new Label("Game Paused");
         gamePausedLabel.setStyle(
                 "-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: #ffffff; " +
                         "-fx-background-color: rgba(70,130,180,0.8); -fx-padding: 30px; -fx-background-radius: 15;"
         );
-        gamePausedLabel.setVisible(false);
         gamePausedLabel.setAlignment(Pos.CENTER);
+
+        // Overlay pane
+        pauseOverlay = new StackPane(dim, gamePausedLabel);
+        pauseOverlay.setAlignment(Pos.CENTER);
+        pauseOverlay.setVisible(false);
+        pauseOverlay.setPickOnBounds(true); // Block mouse events
     }
 
     /**
@@ -336,11 +353,11 @@ public class CardRenderer {
     }
 
     /**
-     * Gets the pause overlay label
-     * @return The pause overlay label
+     * Gets the pause overlay
+     * @return The pause overlay
      */
-    public Label getPauseOverlay() {
-        return gamePausedLabel;
+    public StackPane getPauseOverlay() {
+        return pauseOverlay;
     }
 
     /**
@@ -348,7 +365,8 @@ public class CardRenderer {
      * @param visible True to show the overlay, false to hide it
      */
     public void showPauseOverlay(boolean visible) {
-        gamePausedLabel.setVisible(visible);
+        pauseOverlay.setVisible(visible);
+        setCardButtonsDisabled(visible);
     }
 
     /**
