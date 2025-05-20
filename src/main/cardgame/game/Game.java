@@ -19,9 +19,14 @@ public abstract class Game extends Observable {
     private boolean isPaused;
     private Card firstCard;
     private Card secondCard;
-    //protected GameStatistics statistics = GameStatistics.loadFromDisk();
     protected GameStatistics statistics;
     private long startTime;
+
+    // Helper method to notify observers with an event
+    private void notifyWithEvent(String eventType) {
+        setChanged();
+        notifyObservers(eventType);
+    }
 
     /**
      * Constructor for standard game without countdown
@@ -60,41 +65,29 @@ public abstract class Game extends Observable {
         this.isPaused = false;
         this.startTime = System.currentTimeMillis(); // Start timing
         this.timer.startTimer();
-        setChanged();
-        notifyObservers("GAME_STARTED");
+        notifyWithEvent("GAME_STARTED");
     }
 
-
+    /**
+     * Pauses the game and the timer
+     */
     public void pause() {
-        if (isActive) {
+        if (isActive && !isPaused) {
             this.isPaused = true;  // Set paused state
             this.timer.pauseTimer();
-            setChanged();
-            notifyObservers("GAME_PAUSED");
+            notifyWithEvent("GAME_PAUSED");
         }
     }
 
+    /**
+     * Resumes the game after being paused
+     */
     public void resume() {
         if (isActive && isPaused) {  // Only resume if both active and paused
             this.isPaused = false;   // Clear paused state
             this.timer.resumeTimer();
-            setChanged();
-            notifyObservers("GAME_RESUMED");
+            notifyWithEvent("GAME_RESUMED");
         }
-    }
-    
-    /**
-     * Alias method for pause() - used by UI controls
-     */
-    public void pauseGame() {
-        pause();
-    }
-    
-    /**
-     * Alias method for resume() - used by UI controls
-     */
-    public void resumeGame() {
-        resume();
     }
     
     /**
@@ -105,18 +98,19 @@ public abstract class Game extends Observable {
         return isPaused;
     }
 
-
     /**
-     * Check if the game is currently paused
-     * return true if the game is paused
+     * Ends the current game and updates statistics
      */
     public void endGame() {
+        if (!isActive) return;
+
         this.isActive = false;
         this.timer.stopTimer();
 
         // Final stats
-        int matches = board.getMatchedPairsCount(); // or player.getMatchedPairs()
+        int matches = board.getMatchedPairsCount();
         int moves = player.getMoves();
+        int score = player.getScore(); // Get the actual player score
         long duration;
         if (timer.isCountdown()) {
             duration = timer.getMaxTime() - timer.getRemainingTime();
@@ -126,7 +120,11 @@ public abstract class Game extends Observable {
 
         // Update and save statistics
         if (statistics != null) {
-            statistics.updateGameStats(matches, moves, duration);
+            // Determine if this is a timed game based on timer type
+            boolean isTimedGame = timer.isCountdown();
+
+            // Use the new method that accepts score and game type
+            statistics.updateGameStats(matches, moves, duration, score, isTimedGame);
 
             UserProfile profile = GlobalProfileContext.getActiveProfile();
             if (profile != null) {
@@ -139,8 +137,7 @@ public abstract class Game extends Observable {
         }
 
         // Notify UI
-        setChanged();
-        notifyObservers("GAME_OVER");
+        notifyWithEvent("GAME_OVER");
     }
 
     public boolean processTurn(Card card1, Card card2) {
@@ -190,12 +187,10 @@ public abstract class Game extends Observable {
     }
 
     public int getMatches() {
-        // Replace 'matches' with the actual field or logic that tracks matches
         return board.getMatchedPairsCount();
     }
 
     public GameStatistics getStatistics() {
         return statistics;
     }
-
 }

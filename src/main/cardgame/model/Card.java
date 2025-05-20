@@ -11,9 +11,15 @@ public class Card extends Observable implements CardBehavior{
 
     public Card(int id, String imagePath) {
         this.id = id;
-        this.imagePath = imagePath; // Corrected from 'imagePath' to 'value'
+        this.imagePath = imagePath;
         this.isMatched = false;
         this.isFaceUp = false;
+    }
+
+    // Helper method to notify observers with an event
+    private void notifyWithEvent(String eventType) {
+        setChanged();
+        notifyObservers(eventType);
     }
 
     public static String getBackImagePath() {
@@ -29,24 +35,20 @@ public class Card extends Observable implements CardBehavior{
     }
 
     public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
-
-        setChanged();
-        notifyObservers("IMAGE_CHANGED");
+        if (imagePath != null && !imagePath.equals(this.imagePath)) {
+            this.imagePath = imagePath;
+            notifyWithEvent("IMAGE_CHANGED");
+        }
     }
-
 
     public boolean isMatched() {
         return isMatched;
     }
 
     public void setMatched(boolean matched) {
-        boolean oldValue = this.isMatched;
-        this.isMatched = matched;
-
-        if (oldValue != this.isMatched) {
-            setChanged();
-            notifyObservers("MATCHED_STATUS_CHANGED");
+        if (this.isMatched != matched) {
+            this.isMatched = matched;
+            notifyWithEvent("MATCHED_STATUS_CHANGED");
         }
     }
 
@@ -56,27 +58,36 @@ public class Card extends Observable implements CardBehavior{
 
     public void flip() {
         this.isFaceUp = !this.isFaceUp;
-
-        setChanged();
-        notifyObservers("CARD_FLIPPED");
+        notifyWithEvent("CARD_FLIPPED");
     }
 
     public int getId() {
         return id;
     }
 
+    public void setId(int id) {
+        if (id != this.id) {
+            this.id = id;
+            notifyWithEvent("ID_CHANGED");
+        }
+    }
+
     /**
      * Resets the card to its initial state (face down, not matched)
      */
     public void reset() {
+        boolean changed = false;
         if (isFaceUp) {
             isFaceUp = false;
+            changed = true;
         }
         if (isMatched) {
             isMatched = false;
+            changed = true;
         }
-        setChanged();
-        notifyObservers("CARD_RESET");
+        if (changed) {
+            notifyWithEvent("CARD_RESET");
+        }
     }
 
     /**
@@ -88,5 +99,4 @@ public class Card extends Observable implements CardBehavior{
         if (otherCard == null) return false;
         return this.imagePath != null && this.imagePath.equals(otherCard.getImagePath());
     }
-
 }

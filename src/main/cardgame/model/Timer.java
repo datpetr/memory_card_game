@@ -29,18 +29,6 @@ public class Timer extends Observable {
         this.startTime = 0;
     }
 
-    // In main.cardgame.model.Timer.java
-    public int getElapsedSeconds() {
-        if (state == State.READY) return 0;
-        long elapsedMillis;
-        if (state == State.PAUSED) {
-            elapsedMillis = pausedAt - startTime - totalPausedTime;
-        } else {
-            elapsedMillis = System.currentTimeMillis() - startTime - totalPausedTime;
-        }
-        return (int) (elapsedMillis / 1000);
-    }
-
     // Constructor for elapsed time tracking
     public Timer() {
         this.isCountdown = false;
@@ -48,14 +36,34 @@ public class Timer extends Observable {
         this.totalPausedTime = 0;
     }
 
+    // Consolidated method to calculate time
+    private long getCurrentTimeMillis() {
+        if (state == State.READY) {
+            return 0;
+        } else if (state == State.PAUSED) {
+            return pausedAt - startTime - totalPausedTime;
+        } else {
+            return System.currentTimeMillis() - startTime - totalPausedTime;
+        }
+    }
+
+    // Get elapsed time in seconds - consistent way to get time
+    public int getElapsedSeconds() {
+        return (int) (getCurrentTimeMillis() / 1000);
+    }
+
+    // Helper method for notifications
+    private void notifyObserversWithEvent(String event) {
+        setChanged();
+        notifyObservers(event);
+    }
+
     public void startTimer() {
         if (state == State.READY || state == State.STOPPED) {
             this.startTime = System.currentTimeMillis();
             this.totalPausedTime = 0;
             this.state = State.RUNNING;
-
-            setChanged();
-            notifyObservers("TIMER_STARTED");
+            notifyObserversWithEvent("TIMER_STARTED");
 
             // Only for countdown (timed) mode
             if (isCountdown) {
@@ -77,9 +85,7 @@ public class Timer extends Observable {
         if (state == State.RUNNING) {
             this.pausedAt = System.currentTimeMillis();
             this.state = State.PAUSED;
-
-            setChanged();
-            notifyObservers("TIMER_PAUSED");
+            notifyObserversWithEvent("TIMER_PAUSED");
         }
     }
 
@@ -87,9 +93,7 @@ public class Timer extends Observable {
         if (state == State.PAUSED) {
             this.totalPausedTime += (System.currentTimeMillis() - this.pausedAt);
             this.state = State.RUNNING;
-
-            setChanged();
-            notifyObservers("TIMER_RESUMED");
+            notifyObserversWithEvent("TIMER_RESUMED");
         }
     }
 
@@ -101,9 +105,7 @@ public class Timer extends Observable {
             if (isCountdown && countdownTimeline != null) {
                 countdownTimeline.stop();
             }
-
-            setChanged();
-            notifyObservers("TIMER_STOPPED");
+            notifyObserversWithEvent("TIMER_STOPPED");
         }
     }
 
@@ -114,16 +116,6 @@ public class Timer extends Observable {
         return state == State.RUNNING && getRemainingTime() <= 0;
     }
 
-    private long getCurrentTime() {
-        if (state == State.READY) {
-            return 0;
-        } else if (state == State.PAUSED) {
-            return pausedAt - startTime - totalPausedTime;
-        } else {
-            return System.currentTimeMillis() - startTime - totalPausedTime;
-        }
-    }
-
     public long getRemainingTime() {
         if (!isCountdown) {
             throw new UnsupportedOperationException("This timer does not support countdown.");
@@ -131,18 +123,15 @@ public class Timer extends Observable {
         if (state == State.READY) {
             return countdownMillis;
         }
-        return Math.max(countdownMillis - getCurrentTime(), 0);
+        return Math.max(countdownMillis - getCurrentTimeMillis(), 0);
     }
 
     public long getElapsedTime() {
-        if (isCountdown) {
-            throw new UnsupportedOperationException("This timer only supports countdown.");
-        }
-        return getCurrentTime();
+        return getCurrentTimeMillis();
     }
 
     public String getFormatedTime() {
-        long time = isCountdown ? getCurrentTime() : getElapsedTime();
+        long time = isCountdown ? getRemainingTime() : getElapsedTime();
         return formatTime(time);
     }
 
@@ -166,9 +155,7 @@ public class Timer extends Observable {
             throw new UnsupportedOperationException("Cannot set time limit for elapsed-time timer.");
         }
         this.countdownMillis = countdownSeconds * 1000L;
-
-        setChanged();
-        notifyObservers("TIME_LIMIT_CHANGED");
+        notifyObserversWithEvent("TIME_LIMIT_CHANGED");
     }
 
     // Method to get the maximum time for countdown timer
@@ -182,8 +169,6 @@ public class Timer extends Observable {
     public void resetTimer() {
         this.state = State.READY;
         this.startTime = 0;
-
-        setChanged();
-        notifyObservers("TIMER_RESET");
+        notifyObserversWithEvent("TIMER_RESET");
     }
 }
