@@ -31,18 +31,13 @@ public class ProfileStatsDialog extends Dialog<Void> {
                     UserProfile profile = ProfileManager.loadProfile(selectedName);
                     GameStatistics stats = profile.getStatistics();
 
-                    /*System.out.println("Loaded profile: " + profile.getUsername());
-                    System.out.println("Games: " + stats.getTotalGames());
-                    System.out.println("Best score: " + stats.getBestScore());
-                    System.out.println("Best time: " + stats.getBestTime());*/
-
                     statsLabel.setText(
                             "Username: " + profile.getUsername() + "\n" +
                                     "Games Played: " + stats.getTotalGames() + "\n" +
                                     "Best Score: " + stats.getBestScore() + " moves\n" +
-                                    "Best Time: " + stats.getBestTime() + " sec\n" +
+                                    "Best Time: " + stats.getBestTime() / 1000 + " sec\n" +
                                     "Average Moves: " + String.format("%.2f", stats.getAverageMoves()) + "\n" +
-                                    "Average Time: " + String.format("%.2f", stats.getAverageTime()) + " sec"
+                                    "Average Time: " + String.format("%.2f", (stats.getAverageTime() / 1000)) + " sec"
                     );
                 } catch (IOException | ClassNotFoundException ex) {
                     statsLabel.setText("Failed to load profile.");
