@@ -9,6 +9,11 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import main.cardgame.stats.StatsManager;
+import javafx.stage.Stage;
+import main.cardgame.profile.ProfileSelectionDialog;
+import main.cardgame.profile.GlobalProfileContext;
+import main.cardgame.profile.UserProfile;
+
 
 /**
  * Welcome screen for the Memory Card Game
@@ -65,12 +70,23 @@ public class WelcomePanel {
             });
         });
 
-        playButton.setOnAction(e -> {
+        /*playButton.setOnAction(e -> {
             if (gameBoard.promptForPlayerName(primaryStage)) {
                 gameBoard.showModeSelection(primaryStage);
             }
             // If canceled, do nothing (stay on welcome panel)
+        });*/
+
+        playButton.setOnAction(e -> {
+            ProfileSelectionDialog dialog = new ProfileSelectionDialog(primaryStage, () -> {
+                if (GlobalProfileContext.getActiveProfile() != null) {
+                    gameBoard.showModeSelection(primaryStage);
+                }
+            });
+            dialog.showAndWait();
         });
+
+
 
         exitButton.setOnAction(e -> Platform.exit());
 

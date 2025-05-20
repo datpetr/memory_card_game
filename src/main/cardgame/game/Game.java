@@ -6,6 +6,8 @@ import main.cardgame.model.Card;
 import main.cardgame.model.GameBoard;
 import main.cardgame.model.Player;
 import main.cardgame.model.Timer;
+import main.cardgame.profile.GlobalProfileContext;
+import main.cardgame.profile.UserProfile;
 
 import java.util.Observable;
 
@@ -17,8 +19,8 @@ public abstract class Game extends Observable {
     private boolean isPaused;
     private Card firstCard;
     private Card secondCard;
-    protected GameStatistics statistics = GameStatistics.loadFromDisk();
-
+    //protected GameStatistics statistics = GameStatistics.loadFromDisk();
+    protected GameStatistics statistics;
     /**
      * Constructor for standard game without countdown
      */
@@ -45,9 +47,15 @@ public abstract class Game extends Observable {
         this.secondCard = null;
     }
 
+    public void initializeStatistics() {
+        UserProfile profile = GlobalProfileContext.getActiveProfile();
+        this.statistics = (profile != null) ? profile.getStatistics() : new GameStatistics();
+    }
+
     private long startTime; // Add this field
 
     public void play() {
+        initializeStatistics();
         this.isActive = true;
         this.isPaused = false;
         this.startTime = System.currentTimeMillis(); // Start timing
@@ -105,7 +113,7 @@ public abstract class Game extends Observable {
         return isPaused;
     }
 
-    public void endGame() {
+    /*public void endGame() {
         this.isActive = false;
         this.timer.stopTimer();
 
@@ -117,7 +125,35 @@ public abstract class Game extends Observable {
 
         setChanged();
         notifyObservers("GAME_OVER");
+    }*/
+    public void endGame() {
+        this.isActive = false;
+        this.timer.stopTimer();
+
+        // Final stats
+        int matches = board.getMatchedPairsCount(); // or player.getMatchedPairs()
+        int moves = player.getMoves();
+        long duration = timer.getElapsedTime(); // Use consistent timing method
+
+        // Update and save statistics
+        if (statistics != null) {
+            statistics.updateGameStats(matches, moves, duration);
+
+            UserProfile profile = GlobalProfileContext.getActiveProfile();
+            if (profile != null) {
+                try {
+                    main.cardgame.profile.ProfileManager.saveProfile(profile);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        // Notify UI
+        setChanged();
+        notifyObservers("GAME_OVER");
     }
+
     // This method is commented out to avoid confusion with the new endGame() method
     /*public void endGame() {
         this.isActive = false;
