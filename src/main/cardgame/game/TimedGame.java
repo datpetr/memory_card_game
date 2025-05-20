@@ -24,13 +24,24 @@ public class TimedGame extends Game {
 
     @Override
     public void endGame() {
-        if (!getTimer().isTimeUp()) {
+        // Only apply time bonus if the game is still active and not timed out
+        if (isActive() && !getTimer().isTimeUp()) {
             int remainingSeconds = (int) getTimer().getRemainingTime() / 1000;
-            getPlayer().incrementScore(remainingSeconds / 2);
-        }
-        getTimer().stopTimer(); // Always stop the timer
+            int timeBonus = remainingSeconds / 2;
 
-        // Prevent duplicate end logic
+            if (timeBonus > 0) {
+                getPlayer().incrementScore(timeBonus);
+
+                // Notify observers about the bonus
+                setChanged();
+                notifyObservers("TIME_BONUS_ADDED");
+            }
+        }
+
+        // Always stop the timer
+        getTimer().stopTimer();
+
+        // Call parent end game method after bonuses are applied
         if (isActive()) {
             super.endGame();
         }

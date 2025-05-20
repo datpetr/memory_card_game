@@ -76,7 +76,8 @@ public class GameOverDialog {
             alert.showAndWait();
 
             if (isWin) {
-                int matches = game.getPlayer().getScore();
+                // Use the actual number of matches (matchedPairsCount) instead of player's score
+                int matches = board.getMatchedPairsCount();
                 int moves = game.getPlayer().getMoves();
                 long timeInSeconds = (game.getTimer().getElapsedTime() / 1000);
 

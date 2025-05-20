@@ -135,10 +135,10 @@ public class ControlPanel {
         
         // First handle the game state change - this should always work
         if (game.isActive() && !game.isPaused()) {
-            game.pauseGame();
+            game.pause();
             pauseButton.setText("Resume");
         } else if (game.isActive() && game.isPaused()) {
-            game.resumeGame();
+            game.resume();
             pauseButton.setText("Pause");
         }
         

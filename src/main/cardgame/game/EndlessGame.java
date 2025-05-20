@@ -18,20 +18,22 @@ public class EndlessGame extends Game {
     // Add bonus points based on time and efficiency
     @Override
     public void endGame() {
-        // Calculate bonus before calling super.endGame() which sets isActive to false
-        int timeElapsed = (int) getTimer().getElapsedTime() / 1000;
-        int movesBonus = Math.max(100 - getPlayer().getMoves(), 0);
+        // Only calculate and add bonus if the game is still active
+        if (isActive()) {
+            // Calculate bonus before calling super.endGame() which sets isActive to false
+            int timeElapsed = (int) getTimer().getElapsedTime() / 1000;
+            int movesBonus = Math.max(100 - getPlayer().getMoves(), 0);
 
-        // Call parent method which handles notifications and state of chage
+            // Apply the bonus BEFORE calling super.endGame()
+            getPlayer().incrementScore(movesBonus);
+
+            // Notify observers about bonus points
+            setChanged();
+            notifyObservers("BONUS_POINTS_ADDED");
+        }
+
+        // Call parent method which handles notifications and state changes
         super.endGame();
-
-        // Apply the bonus after calling super
-        getPlayer().incrementScore(movesBonus);
-
-        // Notify observers about bonus points
-        setChanged();
-        notifyObservers("BONUS_POINTS_ADDED");
-
     }
 
     //
@@ -63,3 +65,4 @@ public class EndlessGame extends Game {
     }
 
 }
+

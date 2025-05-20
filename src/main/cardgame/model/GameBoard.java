@@ -22,6 +22,12 @@ public class GameBoard extends Observable {
         initializeBoard(cards);
     }
 
+    // Helper method to notify observers with an event
+    private void notifyWithEvent(String eventType) {
+        setChanged();
+        notifyObservers(eventType);
+    }
+
     public int determineRows(String level) {
         switch (level.toLowerCase()) {
             case "easy":
@@ -63,16 +69,6 @@ public class GameBoard extends Observable {
         return matchedPairsCount == totalPairs;
     }
 
-    public void flipCard(int row, int col) {
-        Card card = getCard(row, col);
-        if (card != null && !card.isMatched()) {
-            card.flip(); // Flip the card
-
-            setChanged();
-            notifyObservers("CARD_FLIPPED");
-        }
-    }
-
     public boolean checkMatch(Card card1, Card card2) {
         if (card1 == null || card2 == null) {
             return false;
@@ -84,9 +80,7 @@ public class GameBoard extends Observable {
             card1.setMatched(true);
             card2.setMatched(true);
             matchedPairsCount++;
-
-            setChanged();
-            notifyObservers("MATCH_FOUND");
+            notifyWithEvent("MATCH_FOUND");
         }
 
         return isMatch;
@@ -113,46 +107,46 @@ public class GameBoard extends Observable {
 
         // Reset matched pairs when initializing a new board
         matchedPairsCount = 0;
-
-        setChanged();
-        notifyObservers("BOARD_INITIALIZED");
-    }
-
-    public void resetBoard() {
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
-                Card card = board[row][col];
-                if (card != null) {
-                    card.flip(); // Flip the card back
-                }
-                if (card.isMatched()) {
-                    card.setMatched(false);
-                }
-            }
-        }
-        matchedPairsCount = 0;
-
-        setChanged();
-        notifyObservers("BOARD_RESET");
-    }
-
-    public int getMatchedPairsCount() {
-        return matchedPairsCount;
+        notifyWithEvent("BOARD_INITIALIZED");
     }
 
     public int getRows() {
         return rows;
     }
 
+    public void setRows(int rows) {
+        if (rows > 0 && rows != this.rows) {
+            this.rows = rows;
+            notifyWithEvent("ROWS_CHANGED");
+        }
+    }
+
     public int getCols() {
         return cols;
     }
 
-    // For backward compatibility
-    public int getGridSize() {
-        return Math.max(rows, cols);
+    public void setCols(int cols) {
+        if (cols > 0 && cols != this.cols) {
+            this.cols = cols;
+            notifyWithEvent("COLS_CHANGED");
+        }
     }
-    
+
+    public int getMatchedPairsCount() {
+        return matchedPairsCount;
+    }
+
+    public void setMatchedPairsCount(int matchedPairsCount) {
+        if (matchedPairsCount >= 0 && matchedPairsCount <= totalPairs && matchedPairsCount != this.matchedPairsCount) {
+            this.matchedPairsCount = matchedPairsCount;
+            notifyWithEvent("MATCHED_PAIRS_CHANGED");
+        }
+    }
+
+    public int getTotalPairs() {
+        return totalPairs;
+    }
+
     // Store the observer for retrieval later
     @Override
     public synchronized void addObserver(Observer o) {
@@ -163,7 +157,6 @@ public class GameBoard extends Observable {
     public Object getObserver() {
         return observer;
     }
-
 
     public void setObserver(Object observer) {
         this.observer = observer;

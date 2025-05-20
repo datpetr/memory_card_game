@@ -21,7 +21,7 @@ public class DialogManager {
     public static boolean showConfirmationDialog(String message, Game game) {
         // Pause game and timer before showing dialog (like Pause)
         if (game.isActive() && !game.isPaused()) {
-            game.pauseGame();
+            game.pause();
             Object observer = game.getBoard() != null ? game.getBoard().getObserver() : null;
             if (observer instanceof GameBoardUI) {
                 GameBoardUI ui = (GameBoardUI) observer;
@@ -46,7 +46,7 @@ public class DialogManager {
 
         // Resume game and timer if cancelled (like Resume)
         if (!result && game.isPaused()) {
-            game.resumeGame();
+            game.resume();
             Object observer = game.getBoard() != null ? game.getBoard().getObserver() : null;
             if (observer instanceof GameBoardUI) {
                 GameBoardUI ui = (GameBoardUI) observer;
