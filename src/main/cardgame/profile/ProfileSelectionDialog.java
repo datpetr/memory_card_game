@@ -10,9 +10,19 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Dialog for user profile selection and creation.
+ * Allows players to select an existing profile or create a new one.
+ */
 public class ProfileSelectionDialog extends Stage {
     private UserProfile selectedProfile;
 
+    /**
+     * Creates a new profile selection dialog.
+     * 
+     * @param owner The owner stage of this dialog
+     * @param onProfileSelected Callback to execute when a profile is selected
+     */
     public ProfileSelectionDialog(Stage owner, Runnable onProfileSelected) {
         setTitle("Select Profile");
         initOwner(owner);
@@ -91,3 +101,4 @@ public class ProfileSelectionDialog extends Stage {
         return selectedProfile;
     }
 }
+

@@ -13,6 +13,7 @@ import javafx.stage.Stage;
  * Allows players to choose between Endless and Timed game modes.
  * Preserves the original UI components and behavior from GameBoardVisualizer2.
  */
+
 public class ModeSelectionPanel {
     /** Default padding for UI elements */
     private static final double PADDING = 20;

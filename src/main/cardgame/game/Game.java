@@ -16,6 +16,7 @@ import java.util.Observable;
  * Handles common game functionality including game board management,
  * player statistics, timer control, and basic game flow.
  */
+
 public abstract class Game extends Observable {
     private GameBoard board;
     private Player player;

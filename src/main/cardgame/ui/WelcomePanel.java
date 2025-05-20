@@ -21,6 +21,7 @@ import main.cardgame.profile.UserProfile;
  * Provides options to play the game, view statistics, and manage user profiles.
  * Preserves the original UI components and behavior from GameBoardVisualizer2.
  */
+
 public class WelcomePanel {
     /** Default padding for UI elements */
     private static final double PADDING = 20;

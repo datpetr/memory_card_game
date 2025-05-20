@@ -10,7 +10,15 @@ import main.cardgame.stats.GameStatistics;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Dialog for displaying user profile statistics.
+ * Allows selecting a profile and viewing its associated game statistics.
+ */
 public class ProfileStatsDialog extends Dialog<Void> {
+    /**
+     * Creates a new profile statistics dialog.
+     * Initializes the UI components for profile selection and statistics display.
+     */
     public ProfileStatsDialog() {
         setTitle("View Profile Statistics");
 

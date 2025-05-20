@@ -9,6 +9,7 @@ import javafx.util.Duration;
  * Represents a timer for the memory card game.
  * Supports both countdown and elapsed time tracking modes.
  */
+
 public class Timer extends Observable {
     /**
      * Enumeration of possible timer states

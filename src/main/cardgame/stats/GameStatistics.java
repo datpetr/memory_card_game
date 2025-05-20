@@ -10,6 +10,7 @@ import com.google.gson.GsonBuilder;
  * Stores aggregate data such as total games played, matches made, moves,
  * time spent playing, and best scores for different game modes.
  */
+
 public class GameStatistics implements Serializable {
     private static final long serialVersionUID = 1L;
     /** Total number of games played */

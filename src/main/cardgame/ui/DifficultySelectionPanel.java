@@ -13,6 +13,7 @@ import javafx.stage.Stage;
  * Provides options for Easy, Medium, and Hard difficulty levels.
  * Preserves the original UI components and behavior from GameBoardVisualizer2.
  */
+
 public class DifficultySelectionPanel {
     /** Default padding for UI elements */
     private static final double PADDING = 20;

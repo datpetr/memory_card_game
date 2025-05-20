@@ -26,6 +26,7 @@ import java.util.Map;
  * Comprehensive card rendering and board management class
  * Combines card rendering, animations, and board layout functionality
  */
+
 public class CardRenderer {
     /** Default padding for card layout */
     private static final double PADDING = 20;

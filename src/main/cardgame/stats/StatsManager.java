@@ -5,6 +5,7 @@ package main.cardgame.stats;
  * Singleton manager for game statistics.
  * Provides static methods to access and modify statistics across the application.
  */
+
 public class StatsManager {
     /** Singleton instance of game statistics */
     private static GameStatistics stats = GameStatistics.loadFromDisk();

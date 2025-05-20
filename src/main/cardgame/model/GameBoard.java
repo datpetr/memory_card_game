@@ -8,6 +8,7 @@ import java.util.Observer;
  * Represents the game board for the memory card game.
  * Contains a grid of cards and tracks matched pairs.
  */
+
 public class GameBoard extends Observable {
     private Card[][] board;
     private int rows;

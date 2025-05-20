@@ -4,6 +4,7 @@ package main.cardgame.model;
  * Interface defining the essential behavior of a card in the memory game.
  * Provides methods for accessing and manipulating card state.
  */
+
 public interface CardBehavior {
     /**
      * Gets the path to the card's image

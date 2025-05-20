@@ -9,6 +9,7 @@ import main.cardgame.model.Card;
  * Players must find all matches before time runs out.
  * Includes time-based bonus points and unique scoring mechanisms.
  */
+
 public class TimedGame extends Game {
     /** Time limit in seconds for easy difficulty */
     public static final int EASY_TIME = 60;   // 1 minute

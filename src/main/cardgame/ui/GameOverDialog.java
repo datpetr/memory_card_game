@@ -18,6 +18,7 @@ import java.io.IOException;
  * Shows different messages based on whether the player won or ran out of time.
  * Preserves the original dialog implementation from GameBoardVisualizer2.
  */
+
 public class GameOverDialog {
     /** The game instance that has ended */
     private Game game;

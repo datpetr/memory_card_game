@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
  * Refactored from GameBoardVisualizer2 to improve code organization
  * while maintaining identical UI components and behavior.
  */
+
 public class GameBoardUI extends Application implements Observer {
     /** Default number of rows in the game board */
     private static int BOARD_ROWS = 3;

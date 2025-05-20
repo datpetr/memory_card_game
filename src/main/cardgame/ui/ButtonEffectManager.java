@@ -5,6 +5,7 @@ import javafx.scene.control.Button;
 /**
  * Utility class for managing button effects
  */
+
 public class ButtonEffectManager {
     /**
      * Adds hover and click effects to a button

@@ -18,6 +18,7 @@ import main.cardgame.game.Game;
  * Manages the game control buttons (pause, restart, main menu)
  * Preserves the original UI components and logic from GameBoardVisualizer2
  */
+
 public class ControlPanel {
     /** Button to pause/resume the game */
     private Button pauseButton;

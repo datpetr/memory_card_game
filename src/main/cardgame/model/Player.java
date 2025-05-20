@@ -6,6 +6,7 @@ import java.util.Observable;
  * Represents a player in the memory card game.
  * Tracks player's name, score, and number of moves made during gameplay.
  */
+
 public class Player extends Observable {
     private String name;
     private int score;

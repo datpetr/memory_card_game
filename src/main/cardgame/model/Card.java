@@ -6,6 +6,7 @@ import java.util.Observable;
  * Represents a card in the memory game.
  * Each card has an image, a matched state, and can be flipped.
  */
+
 public class Card extends Observable implements CardBehavior{
     private int id;
     private String imagePath;

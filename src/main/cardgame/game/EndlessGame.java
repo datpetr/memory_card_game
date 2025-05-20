@@ -9,6 +9,7 @@ import main.cardgame.model.Card;
  * Players can take as much time as needed to find all matches.
  * Includes efficiency-based bonus points for completing with fewer moves.
  */
+
 public class EndlessGame extends Game {
     /**
      * Creates a new endless game

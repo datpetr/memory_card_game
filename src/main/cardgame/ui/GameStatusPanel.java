@@ -15,6 +15,7 @@ import main.cardgame.model.Player;
  * Manages the game status display (score, moves, time)
  * Preserves the original UI components and logic from GameBoardVisualizer2
  */
+
 public class GameStatusPanel {
     /** Label displaying the current score */
     private Label scoreLabel;
