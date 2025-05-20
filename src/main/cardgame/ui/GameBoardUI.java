@@ -6,6 +6,7 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -51,7 +52,7 @@ public class GameBoardUI extends Application implements Observer {
     public GameStatusPanel statusPanel;
     public CardRenderer cardRenderer;
     private ControlPanel controlPanel;
-    private BoardCanvas boardCanvas;
+
 
     private String playerName;
     private boolean gameOverShown = false;
@@ -84,62 +85,6 @@ public class GameBoardUI extends Application implements Observer {
     public void showDifficultySelection(Stage primaryStage, String mode) {
         difficultySelectionPanel = new DifficultySelectionPanel(primaryStage, this, mode);
         difficultySelectionPanel.show();
-    }
-
-    /**
-     * Starts the game with the selected settings
-     * @param primaryStage The primary stage
-     */
-
-    // Method to prompt and validate player name
-    boolean promptForPlayerName(Stage primaryStage) {
-        Pattern validPattern = Pattern.compile("^[A-Za-z0-9_-]{3,12}$");
-        while (true) {
-            TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle("Enter Player Name");
-            dialog.setHeaderText(null);
-            dialog.setContentText("Name:");
-            dialog.initOwner(primaryStage);
-            // Center the dialog after it is shown
-            Platform.runLater(() -> {
-                Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
-                dialogStage.setX(primaryStage.getX() + (primaryStage.getWidth() - dialogStage.getWidth()) / 2);
-                dialogStage.setY(primaryStage.getY() + (primaryStage.getHeight() - dialogStage.getHeight()) / 2);
-            });
-            Optional<String> result = dialog.showAndWait();
-            if (result.isPresent()) {
-                String input = result.get().trim();
-                try {
-                    if (input.contains(" ")) {
-                        throw new IllegalArgumentException("Name cannot contain spaces.");
-                    }
-                    if (input.length() < 3 || input.length() > 12) {
-                        throw new IllegalArgumentException("Name must be 3-12 characters.");
-                    }
-                    if (!validPattern.matcher(input).matches()) {
-                        throw new IllegalArgumentException("Name can only contain latin letters, digits, _ and -.");
-                    }
-                    playerName = input;
-                    return true; // Success
-                } catch (IllegalArgumentException ex) {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Invalid Name");
-                    alert.setHeaderText("Invalid player name.");
-                    alert.setContentText(ex.getMessage());
-                    alert.initOwner(primaryStage);
-                    // Center the alert after it is shown
-                    Platform.runLater(() -> {
-                        Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
-                        alertStage.setX(primaryStage.getX() + (primaryStage.getWidth() - alertStage.getWidth()) / 2);
-                        alertStage.setY(primaryStage.getY() + (primaryStage.getHeight() - alertStage.getHeight()) / 2);
-                    });
-                    alert.showAndWait(); // Wait for user to click OK before looping to show dialog again
-                    // Loop continues, so prompt dialog will show again
-                }
-            } else {
-                return false; // Cancel pressed
-            }
-        }
     }
 
     public void showModeSelection(Stage primaryStage) {
@@ -242,10 +187,10 @@ public class GameBoardUI extends Application implements Observer {
         mainLayout.setTop(statusBar);
 
         // Create the game board
-        boardCanvas = new BoardCanvas(board, cardRenderer.getGridPane());
+        cardRenderer = new CardRenderer(this, game, board, board.getCols(), board.getRows(), CARD_ASPECT_RATIO, GAP);
 
         // Setup pause overlay (identical to original)
-        StackPane centerPane = new StackPane(boardCanvas.getGridPane(), cardRenderer.getPauseOverlay());
+        StackPane centerPane = new StackPane(cardRenderer.getGridPane(), cardRenderer.getPauseOverlay());
         mainLayout.setCenter(centerPane);
 
         // Create the scene (preserved from original)
@@ -336,5 +281,43 @@ public class GameBoardUI extends Application implements Observer {
             Card.setBackImagePath("file:src/main/resources/images/back2.jpg");
             launch(args);
         }
+
+
+    /**
+     * Shows a confirmation dialog.
+     * @param message The message to display.
+     * @return True if the user confirmed, false otherwise.
+     */
+    public boolean showConfirmationDialog(String message) {
+        // Pause game and timer before showing dialog
+        if (game.isActive() && !game.isPaused()) {
+            game.pauseGame();
+            if (statusPanel != null) {
+                statusPanel.stopTimerUpdates();
+            }
+        }
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, message, ButtonType.YES, ButtonType.NO);
+        alert.setTitle("Confirmation");
+        alert.setHeaderText(null);
+        alert.getDialogPane().lookupButton(ButtonType.NO).requestFocus();
+        alert.getDialogPane().setStyle(
+                "-fx-background-color: linear-gradient(to bottom, #f0f8ff, #87cefa); " +
+                        "-fx-border-color: #4682b4; " +
+                        "-fx-border-width: 2; " +
+                        "-fx-border-radius: 10; " +
+                        "-fx-background-radius: 10;"
+        );
+        boolean result = alert.showAndWait().orElse(ButtonType.NO) == ButtonType.YES;
+
+        // Resume game and timer if cancelled
+        if (!result && game.isPaused()) {
+            game.resumeGame();
+            if (statusPanel != null) {
+                statusPanel.startTimerUpdates();
+            }
+        }
+        return result;
+    }
 }
 
