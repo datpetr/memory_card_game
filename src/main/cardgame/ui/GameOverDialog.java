@@ -78,7 +78,7 @@ public class GameOverDialog {
             if (isWin) {
                 int matches = game.getPlayer().getScore();
                 int moves = game.getPlayer().getMoves();
-                long timeInSeconds = game.getTimer().getElapsedTime() / 1000;
+                long timeInSeconds = (game.getTimer().getElapsedTime() / 1000);
 
                 var profile = GlobalProfileContext.getActiveProfile();
                 if (profile != null) {
