@@ -80,7 +80,7 @@ public class GameBoard extends Observable {
 
         boolean isMatch = card1.getImagePath().equals(card2.getImagePath());
 
-        if (isMatch && !card1.isMatched() && !card2.isMatched()) {
+        if (isMatch && !card1.isMatched() && !card2.isMatched() && card1 != card2) {
             card1.setMatched(true);
             card2.setMatched(true);
             matchedPairsCount++;
