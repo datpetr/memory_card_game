@@ -20,31 +20,40 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Handles card display and animations
- * Preserves the original UI components and animation logic from GameBoardVisualizer2
+ * Comprehensive card rendering and board management class
+ * Combines card rendering, animations, and board layout functionality
  */
 public class CardRenderer {
     private static final double PADDING = 20;
     private static final double GAP = 10;
 
+    // Game components
     private GameBoardUI gameBoardUI;
     private Game game;
     private GameBoard board;
-    private int cols;  // Using cols first to match GridPane convention (col, row)
+
+    // Layout properties
+    private int cols;
     private int rows;
     private double cardAspectRatio;
     private double gap;
+    private GridPane gridPane;
 
+    // Card state management
     private Card firstFlippedCard;
     private Card secondFlippedCard;
     private final Map<Card, ImageView> cardViews = new HashMap<>();
     private final Map<Card, Button> cardButtons = new HashMap<>();
-    private GridPane gridPane;
+
+    // UI elements
     private Label gamePausedLabel;
+
+    // Game state flags
     private boolean cardClicksBlocked = false;
     private boolean flippingFirstCard = false;
 
-    public CardRenderer(GameBoardUI gameBoardUI, Game game, GameBoard board, int cols, int rows, double cardAspectRatio, double gap) {
+    public CardRenderer(GameBoardUI gameBoardUI, Game game, GameBoard board, int cols, int rows,
+                        double cardAspectRatio, double gap) {
         this.gameBoardUI = gameBoardUI;
         this.game = game;
         this.board = board;
@@ -53,31 +62,36 @@ public class CardRenderer {
         this.cardAspectRatio = cardAspectRatio;
         this.gap = gap;
 
-        initialize();
+        initializeGrid();
+        initializeCards();
+        initializePauseOverlay();
     }
 
     /**
-     * Initializes the card renderer and creates the game board
+     * Initializes the game board grid
      */
-    private void initialize() {
-        // Create the grid pane for cards
+    private void initializeGrid() {
         gridPane = new GridPane();
         gridPane.setHgap(gap);
         gridPane.setVgap(gap);
         gridPane.setAlignment(Pos.CENTER);
+        gridPane.setPadding(new Insets(PADDING));
 
-        // Responsive card sizing: bind to parent grid size
+        // Responsive card sizing
         gridPane.widthProperty().addListener((obs, oldVal, newVal) -> resizeCards());
         gridPane.heightProperty().addListener((obs, oldVal, newVal) -> resizeCards());
+    }
 
-        // Initial card creation with placeholder size (will be resized)
+    /**
+     * Initializes all card elements
+     */
+    private void initializeCards() {
         double initialCardWidth = 100;
         double initialCardHeight = 100 / cardAspectRatio;
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 Card card = board.getCard(row, col);
-
                 if (card == null) {
                     throw new IllegalStateException(
                             "No card found at position [" + row + "][" + col + "]"
@@ -85,15 +99,18 @@ public class CardRenderer {
                 }
 
                 card.addObserver(gameBoardUI);
-
                 Button cardButton = createCardButton(card, initialCardWidth, initialCardHeight);
                 cardButtons.put(card, cardButton);
                 gridPane.add(cardButton, col, row);
                 cardViews.put(card, (ImageView) cardButton.getGraphic());
             }
         }
+    }
 
-        // Create pause overlay (identical to original)
+    /**
+     * Initializes the pause overlay
+     */
+    private void initializePauseOverlay() {
         gamePausedLabel = new Label("Game Paused");
         gamePausedLabel.setStyle(
                 "-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: #ffffff; " +
@@ -103,7 +120,26 @@ public class CardRenderer {
         gamePausedLabel.setAlignment(Pos.CENTER);
     }
 
-    // Responsive resizing for cards
+    /**
+     * Creates a styled card button with click handler
+     */
+    private Button createCardButton(Card card, double cardWidth, double cardHeight) {
+        Button cardButton = new Button();
+        cardButton.setPrefSize(cardWidth, cardHeight);
+        cardButton.setPadding(Insets.EMPTY);
+
+        ImageView imageView = new ImageView(new Image(Card.getBackImagePath()));
+        imageView.setFitWidth(cardWidth);
+        imageView.setFitHeight(cardHeight);
+        cardButton.setGraphic(imageView);
+
+        cardButton.setOnAction(event -> handleCardFlip(card, imageView));
+        return cardButton;
+    }
+
+    /**
+     * Handles responsive card resizing
+     */
     private void resizeCards() {
         double gridWidth = gridPane.getWidth();
         double gridHeight = gridPane.getHeight();
@@ -128,35 +164,34 @@ public class CardRenderer {
     }
 
     /**
-     * Creates a button for a card with the original style and behavior
-     * @param card The card to create a button for
-     * @param cardWidth The width of the card
-     * @param cardHeight The height of the card
-     * @return The created button
+     * Handles card flip animation and game logic
      */
-    private Button createCardButton(Card card, double cardWidth, double cardHeight) {
-        // Original button creation code
-        Button cardButton = new Button();
-        cardButton.setPrefSize(cardWidth, cardHeight);
-        cardButton.setPadding(Insets.EMPTY);
+    private void handleCardFlip(Card card, ImageView imageView) {
+        if (cardClicksBlocked || card.isMatched() || card.isFaceUp() || !game.isActive()) return;
 
-        ImageView imageView = new ImageView(new Image(Card.getBackImagePath()));
-        imageView.setFitWidth(cardWidth);
-        imageView.setFitHeight(cardHeight);
-        cardButton.setGraphic(imageView);
+        if (firstFlippedCard != null && card == firstFlippedCard) return;
 
-        // Original click handler
-        cardButton.setOnAction(event -> handleCardFlip(card, imageView));
-        return cardButton;
+        if (firstFlippedCard == null && !flippingFirstCard) {
+            cardClicksBlocked = true;
+            flippingFirstCard = true;
+            animateCardFlip(card, imageView, () -> {
+                firstFlippedCard = card;
+                flippingFirstCard = false;
+                cardClicksBlocked = false;
+            });
+        } else if (secondFlippedCard == null) {
+            cardClicksBlocked = true;
+            animateCardFlip(card, imageView, () -> {
+                secondFlippedCard = card;
+                boolean isMatch = game.processTurn(firstFlippedCard, secondFlippedCard);
+                checkForMatch(isMatch);
+            });
+        }
     }
 
     /**
-     * Handles a card flip
-     * Original implementation from GameBoardVisualizer2
-     * @param card The card to flip
-     * @param imageView The image view to update
+     * Animates a card flip with optional completion handler
      */
-
     private void animateCardFlip(Card card, ImageView imageView, Runnable onFinished) {
         ScaleTransition flipOut = new ScaleTransition(Duration.millis(200), imageView);
         flipOut.setFromX(1.0);
@@ -173,34 +208,8 @@ public class CardRenderer {
         flipOut.play();
     }
 
-    private void handleCardFlip(Card card, ImageView imageView) {
-        if (cardClicksBlocked || card.isMatched() || card.isFaceUp() || !game.isActive()) return;
-
-        // Prevent clicking the same card again
-        if (firstFlippedCard != null && card == firstFlippedCard) return;
-
-        if (firstFlippedCard == null && !flippingFirstCard) {
-            cardClicksBlocked = true; // Block all clicks during animation
-            flippingFirstCard = true;
-            animateCardFlip(card, imageView, () -> {
-                firstFlippedCard = card;
-                flippingFirstCard = false;
-                cardClicksBlocked = false; // Allow next click after animation
-            });
-        } else if (secondFlippedCard == null) {
-            cardClicksBlocked = true;
-            animateCardFlip(card, imageView, () -> {
-                secondFlippedCard = card;
-                boolean isMatch = game.processTurn(firstFlippedCard, secondFlippedCard);
-                checkForMatch(isMatch);
-            });
-        }
-    }
     /**
-     * Updates a card's image
-     * Original implementation from GameBoardVisualizer2
-     * @param card The card to update
-     * @param imageView The image view to update
+     * Updates the displayed image for a card
      */
     private void updateCardImage(Card card, ImageView imageView) {
         String path = card.isFaceUp() ? card.getImagePath() : Card.getBackImagePath();
@@ -208,9 +217,7 @@ public class CardRenderer {
     }
 
     /**
-     * Checks if the flipped cards match
-     * Original implementation from GameBoardVisualizer2
-     * @param isMatch Whether the cards match
+     * Handles match checking logic
      */
     private void checkForMatch(boolean isMatch) {
         cardClicksBlocked = true;
@@ -222,12 +229,11 @@ public class CardRenderer {
     }
 
     /**
-     * Handles a match
-     * Original implementation from GameBoardVisualizer2
+     * Handles successful matches
      */
     private void handleMatch() {
         animateMatch(firstFlippedCard, secondFlippedCard);
-        PauseTransition pause = new PauseTransition(Duration.millis(250)); // Match animation total duration
+        PauseTransition pause = new PauseTransition(Duration.millis(250));
         pause.setOnFinished(e -> {
             cardClicksBlocked = false;
             resetSelections();
@@ -239,9 +245,9 @@ public class CardRenderer {
         });
         pause.play();
     }
+
     /**
-     * Handles a mismatch
-     * Original implementation from GameBoardVisualizer2
+     * Handles unsuccessful matches
      */
     private void handleMismatch() {
         PauseTransition pause = new PauseTransition(Duration.seconds(0.35));
@@ -255,23 +261,11 @@ public class CardRenderer {
     }
 
     /**
-     * Resets the selected cards
-     * Original implementation from GameBoardVisualizer2
+     * Animates a successful match
      */
-    private void resetSelections() {
-        firstFlippedCard = null;
-        secondFlippedCard = null;
-    }
-
-    /**
-     * Animates a match
-     * Original implementation from GameBoardVisualizer2
-     * @param card1 The first card/
-     * @param card2 The second card
-     */
-
     private void animateMatch(Card card1, Card card2) {
-        if (card1 == null || card2 == null || card1 == card2) return; // Only animate if cards are different
+        if (card1 == null || card2 == null || card1 == card2) return;
+
         FadeTransition ft1 = new FadeTransition(Duration.millis(500), cardViews.get(card1));
         ft1.setFromValue(1.0);
         ft1.setToValue(0.3);
@@ -288,23 +282,38 @@ public class CardRenderer {
     }
 
     /**
-     * Animates a mismatch
-     * Original implementation from GameBoardVisualizer2
-     * @param card1 The first card
-     * @param card2 The second card
+     * Resets the card selection state
      */
-    private void animateMismatch(Card card1, Card card2) {
-        PauseTransition pause = new PauseTransition(Duration.seconds(0.5));
-        pause.setOnFinished(event -> Platform.runLater(() -> {
-            animateCardFlip(card1, cardViews.get(card1), null);
-            animateCardFlip(card2, cardViews.get(card2), null);
-        }));
-        pause.play();
+    private void resetSelections() {
+        firstFlippedCard = null;
+        secondFlippedCard = null;
+    }
+
+    // ========== Public Interface ========== //
+
+    /**
+     * Gets the game board grid pane
+     */
+    public GridPane getGridPane() {
+        return gridPane;
     }
 
     /**
-     * Sets whether card buttons are disabled
-     * @param disabled Whether the buttons should be disabled
+     * Gets the pause overlay label
+     */
+    public Label getPauseOverlay() {
+        return gamePausedLabel;
+    }
+
+    /**
+     * Shows or hides the pause overlay
+     */
+    public void showPauseOverlay(boolean visible) {
+        gamePausedLabel.setVisible(visible);
+    }
+
+    /**
+     * Enables/disables all card buttons
      */
     public void setCardButtonsDisabled(boolean disabled) {
         for (Button btn : cardButtons.values()) {
@@ -313,8 +322,7 @@ public class CardRenderer {
     }
 
     /**
-     * Updates a card's image after an update
-     * @param card The card to update
+     * Updates a card's display after state change
      */
     public void handleCardUpdate(Card card) {
         ImageView imageView = cardViews.get(card);
@@ -322,29 +330,4 @@ public class CardRenderer {
             updateCardImage(card, imageView);
         }
     }
-
-    /**
-     * Gets the grid pane containing all cards
-     * @return The grid pane
-     */
-    public GridPane getGridPane() {
-        return gridPane;
-    }
-
-    /**
-     * Gets the pause overlay label
-     * @return The pause overlay label
-     */
-    public Label getPauseOverlay() {
-        return gamePausedLabel;
-    }
-
-    /**
-     * Shows or hides the pause overlay
-     * @param visible Whether the overlay should be visible
-     */
-    public void showPauseOverlay(boolean visible) {
-        gamePausedLabel.setVisible(visible);
-    }
 }
-

@@ -79,7 +79,7 @@ public class ControlPanel {
         
         // Direct action handling without Platform.runLater
         restartButton.setOnAction(e -> {
-            if (gameBoard != null && DialogManager.showConfirmationDialog("Are you sure you want to restart the game?", game)) {
+            if (gameBoard != null && gameBoard.showConfirmationDialog("Are you sure you want to restart the game?")) {
                 gameBoard.restartGame(primaryStage);
             }
         });
@@ -94,7 +94,7 @@ public class ControlPanel {
         
         // Direct action handling without Platform.runLater
         mainMenuButton.setOnAction(e -> {
-            if (gameBoard != null && DialogManager.showConfirmationDialog("Are you sure you want to return to the main menu?", game)) {
+            if (gameBoard != null && gameBoard.showConfirmationDialog("Are you sure you want to return to the main menu?")) {
                 gameBoard.returnToMainMenu(primaryStage);
             }
         });
