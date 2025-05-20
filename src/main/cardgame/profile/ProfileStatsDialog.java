@@ -18,7 +18,11 @@ public class ProfileStatsDialog extends Dialog<Void> {
         profileSelector.getItems().addAll(ProfileManager.listProfiles());
         profileSelector.setPromptText("Select a profile");
 
-        Label statsLabel = new Label();
+        TextArea statsLabel = new TextArea();
+        statsLabel.setEditable(false);
+        statsLabel.setWrapText(true);
+        statsLabel.setPrefRowCount(6);
+
 
         profileSelector.setOnAction(e -> {
             String selectedName = profileSelector.getValue();
@@ -26,6 +30,11 @@ public class ProfileStatsDialog extends Dialog<Void> {
                 try {
                     UserProfile profile = ProfileManager.loadProfile(selectedName);
                     GameStatistics stats = profile.getStatistics();
+
+                    /*System.out.println("Loaded profile: " + profile.getUsername());
+                    System.out.println("Games: " + stats.getTotalGames());
+                    System.out.println("Best score: " + stats.getBestScore());
+                    System.out.println("Best time: " + stats.getBestTime());*/
 
                     statsLabel.setText(
                             "Username: " + profile.getUsername() + "\n" +
@@ -42,8 +51,8 @@ public class ProfileStatsDialog extends Dialog<Void> {
             }
         });
 
-        VBox content = new VBox(10, profileSelector, statsLabel);
-        content.setPadding(new Insets(20));
+        VBox content = new VBox(15, profileSelector, statsLabel);
+        content.setPadding(new Insets(50));
 
         getDialogPane().setContent(content);
         getDialogPane().getButtonTypes().add(ButtonType.CLOSE);

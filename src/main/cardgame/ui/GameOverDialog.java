@@ -9,6 +9,10 @@ import main.cardgame.game.Game;
 import main.cardgame.model.GameBoard;
 import java.util.concurrent.CompletableFuture; // Add this import
 
+import main.cardgame.profile.GlobalProfileContext;
+import main.cardgame.profile.ProfileManager;
+import java.io.IOException;
+
 /**
  * Game over dialog
  * Preserves the original dialog implementation from GameBoardVisualizer2
@@ -71,9 +75,23 @@ public class GameOverDialog {
 
             alert.showAndWait();
 
-            // Notify GameBoardUI to return to the main menu
-            gameBoardUI.returnToMainMenu(gameBoardUI.getPrimaryStage());
+            if (isWin) {
+                int matches = game.getPlayer().getScore();
+                int moves = game.getPlayer().getMoves();
+                long timeInSeconds = game.getTimer().getElapsedTime() / 1000;
 
+                var profile = GlobalProfileContext.getActiveProfile();
+                if (profile != null) {
+                    profile.getStatistics().updateGameStats(matches, moves, timeInSeconds);
+                    try {
+                        ProfileManager.saveProfile(profile);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            gameBoardUI.returnToMainMenu(gameBoardUI.getPrimaryStage());
             future.complete(null);
         });
         
