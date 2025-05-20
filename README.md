@@ -61,6 +61,8 @@ memory_card_game_new_new/
 
 ## Installation
 ### Prerequisites
+- GSON
+- JavaFX
 - Java JDK 17 or higher
 - Git
 
