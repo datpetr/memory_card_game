@@ -11,6 +11,11 @@ import main.cardgame.profile.UserProfile;
 
 import java.util.Observable;
 
+/**
+ * Abstract base class for all game modes in the memory card game.
+ * Handles common game functionality including game board management,
+ * player statistics, timer control, and basic game flow.
+ */
 public abstract class Game extends Observable {
     private GameBoard board;
     private Player player;
@@ -22,7 +27,10 @@ public abstract class Game extends Observable {
     protected GameStatistics statistics;
     private long startTime;
 
-    // Helper method to notify observers with an event
+    /**
+     * Notifies observers with the specified event type
+     * @param eventType The type of event that occurred
+     */
     private void notifyWithEvent(String eventType) {
         setChanged();
         notifyObservers(eventType);
@@ -30,6 +38,8 @@ public abstract class Game extends Observable {
 
     /**
      * Constructor for standard game without countdown
+     * @param board The game board
+     * @param player The player
      */
     public Game(GameBoard board, Player player) {
         this.board = board;
@@ -43,6 +53,9 @@ public abstract class Game extends Observable {
 
     /**
      * Constructor for game with countdown timer
+     * @param board The game board
+     * @param player The player
+     * @param countdownSeconds The countdown time in seconds
      */
     public Game(GameBoard board, Player player, int countdownSeconds) {
         this.board = board;
@@ -54,11 +67,17 @@ public abstract class Game extends Observable {
         this.secondCard = null;
     }
 
+    /**
+     * Initializes game statistics from the active user profile
+     */
     public void initializeStatistics() {
         UserProfile profile = GlobalProfileContext.getActiveProfile();
         this.statistics = (profile != null) ? profile.getStatistics() : new GameStatistics();
     }
 
+    /**
+     * Starts the game
+     */
     public void play() {
         initializeStatistics();
         this.isActive = true;
@@ -91,7 +110,7 @@ public abstract class Game extends Observable {
     }
     
     /**
-     * Check if the game is currently paused
+     * Checks if the game is currently paused
      * @return true if the game is paused
      */
     public boolean isPaused() {
@@ -140,6 +159,12 @@ public abstract class Game extends Observable {
         notifyWithEvent("GAME_OVER");
     }
 
+    /**
+     * Processes a turn when two cards are selected
+     * @param card1 The first selected card
+     * @param card2 The second selected card
+     * @return True if the cards match, false otherwise
+     */
     public boolean processTurn(Card card1, Card card2) {
         if (card1 == null || card2 == null || !isActive) {
             return false;
@@ -164,32 +189,64 @@ public abstract class Game extends Observable {
         return isMatch;
     }
 
+    /**
+     * Determines if the game is over based on game-specific rules
+     * @return True if the game is over, false otherwise
+     */
     public abstract boolean isGameOver();
 
+    /**
+     * Checks if the game is currently active
+     * @return True if the game is active, false otherwise
+     */
     public boolean isActive() {
         return isActive;
     }
 
+    /**
+     * Gets the game board
+     * @return The game board
+     */
     public GameBoard getBoard() {
         return board;
     }
 
+    /**
+     * Gets the player
+     * @return The player
+     */
     public Player getPlayer() {
         return player;
     }
 
+    /**
+     * Gets the timer
+     * @return The timer
+     */
     public Timer getTimer() {
         return timer;
     }
 
+    /**
+     * Gets the number of moves made by the player
+     * @return The number of moves
+     */
     public int getMoves() {
         return player.getMoves();
     }
 
+    /**
+     * Gets the number of matches found
+     * @return The number of matched pairs
+     */
     public int getMatches() {
         return board.getMatchedPairsCount();
     }
 
+    /**
+     * Gets the game statistics
+     * @return The game statistics
+     */
     public GameStatistics getStatistics() {
         return statistics;
     }

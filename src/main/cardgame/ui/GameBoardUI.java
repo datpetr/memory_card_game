@@ -291,7 +291,7 @@ public class GameBoardUI extends Application implements Observer {
     public boolean showConfirmationDialog(String message) {
         // Pause game and timer before showing dialog
         if (game.isActive() && !game.isPaused()) {
-            game.pauseGame();
+            game.pause();
             if (statusPanel != null) {
                 statusPanel.stopTimerUpdates();
             }
@@ -312,7 +312,7 @@ public class GameBoardUI extends Application implements Observer {
 
         // Resume game and timer if cancelled
         if (!result && game.isPaused()) {
-            game.resumeGame();
+            game.resume();
             if (statusPanel != null) {
                 statusPanel.startTimerUpdates();
             }
