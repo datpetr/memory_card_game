@@ -17,7 +17,6 @@ This project aims to enhance memory skills while providing entertainment through
 - [Implementation Details](#implementation-details)
 - [Screenshots/Diagrams](#screenshotsdiagrams)
 - [Contributing](#contributing)
-- [License](#license)
 - [Contact](#contact)
 
 ## Installation
