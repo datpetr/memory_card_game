@@ -51,7 +51,6 @@ memory_card_game_new_new/
 │   └── resources/
        ├── statistics.json
        └── images/
-           ├── back2.jpg
            ├── backCards/
            ├── easy/
            ├── hard/
