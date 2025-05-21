@@ -169,7 +169,11 @@ memory_card_game/
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Contact
-- **Developer:** [Petr Datsenko] [Samuil Datsenko] [Elizabeth Polyakova] [Ahmet Mustafa Turac]
+- **Developers:**
+- [Petr Datsenko]
+- [Samuil Datsenko]
+- [Elizabeth Polyakova]
+- [Ahmet Mustafa Turac]
 - **Email:** [dat.petr@gmail.com]
 - **Issues:** [GitHub Issues](https://github.com/datpetr/memory_card_game/issues)
 
