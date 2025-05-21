@@ -9,7 +9,7 @@ A feature-rich, interactive Memory Card Game implemented in Java. The game offer
 
 ## Tree Structure
 ```
-memory_card_game_new_new/
+memory_card_game/
 ├── full_memory_game_uml.puml
 ├── memory_card_game.iml
 ├── libs/
@@ -72,9 +72,9 @@ memory_card_game_new_new/
    ```
 2. Navigate to the project directory:
    ```sh
-   cd memory_card_game_new_new
+   cd memory_card_game
    ```
-3. Ensure `gson-2.10.1.jar` is present in the `libs/` directory (already included).
+3. Ensure `gson-2.10.1.jar` and `javaFx` is present in the `libs/` directory (already included).
 4. Compile the project:
    ```sh
    javac -cp libs/gson-2.10.1.jar -d out src/main/cardgame/Main.java
