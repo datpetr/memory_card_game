@@ -2,6 +2,7 @@ package main.cardgame.model;
 
 import java.util.Observable;
 
+
 /**
  * Represents a player in the memory card game.
  * Tracks player's name, score, and number of moves made during gameplay.
@@ -73,6 +74,17 @@ public class Player extends Observable {
     public void setScore(int newScore) {
         if (newScore >= 0 && newScore != this.score) {
             this.score = newScore;
+            notifyWithEvent("SCORE_CHANGED");
+        }
+    }
+
+    /**
+     * We have Method Overloading with a double parameter
+     * @param newScore
+     */
+    public void setScore(double newScore) {
+        if (newScore >= 0 && (int) Math.round(newScore) != this.score) {
+            this.score = (int) Math.round(newScore);
             notifyWithEvent("SCORE_CHANGED");
         }
     }

@@ -342,7 +342,6 @@ public class CardRenderer {
         secondFlippedCard = null;
     }
 
-    // ========== Public Interface ========== //
 
     /**
      * Gets the game board grid pane
