@@ -27,6 +27,17 @@ public class Timer extends Observable {
     private State state;
     private Timeline countdownTimeline;
 
+
+    /**
+     * Creates a timer for elapsed time tracking
+     */
+    public Timer() {
+        this.isCountdown = false;
+        this.state = State.READY;
+        this.totalPausedTime = 0;
+    }
+
+
     /**
      * Creates a countdown timer with the specified time limit
      * @param countdownSeconds The time limit in seconds
@@ -38,14 +49,7 @@ public class Timer extends Observable {
         this.startTime = 0;
     }
 
-    /**
-     * Creates a timer for elapsed time tracking
-     */
-    public Timer() {
-        this.isCountdown = false;
-        this.state = State.READY;
-        this.totalPausedTime = 0;
-    }
+
 
     /**
      * Calculates the current time in milliseconds based on the timer's state

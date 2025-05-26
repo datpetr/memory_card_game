@@ -32,17 +32,41 @@ public class ProfileSelectionDialog extends Stage {
 
         createButton.setOnAction(e -> {
             String name = newProfileField.getText().trim();
-            if (!name.isEmpty() && !profileComboBox.getItems().contains(name)) {
-                UserProfile newProfile = new UserProfile(name);
-                try {
-                    ProfileManager.saveProfile(newProfile);
-                    profileComboBox.getItems().add(name);
-                    profileComboBox.setValue(name);
-                    statusLabel.setText("Profile created.");
-                } catch (IOException ex) {
-                    statusLabel.setText("Error saving profile.");
-                    ex.printStackTrace();
-                }
+
+            // Validate name length
+            if (name.isEmpty()) {
+                statusLabel.setText("Error: Name cannot be empty.");
+                return;
+            }
+
+            if (name.length() < 3 || name.length() > 12) {
+                statusLabel.setText("Error: Name must be between \n\t  3-12 characters long.");
+                return;
+            }
+
+            // Validate characters (only Latin letters, '_' and '-')
+            if (!name.matches("^[a-zA-Z0-9_-]+$")) {
+                statusLabel.setText("Error: Name can only contain \n\t Latin letters, '_' and '-'.");
+                return;
+            }
+
+            // Check if profile already exists
+            if (profileComboBox.getItems().contains(name)) {
+                statusLabel.setText("Error: This profile name already exists.");
+                return;
+            }
+
+            // If all validations pass, create the profile
+            UserProfile newProfile = new UserProfile(name);
+            try {
+                ProfileManager.saveProfile(newProfile);
+                profileComboBox.getItems().add(name);
+                profileComboBox.setValue(name);
+                statusLabel.setText("Profile created successfully.");
+                newProfileField.clear();
+            } catch (IOException ex) {
+                statusLabel.setText("Error: Failed to save profile.");
+                ex.printStackTrace();
             }
         });
 
@@ -91,3 +115,4 @@ public class ProfileSelectionDialog extends Stage {
         return selectedProfile;
     }
 }
+
