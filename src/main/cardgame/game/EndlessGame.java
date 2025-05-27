@@ -87,6 +87,5 @@ public class EndlessGame extends Game {
 
         return result;
     }
-
 }
 

@@ -33,26 +33,29 @@ public class ProfileSelectionDialog extends Stage {
         createButton.setOnAction(e -> {
             String name = newProfileField.getText().trim();
 
-            // Validate name length
-            if (name.isEmpty()) {
-                statusLabel.setText("Error: Name cannot be empty.");
-                return;
-            }
+            try {
+                // Validate name
+                if (name.isEmpty()) {
+                    throw new IllegalArgumentException("Error: Name cannot be empty.");
+                }
 
-            if (name.length() < 3 || name.length() > 12) {
-                statusLabel.setText("Error: Name must be between \n\t  3-12 characters long.");
-                return;
-            }
+                if (name.length() < 3 || name.length() > 12) {
+                    throw new IllegalArgumentException("Error: Name must be between \n\t    3-12 characters long.");
+                }
 
-            // Validate characters (only Latin letters, '_' and '-')
-            if (!name.matches("^[a-zA-Z0-9_-]+$")) {
-                statusLabel.setText("Error: Name can only contain \n\t Latin letters, '_' and '-'.");
-                return;
-            }
+                // Validate characters (only Latin letters, numbers, '_' and '-')
+                if (!name.matches("^[a-zA-Z0-9_-]+$")) {
+                    throw new IllegalArgumentException("Error: Name can only contain \n\t Latin letters, numbers, '_' and '-'.");
+                }
 
-            // Check if profile already exists
-            if (profileComboBox.getItems().contains(name)) {
-                statusLabel.setText("Error: This profile name already exists.");
+                // Check if profile already exists
+                if (profileComboBox.getItems().contains(name)) {
+                    throw new IllegalArgumentException("Error: This profile name already exists.");
+                }
+
+                // All validations passed
+            } catch (IllegalArgumentException ex) {
+                statusLabel.setText(ex.getMessage());
                 return;
             }
 
