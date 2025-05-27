@@ -141,7 +141,7 @@ First, make sure you know the exact path to the `lib` folder of your JavaFX SDK.
 *   **On Windows:**
     Ensure `PATH_TO_JAVAFX_LIB` is a Windows-style path (e.g., `C:\\path\\to\\javafx-sdk\\lib`). The classpath separator is a semicolon (`;`).
     ```sh
-    java --module-path PATH_TO_JAVAFX_LIB --add-modules javafx.controls,javafx.fxml,javafx.graphics -cp "out;libs\\gson-2.10.1.jar" main.cardgame.Main
+    java --module-path /path/to/javafx-sdk/lib --add-modules javafx.controls,javafx.fxml,javafx.graphics -cp "out;libs\\gson-2.10.1.jar" main.cardgame.Main
     ```
 
     **Note for Windows Users:** While Java can sometimes be flexible with forward slashes (`/`) versus backslashes (`\\`) in paths provided as arguments, the classpath separator must be a semicolon (`;`).
