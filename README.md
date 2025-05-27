@@ -168,10 +168,10 @@ First, make sure you know the exact path to the `lib` folder of your JavaFX SDK.
 
 ## Contact
 - **Developers:**
-  Petr Datsenko
-  Samuil Datsenko
-  Elizabeth Polyakova
-  Ahmet Mustafa Turac
+   1. Petr Datsenko
+   2. Samuil Datsenko
+   3. Elizabeth Polyakova
+   4. Ahmet Mustafa Turac
 - **Email:** [dat.petr@gmail.com]
 - **Issues:** [GitHub Issues](https://github.com/datpetr/memory_card_game/issues)
 
