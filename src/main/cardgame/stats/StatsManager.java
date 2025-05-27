@@ -55,8 +55,8 @@ public class StatsManager {
      * @param moves Number of moves made
      * @param timeInSeconds Time taken to complete the game
      */
-    public static void recordGame(int matches, int moves, long timeInSeconds) {
-        stats.updateGameStats(matches, moves, timeInSeconds);
+    public static void recordGame(int matches, int moves, long timeInSeconds, int score, boolean isTimedGame, boolean isWin) {
+        stats.updateGameStats(matches, moves, timeInSeconds, score, isTimedGame, isWin);
     }
 
     /**
@@ -64,7 +64,8 @@ public class StatsManager {
      */
     public static void resetStats() {
         stats = new GameStatistics();
-        stats.updateGameStats(0, 0, 0); // Optionally save/reset file
+        // Provide all required arguments for updateGameStats (matches, moves, time, score, isTimedGame, isWin)
+        stats.updateGameStats(0, 0, 0, 0, false, false); // Optionally save/reset file
     }
 }
 

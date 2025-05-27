@@ -30,6 +30,26 @@ public class GameStatistics implements Serializable {
     /** Highest score achieved in endless mode */
     private int bestEndlessScore; // Highest score in endless mode
 
+    /** Add a field for best moves (lowest is better) */
+    private int bestMoves = Integer.MAX_VALUE;
+
+    /** Best (lowest) moves for timed mode */
+    private int bestTimedMoves = Integer.MAX_VALUE;
+    /** Best (lowest) moves for endless mode */
+    private int bestEndlessMoves = Integer.MAX_VALUE;
+    /** Best (lowest) time for timed mode */
+    private long bestTimedTime = Long.MAX_VALUE;
+    /** Best (lowest) time for endless mode */
+    private long bestEndlessTime = Long.MAX_VALUE;
+
+    // Add fields for per-mode totals
+    private int timedGamesPlayed;
+    private int endlessGamesPlayed;
+    private int totalTimedMoves;
+    private int totalEndlessMoves;
+    private long totalTimedTime;
+    private long totalEndlessTime;
+
     /** Path where statistics are saved */
     private static final String FILE_PATH = "src/main/resources/statistics.json";
 
@@ -49,7 +69,11 @@ public class GameStatistics implements Serializable {
 
         try (Reader reader = new FileReader(file)) {
             Gson gson = new Gson();
-            return gson.fromJson(reader, GameStatistics.class);
+            GameStatistics loaded = gson.fromJson(reader, GameStatistics.class);
+            // Defensive: ensure best scores are not negative or zero if previously set
+            if (loaded.bestTimedScore < 0) loaded.bestTimedScore = 0;
+            if (loaded.bestEndlessScore < 0) loaded.bestEndlessScore = 0;
+            return loaded;
         } catch (IOException e) {
             e.printStackTrace();
             return new GameStatistics();
@@ -64,41 +88,68 @@ public class GameStatistics implements Serializable {
      * @param time        Time taken (or elapsed) in milliseconds
      * @param score       Player's final score
      * @param isTimedGame Whether this was a timed game
+     * @param isWin       Whether the game was won
      */
-    public void updateGameStats(int matches, int moves, long time, int score, boolean isTimedGame) {
+    public void updateGameStats(int matches, int moves, long time, int score, boolean isTimedGame, boolean isWin) {
         totalGames++;
         totalMatches += matches;
         totalMoves += moves;
         totalTime += time;
 
-        // Update best score (highest is better)
-        if (score > bestScore) {
-            bestScore = score;
-        }
-
-        // Update game-specific best scores
         if (isTimedGame) {
-            if (score > bestTimedScore) {
-                bestTimedScore = score;
-            }
+            timedGamesPlayed++;
+            totalTimedMoves += moves;
+            totalTimedTime += time;
         } else {
-            if (score > bestEndlessScore) {
-                bestEndlessScore = score;
+            endlessGamesPlayed++;
+            totalEndlessMoves += moves;
+            totalEndlessTime += time;
+        }
+
+        // Only update bests if the game was won
+        if (isWin) {
+            // Update best score (highest is better)
+            if (score > bestScore) {
+                bestScore = score;
+            }
+            // Update best moves (lowest is better)
+            if (moves < bestMoves) {
+                bestMoves = moves;
+            }
+            // Update game-specific best scores and moves/times
+            if (isTimedGame) {
+                if (score > bestTimedScore) {
+                    bestTimedScore = score;
+                }
+                if (moves < bestTimedMoves) {
+                    bestTimedMoves = moves;
+                }
+                if (time < bestTimedTime) {
+                    bestTimedTime = time;
+                }
+            } else {
+                if (score > bestEndlessScore) {
+                    bestEndlessScore = score;
+                }
+                if (moves < bestEndlessMoves) {
+                    bestEndlessMoves = moves;
+                }
+                if (time < bestEndlessTime) {
+                    bestEndlessTime = time;
+                }
+            }
+            // Update best time (lowest is better)
+            if (time < bestTime || bestTime == 0) {
+                bestTime = time;
             }
         }
-
-        // Update best time (lowest is better)
-        if (bestTime == 0 || time < bestTime) {
-            bestTime = time;
-        }
-
         save();
     }
 
     /**
      * Legacy method for backward compatibility
      */
-    public void updateGameStats(int matches, int moves, long time) {
+    /*public void updateGameStats(int matches, int moves, long time) {
         totalGames++;
         totalMatches += matches;
         totalMoves += moves;
@@ -114,7 +165,7 @@ public class GameStatistics implements Serializable {
         }
 
         save();
-    }
+    }*/
 
     /**
      * Calculates the average number of moves per game
@@ -125,11 +176,47 @@ public class GameStatistics implements Serializable {
     }
 
     /**
+     * Calculates the average number of moves per timed games
+     */
+    public double getAverageTimedMoves() {
+        int timedGames = getTimedGamesPlayed();
+        int timedMoves = totalTimedMoves;
+        return timedGames == 0 ? 0 : (double) timedMoves / timedGames;
+    }
+
+    /**
+     * Calculates the average number of moves per endless games
+     */
+    public double getAverageEndlessMoves() {
+        int endlessGames = getEndlessGamesPlayed();
+        int endlessMoves = totalEndlessMoves;
+        return endlessGames == 0 ? 0 : (double) endlessMoves / endlessGames;
+    }
+
+    /**
      * Calculates the average time spent per game
      * @return The average time in milliseconds, or 0 if no games have been played
      */
     public double getAverageTime() {
         return totalGames == 0 ? 0 : (double) totalTime / totalGames;
+    }
+
+    /**
+     * Calculates the average time per timed games (in ms)
+     */
+    public double getAverageTimedTime() {
+        int timedGames = getTimedGamesPlayed();
+        long timedTime = totalTimedTime;
+        return timedGames == 0 ? 0 : (double) timedTime / timedGames;
+    }
+
+    /**
+     * Calculates the average time per endless games (in ms)
+     */
+    public double getAverageEndlessTime() {
+        int endlessGames = getEndlessGamesPlayed();
+        long endlessTime = totalEndlessTime;
+        return endlessGames == 0 ? 0 : (double) endlessTime / endlessGames;
     }
 
     /**
@@ -166,10 +253,18 @@ public class GameStatistics implements Serializable {
 
     /**
      * Gets the best score achieved in any game mode
-     * @return The best score
+     * @return The best score (higher is better)
      */
     public int getBestScore() {
         return bestScore;
+    }
+
+    /**
+     * Gets the best (lowest) moves achieved in any game mode
+     * @return The best moves (lower is better)
+     */
+    public int getBestMoves() {
+        return bestMoves == Integer.MAX_VALUE ? 0 : bestMoves;
     }
 
     /**
@@ -188,13 +283,27 @@ public class GameStatistics implements Serializable {
         return bestEndlessScore;
     }
 
+    public int getBestTimedMoves() { return bestTimedMoves == Integer.MAX_VALUE ? 0 : bestTimedMoves; }
+    public int getBestEndlessMoves() { return bestEndlessMoves == Integer.MAX_VALUE ? 0 : bestEndlessMoves; }
+    public long getBestTimedTime() { return bestTimedTime == Long.MAX_VALUE ? 0 : bestTimedTime; }
+    public long getBestEndlessTime() { return bestEndlessTime == Long.MAX_VALUE ? 0 : bestEndlessTime; }
+
     /**
      * Gets the best (lowest) time achieved for completing a game
-     * @return The best time in milliseconds
+     * @return The best time in milliseconds (as a double, in seconds, matching average time)
      */
-    public long getBestTime() {
-        return bestTime;
+    public double getBestTime() {
+        return bestTime == 0 ? 0 : (double) bestTime / 1000;
     }
+
+    /**
+     * Returns the number of timed games played
+     */
+    public int getTimedGamesPlayed() { return timedGamesPlayed; }
+    /**
+     * Returns the number of endless games played
+     */
+    public int getEndlessGamesPlayed() { return endlessGamesPlayed; }
 
     /**
      * Saves statistics to disk

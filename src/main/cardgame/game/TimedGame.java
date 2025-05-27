@@ -54,8 +54,6 @@ public class TimedGame extends Game {
 
             if (timeBonus > 0) {
                 getPlayer().incrementScore(timeBonus);
-
-                // Notify observers about the bonus
                 setChanged();
                 notifyObservers("TIME_BONUS_ADDED");
             }
@@ -66,7 +64,20 @@ public class TimedGame extends Game {
 
         // Call parent end game method after bonuses are applied
         if (isActive()) {
+            // Ensure score is up to date before updating stats
             super.endGame();
+        } else {
+            // If already inactive, still update stats with final score
+            // (rare, but for safety)
+            int matches = getBoard().getMatchedPairsCount();
+            int moves = getPlayer().getMoves();
+            int score = getPlayer().getScore();
+            long duration = getTimer().getMaxTime() - getTimer().getRemainingTime();
+            boolean isTimedGame = getTimer().isCountdown();
+            boolean isWin = getBoard().allCardsMatched();
+            if (getStatistics() != null) {
+                getStatistics().updateGameStats(matches, moves, duration, score, isTimedGame, isWin);
+            }
         }
     }
 

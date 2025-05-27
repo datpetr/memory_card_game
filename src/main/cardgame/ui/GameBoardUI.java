@@ -272,63 +272,49 @@ public class GameBoardUI extends Application implements Observer {
      */
     public void showGameOverMessage() {
         // After the game ends, before returning to main menu
-        int timeInSeconds = game.getTimer().getElapsedSeconds(); // Adjust this to your timer's API
         if (gameOverShown) return; // Prevent double-counting
         gameOverShown = true;
-        StatsManager.recordGame(
+        boolean isWin = board.allCardsMatched();
+
+        // Check if a user profile is active
+        main.cardgame.profile.UserProfile profile = main.cardgame.profile.GlobalProfileContext.getActiveProfile();
+        if (profile != null) {
+            // End the game, which updates and saves profile statistics
+            game.endGame();
+        } else {
+            // No profile: update global statistics
+            StatsManager.recordGame(
                 game.getMatches(),
                 game.getMoves(),
-                game.getTimer().getElapsedSeconds()
-        );
+                game.getTimer().getElapsedSeconds(),
+                game.getPlayer().getScore(),
+                game.getTimer().isCountdown(),
+                isWin
+            );
+        }
 
         GameOverDialog gameOverDialog = new GameOverDialog(game, board, this); // Pass GameBoardUI instance
         gameOverDialog.show().thenRun(() -> {
             // Return to main menu after dialog closes
-            returnToMainMenu((Stage) controlPanel.getMainMenuButton().getScene().getWindow());
+            returnToMainMenu(getPrimaryStage());
         });
     }
 
-        public static void main(String[] args) {
-            Card.setBackImagePath("file:src/main/resources/images/back2.jpg");
-            launch(args);
-        }
-
-
     /**
-     * Shows a confirmation dialog.
-     * @param message The message to display.
-     * @return True if the user confirmed, false otherwise.
+     * Shows a confirmation dialog with the given message.
+     * @param message The message to display
+     * @return true if user clicks OK/Yes, false if Cancel/No
      */
     public boolean showConfirmationDialog(String message) {
-        // Pause game and timer before showing dialog
-        if (game.isActive() && !game.isPaused()) {
-            game.pause();
-            if (statusPanel != null) {
-                statusPanel.stopTimerUpdates();
-            }
-        }
-
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, message, ButtonType.YES, ButtonType.NO);
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmation");
         alert.setHeaderText(null);
-        alert.getDialogPane().lookupButton(ButtonType.NO).requestFocus();
-        alert.getDialogPane().setStyle(
-                "-fx-background-color: linear-gradient(to bottom, #f0f8ff, #87cefa); " +
-                        "-fx-border-color: #4682b4; " +
-                        "-fx-border-width: 2; " +
-                        "-fx-border-radius: 10; " +
-                        "-fx-background-radius: 10;"
-        );
-        boolean result = alert.showAndWait().orElse(ButtonType.NO) == ButtonType.YES;
+        alert.setContentText(message);
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.isPresent() && result.get() == ButtonType.OK;
+    }
 
-        // Resume game and timer if cancelled
-        if (!result && game.isPaused()) {
-            game.resume();
-            if (statusPanel != null) {
-                statusPanel.startTimerUpdates();
-            }
-        }
-        return result;
+    public static void main(String[] args) {
+        launch(args);
     }
 }
-

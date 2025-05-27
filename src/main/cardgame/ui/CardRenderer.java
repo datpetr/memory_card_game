@@ -31,6 +31,9 @@ public class CardRenderer {
     private static final double PADDING = 20;
     /** Default gap between cards */
     private static final double GAP = 10;
+    //Temporary static values for card dimensions
+    private static final double STATIC_CARD_WIDTH = 90;
+    private static final double STATIC_CARD_HEIGHT = 90;
 
     /** Reference to the parent GameBoardUI */
     private GameBoardUI gameBoardUI;
@@ -184,24 +187,13 @@ public class CardRenderer {
      * Handles responsive card resizing
      */
     private void resizeCards() {
-        double gridWidth = gridPane.getWidth();
-        double gridHeight = gridPane.getHeight();
-
-        if (gridWidth <= 0 || gridHeight <= 0) return;
-
-        double availableWidth = gridWidth - (cols - 1) * gap - 2 * PADDING;
-        double availableHeight = gridHeight - (rows - 1) * gap - 2 * PADDING;
-
-        double cardWidth = Math.min(availableWidth / cols, (availableHeight / rows) * cardAspectRatio);
-        double cardHeight = cardWidth / cardAspectRatio;
-
         for (Card card : cardButtons.keySet()) {
             Button btn = cardButtons.get(card);
-            btn.setPrefSize(cardWidth, cardHeight);
+            btn.setPrefSize(STATIC_CARD_WIDTH, STATIC_CARD_HEIGHT);
             ImageView iv = cardViews.get(card);
             if (iv != null) {
-                iv.setFitWidth(cardWidth);
-                iv.setFitHeight(cardHeight);
+                iv.setFitWidth(STATIC_CARD_WIDTH);
+                iv.setFitHeight(STATIC_CARD_HEIGHT);
             }
         }
     }

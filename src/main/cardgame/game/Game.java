@@ -141,10 +141,9 @@ public abstract class Game extends Observable {
         if (statistics != null) {
             // Determine if this is a timed game based on timer type
             boolean isTimedGame = timer.isCountdown();
-
-            // Use the new method that accepts score and game type
-            statistics.updateGameStats(matches, moves, duration, score, isTimedGame);
-
+            boolean isWin = board.allCardsMatched();
+            // Use the new method that accepts score, game type, and win status
+            statistics.updateGameStats(matches, moves, duration, score, isTimedGame, isWin);
             UserProfile profile = GlobalProfileContext.getActiveProfile();
             if (profile != null) {
                 try {
