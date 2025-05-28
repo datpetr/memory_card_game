@@ -50,6 +50,14 @@ public class GameStatistics implements Serializable {
     private long totalTimedTime;
     private long totalEndlessTime;
 
+    // Per-difficulty best scores, moves, and times for timed and endless modes
+    private int bestTimedScoreEasy = 0, bestTimedScoreMedium = 0, bestTimedScoreHard = 0;
+    private int bestEndlessScoreEasy = 0, bestEndlessScoreMedium = 0, bestEndlessScoreHard = 0;
+    private int bestTimedMovesEasy = Integer.MAX_VALUE, bestTimedMovesMedium = Integer.MAX_VALUE, bestTimedMovesHard = Integer.MAX_VALUE;
+    private int bestEndlessMovesEasy = Integer.MAX_VALUE, bestEndlessMovesMedium = Integer.MAX_VALUE, bestEndlessMovesHard = Integer.MAX_VALUE;
+    private long bestTimedTimeEasy = Long.MAX_VALUE, bestTimedTimeMedium = Long.MAX_VALUE, bestTimedTimeHard = Long.MAX_VALUE;
+    private long bestEndlessTimeEasy = Long.MAX_VALUE, bestEndlessTimeMedium = Long.MAX_VALUE, bestEndlessTimeHard = Long.MAX_VALUE;
+
     /** Path where statistics are saved */
     private static final String FILE_PATH = "src/main/resources/statistics.json";
 
@@ -89,8 +97,9 @@ public class GameStatistics implements Serializable {
      * @param score       Player's final score
      * @param isTimedGame Whether this was a timed game
      * @param isWin       Whether the game was won
+     * @param difficulty  Difficulty string ("easy", "medium", "hard")
      */
-    public void updateGameStats(int matches, int moves, long time, int score, boolean isTimedGame, boolean isWin) {
+    public void updateGameStats(int matches, int moves, long time, int score, boolean isTimedGame, boolean isWin, String difficulty) {
         totalGames++;
         totalMatches += matches;
         totalMoves += moves;
@@ -106,36 +115,52 @@ public class GameStatistics implements Serializable {
             totalEndlessTime += time;
         }
 
-        // Only update bests if the game was won
+        // Always update best score (highest is better)
+        if (score > bestScore) {
+            bestScore = score;
+        }
+        // Only update bests for moves/time if the game was won
         if (isWin) {
-            // Update best score (highest is better)
-            if (score > bestScore) {
-                bestScore = score;
-            }
             // Update best moves (lowest is better)
             if (moves < bestMoves) {
                 bestMoves = moves;
             }
             // Update game-specific best scores and moves/times
             if (isTimedGame) {
-                if (score > bestTimedScore) {
-                    bestTimedScore = score;
-                }
-                if (moves < bestTimedMoves) {
-                    bestTimedMoves = moves;
-                }
-                if (time < bestTimedTime) {
-                    bestTimedTime = time;
+                if (score > bestTimedScore) bestTimedScore = score;
+                if (moves < bestTimedMoves) bestTimedMoves = moves;
+                if (time < bestTimedTime) bestTimedTime = time;
+                // Per-difficulty
+                if ("easy".equalsIgnoreCase(difficulty)) {
+                    if (score > bestTimedScoreEasy) bestTimedScoreEasy = score;
+                    if (moves < bestTimedMovesEasy) bestTimedMovesEasy = moves;
+                    if (time < bestTimedTimeEasy) bestTimedTimeEasy = time;
+                } else if ("medium".equalsIgnoreCase(difficulty)) {
+                    if (score > bestTimedScoreMedium) bestTimedScoreMedium = score;
+                    if (moves < bestTimedMovesMedium) bestTimedMovesMedium = moves;
+                    if (time < bestTimedTimeMedium) bestTimedTimeMedium = time;
+                } else if ("hard".equalsIgnoreCase(difficulty)) {
+                    if (score > bestTimedScoreHard) bestTimedScoreHard = score;
+                    if (moves < bestTimedMovesHard) bestTimedMovesHard = moves;
+                    if (time < bestTimedTimeHard) bestTimedTimeHard = time;
                 }
             } else {
-                if (score > bestEndlessScore) {
-                    bestEndlessScore = score;
-                }
-                if (moves < bestEndlessMoves) {
-                    bestEndlessMoves = moves;
-                }
-                if (time < bestEndlessTime) {
-                    bestEndlessTime = time;
+                if (score > bestEndlessScore) bestEndlessScore = score;
+                if (moves < bestEndlessMoves) bestEndlessMoves = moves;
+                if (time < bestEndlessTime) bestEndlessTime = time;
+                // Per-difficulty
+                if ("easy".equalsIgnoreCase(difficulty)) {
+                    if (score > bestEndlessScoreEasy) bestEndlessScoreEasy = score;
+                    if (moves < bestEndlessMovesEasy) bestEndlessMovesEasy = moves;
+                    if (time < bestEndlessTimeEasy) bestEndlessTimeEasy = time;
+                } else if ("medium".equalsIgnoreCase(difficulty)) {
+                    if (score > bestEndlessScoreMedium) bestEndlessScoreMedium = score;
+                    if (moves < bestEndlessMovesMedium) bestEndlessMovesMedium = moves;
+                    if (time < bestEndlessTimeMedium) bestEndlessTimeMedium = time;
+                } else if ("hard".equalsIgnoreCase(difficulty)) {
+                    if (score > bestEndlessScoreHard) bestEndlessScoreHard = score;
+                    if (moves < bestEndlessMovesHard) bestEndlessMovesHard = moves;
+                    if (time < bestEndlessTimeHard) bestEndlessTimeHard = time;
                 }
             }
             // Update best time (lowest is better)
@@ -304,6 +329,26 @@ public class GameStatistics implements Serializable {
      * Returns the number of endless games played
      */
     public int getEndlessGamesPlayed() { return endlessGamesPlayed; }
+
+    // Getters for per-difficulty bests
+    public int getBestTimedScoreEasy() { return bestTimedScoreEasy; }
+    public int getBestTimedScoreMedium() { return bestTimedScoreMedium; }
+    public int getBestTimedScoreHard() { return bestTimedScoreHard; }
+    public int getBestEndlessScoreEasy() { return bestEndlessScoreEasy; }
+    public int getBestEndlessScoreMedium() { return bestEndlessScoreMedium; }
+    public int getBestEndlessScoreHard() { return bestEndlessScoreHard; }
+    public int getBestTimedMovesEasy() { return bestTimedMovesEasy == Integer.MAX_VALUE ? 0 : bestTimedMovesEasy; }
+    public int getBestTimedMovesMedium() { return bestTimedMovesMedium == Integer.MAX_VALUE ? 0 : bestTimedMovesMedium; }
+    public int getBestTimedMovesHard() { return bestTimedMovesHard == Integer.MAX_VALUE ? 0 : bestTimedMovesHard; }
+    public int getBestEndlessMovesEasy() { return bestEndlessMovesEasy == Integer.MAX_VALUE ? 0 : bestEndlessMovesEasy; }
+    public int getBestEndlessMovesMedium() { return bestEndlessMovesMedium == Integer.MAX_VALUE ? 0 : bestEndlessMovesMedium; }
+    public int getBestEndlessMovesHard() { return bestEndlessMovesHard == Integer.MAX_VALUE ? 0 : bestEndlessMovesHard; }
+    public long getBestTimedTimeEasy() { return bestTimedTimeEasy == Long.MAX_VALUE ? 0 : bestTimedTimeEasy; }
+    public long getBestTimedTimeMedium() { return bestTimedTimeMedium == Long.MAX_VALUE ? 0 : bestTimedTimeMedium; }
+    public long getBestTimedTimeHard() { return bestTimedTimeHard == Long.MAX_VALUE ? 0 : bestTimedTimeHard; }
+    public long getBestEndlessTimeEasy() { return bestEndlessTimeEasy == Long.MAX_VALUE ? 0 : bestEndlessTimeEasy; }
+    public long getBestEndlessTimeMedium() { return bestEndlessTimeMedium == Long.MAX_VALUE ? 0 : bestEndlessTimeMedium; }
+    public long getBestEndlessTimeHard() { return bestEndlessTimeHard == Long.MAX_VALUE ? 0 : bestEndlessTimeHard; }
 
     /**
      * Saves statistics to disk

@@ -192,21 +192,27 @@ public class ControlPanel {
         if (game == null) return;
 
         var stats = game.getStatistics();
-        javafx.scene.layout.VBox content = new javafx.scene.layout.VBox(10);
+        VBox content = new VBox(10);
         content.setPadding(new Insets(15));
         content.getChildren().addAll(
-                new javafx.scene.control.Label("Games Played: " + stats.getTotalGames()),
-                new javafx.scene.control.Label("Total Matches: " + stats.getTotalMatches()),
-                new javafx.scene.control.Label("Total Moves: " + stats.getTotalMoves()),
-                new javafx.scene.control.Label("Best Score: " + stats.getBestScore()),
-                new javafx.scene.control.Label("Best Time: " + stats.getBestTime() / 1000 + " sec"),
-                new javafx.scene.control.Label(String.format("Average Moves: %.2f", stats.getAverageMoves())),
-                new javafx.scene.control.Label(String.format("Average Time: %.2f sec", stats.getAverageTime() / 1000))
+                new Label("Games Played: " + stats.getTotalGames()),
+                new Label("Total Matches: " + stats.getTotalMatches()),
+                new Label("Total Moves: " + stats.getTotalMoves()),
+                new Label("\n--- Timed Mode ---"),
+                new Label("Easy:   Best Score: " + stats.getBestTimedScoreEasy() + ", Best Moves: " + stats.getBestTimedMovesEasy() + ", Best Time: " + (stats.getBestTimedTimeEasy() / 1000) + " sec"),
+                new Label("Medium: Best Score: " + stats.getBestTimedScoreMedium() + ", Best Moves: " + stats.getBestTimedMovesMedium() + ", Best Time: " + (stats.getBestTimedTimeMedium() / 1000) + " sec"),
+                new Label("Hard:   Best Score: " + stats.getBestTimedScoreHard() + ", Best Moves: " + stats.getBestTimedMovesHard() + ", Best Time: " + (stats.getBestTimedTimeHard() / 1000) + " sec"),
+                new Label("\n--- Endless Mode ---"),
+                new Label("Easy:   Best Score: " + stats.getBestEndlessScoreEasy() + ", Best Moves: " + stats.getBestEndlessMovesEasy() + ", Best Time: " + (stats.getBestEndlessTimeEasy() / 1000) + " sec"),
+                new Label("Medium: Best Score: " + stats.getBestEndlessScoreMedium() + ", Best Moves: " + stats.getBestEndlessMovesMedium() + ", Best Time: " + (stats.getBestEndlessTimeMedium() / 1000) + " sec"),
+                new Label("Hard:   Best Score: " + stats.getBestEndlessScoreHard() + ", Best Moves: " + stats.getBestEndlessMovesHard() + ", Best Time: " + (stats.getBestEndlessTimeHard() / 1000) + " sec"),
+                new Label("\nAverage Moves: " + String.format("%.2f", stats.getAverageMoves())),
+                new Label("Average Time: " + String.format("%.2f", (stats.getAverageTime() / 1000)) + " sec")
         );
 
-        javafx.stage.Stage statsStage = new javafx.stage.Stage();
+        Stage statsStage = new Stage();
         statsStage.setTitle("Game Statistics");
-        statsStage.setScene(new javafx.scene.Scene(content));
+        statsStage.setScene(new Scene(content));
         statsStage.show();
     }
 

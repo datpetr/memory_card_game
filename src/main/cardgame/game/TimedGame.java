@@ -20,13 +20,14 @@ public class TimedGame extends Game {
     private boolean isStopped;
 
     /**
-     * Creates a new timed game with the specified countdown
+     * Creates a new timed game with the specified countdown and difficulty
      * @param board The game board
      * @param player The player
      * @param countdownSeconds The time limit in seconds
+     * @param difficulty The difficulty level
      */
-    public TimedGame(GameBoard board, Player player, int countdownSeconds) {
-        super(board, player, countdownSeconds); // Pass GameBoard and playerName to the Game constructor
+    public TimedGame(GameBoard board, Player player, int countdownSeconds, String difficulty) {
+        super(board, player, countdownSeconds, difficulty);
     }
 
     /**
@@ -76,7 +77,7 @@ public class TimedGame extends Game {
             boolean isTimedGame = getTimer().isCountdown();
             boolean isWin = getBoard().allCardsMatched();
             if (getStatistics() != null) {
-                getStatistics().updateGameStats(matches, moves, duration, score, isTimedGame, isWin);
+                getStatistics().updateGameStats(matches, moves, duration, score, isTimedGame, isWin, getDifficulty());
             }
         }
     }

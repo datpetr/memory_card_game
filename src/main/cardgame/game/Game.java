@@ -26,6 +26,7 @@ public abstract class Game extends Observable {
     private Card secondCard;
     protected GameStatistics statistics;
     private long startTime;
+    private String difficulty;
 
     /**
      * Notifies observers with the specified event type
@@ -52,6 +53,23 @@ public abstract class Game extends Observable {
     }
 
     /**
+     * Constructor for standard game without countdown and with difficulty
+     * @param board The game board
+     * @param player The player
+     * @param difficulty The difficulty level
+     */
+    public Game(GameBoard board, Player player, String difficulty) {
+        this.board = board;
+        this.player = player;
+        this.timer = new Timer();  // Create a default timer that tracks elapsed time
+        this.isActive = false;
+        this.isPaused = false;
+        this.firstCard = null;
+        this.secondCard = null;
+        this.difficulty = difficulty;
+    }
+
+    /**
      * Constructor for game with countdown timer
      * @param board The game board
      * @param player The player
@@ -65,6 +83,24 @@ public abstract class Game extends Observable {
         this.isPaused = false;
         this.firstCard = null;
         this.secondCard = null;
+    }
+
+    /**
+     * Constructor for game with countdown timer and difficulty
+     * @param board The game board
+     * @param player The player
+     * @param countdownSeconds The countdown time in seconds
+     * @param difficulty The difficulty level
+     */
+    public Game(GameBoard board, Player player, int countdownSeconds, String difficulty) {
+        this.board = board;
+        this.player = player;
+        this.timer = new Timer(countdownSeconds);  // Create a countdown timer
+        this.isActive = false;
+        this.isPaused = false;
+        this.firstCard = null;
+        this.secondCard = null;
+        this.difficulty = difficulty;
     }
 
     /**
@@ -142,8 +178,8 @@ public abstract class Game extends Observable {
             // Determine if this is a timed game based on timer type
             boolean isTimedGame = timer.isCountdown();
             boolean isWin = board.allCardsMatched();
-            // Use the new method that accepts score, game type, and win status
-            statistics.updateGameStats(matches, moves, duration, score, isTimedGame, isWin);
+            // Use the new method that accepts score, game type, win status, and difficulty
+            statistics.updateGameStats(matches, moves, duration, score, isTimedGame, isWin, difficulty);
             UserProfile profile = GlobalProfileContext.getActiveProfile();
             if (profile != null) {
                 try {
@@ -248,5 +284,13 @@ public abstract class Game extends Observable {
      */
     public GameStatistics getStatistics() {
         return statistics;
+    }
+
+    /**
+     * Gets the difficulty level
+     * @return The difficulty level
+     */
+    public String getDifficulty() {
+        return difficulty;
     }
 }

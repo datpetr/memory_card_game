@@ -22,7 +22,7 @@ public class ProfileStatsDialog extends Dialog<Void> {
         statsLabel.setEditable(false);
         statsLabel.setWrapText(true);
         statsLabel.setPrefRowCount(20); // Make it longer
-        statsLabel.setPrefColumnCount(15); // Make it less wide
+        statsLabel.setPrefColumnCount(30); // Make it less wide
 
 
         profileSelector.setOnAction(e -> {
@@ -36,15 +36,15 @@ public class ProfileStatsDialog extends Dialog<Void> {
                             "Username: " + profile.getUsername() + "\n" +
                             "Games Played: " + stats.getTotalGames() + "\n\n" +
                             "--- Timed Mode ---\n" +
-                            "Best Score: " + stats.getBestTimedScore() + "\n" +
-                            "Best Moves: " + (stats.getBestTimedMoves() == Integer.MAX_VALUE ? "-" : stats.getBestTimedMoves()) + "\n" +
-                            "Best Time: " + (stats.getBestTimedTime() == Long.MAX_VALUE ? "-" : (stats.getBestTimedTime() / 1000) + " sec") + "\n" +
+                            "Easy:   Best Score: " + stats.getBestTimedScoreEasy() + ", Best Moves: " + stats.getBestTimedMovesEasy() + ", Best Time: " + (stats.getBestTimedTimeEasy() / 1000) + " sec\n" +
+                            "Medium: Best Score: " + stats.getBestTimedScoreMedium() + ", Best Moves: " + stats.getBestTimedMovesMedium() + ", Best Time: " + (stats.getBestTimedTimeMedium() / 1000) + " sec\n" +
+                            "Hard:   Best Score: " + stats.getBestTimedScoreHard() + ", Best Moves: " + stats.getBestTimedMovesHard() + ", Best Time: " + (stats.getBestTimedTimeHard() / 1000) + " sec\n" +
                             "Average Moves: " + String.format("%.2f", stats.getAverageTimedMoves()) + "\n" +
                             "Average Time: " + String.format("%.2f", (stats.getAverageTimedTime() / 1000)) + " sec\n\n" +
                             "--- Endless Mode ---\n" +
-                            "Best Score: " + stats.getBestEndlessScore() + "\n" +
-                            "Best Moves: " + (stats.getBestEndlessMoves() == Integer.MAX_VALUE ? "-" : stats.getBestEndlessMoves()) + "\n" +
-                            "Best Time: " + (stats.getBestEndlessTime() == Long.MAX_VALUE ? "-" : (stats.getBestEndlessTime() / 1000) + " sec") + "\n" +
+                            "Easy:   Best Score: " + stats.getBestEndlessScoreEasy() + ", Best Moves: " + stats.getBestEndlessMovesEasy() + ", Best Time: " + (stats.getBestEndlessTimeEasy() / 1000) + " sec\n" +
+                            "Medium: Best Score: " + stats.getBestEndlessScoreMedium() + ", Best Moves: " + stats.getBestEndlessMovesMedium() + ", Best Time: " + (stats.getBestEndlessTimeMedium() / 1000) + " sec\n" +
+                            "Hard:   Best Score: " + stats.getBestEndlessScoreHard() + ", Best Moves: " + stats.getBestEndlessMovesHard() + ", Best Time: " + (stats.getBestEndlessTimeHard() / 1000) + " sec\n" +
                             "Average Moves: " + String.format("%.2f", stats.getAverageEndlessMoves()) + "\n" +
                             "Average Time: " + String.format("%.2f", (stats.getAverageEndlessTime() / 1000)) + " sec\n\n" +
                             "Average Moves (All): " + String.format("%.2f", stats.getAverageMoves()) + "\n" +
@@ -64,4 +64,5 @@ public class ProfileStatsDialog extends Dialog<Void> {
         getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
     }
 }
+
 

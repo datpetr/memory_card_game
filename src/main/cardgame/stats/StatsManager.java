@@ -54,9 +54,13 @@ public class StatsManager {
      * @param matches Number of matches found
      * @param moves Number of moves made
      * @param timeInSeconds Time taken to complete the game
+     * @param score Player's score
+     * @param isTimedGame Whether the game was timed
+     * @param isWin Whether the game was won
+     * @param difficulty The difficulty string ("easy", "medium", "hard")
      */
-    public static void recordGame(int matches, int moves, long timeInSeconds, int score, boolean isTimedGame, boolean isWin) {
-        stats.updateGameStats(matches, moves, timeInSeconds, score, isTimedGame, isWin);
+    public static void recordGame(int matches, int moves, long timeInSeconds, int score, boolean isTimedGame, boolean isWin, String difficulty) {
+        stats.updateGameStats(matches, moves, timeInSeconds, score, isTimedGame, isWin, difficulty);
     }
 
     /**
@@ -64,8 +68,10 @@ public class StatsManager {
      */
     public static void resetStats() {
         stats = new GameStatistics();
-        // Provide all required arguments for updateGameStats (matches, moves, time, score, isTimedGame, isWin)
-        stats.updateGameStats(0, 0, 0, 0, false, false); // Optionally save/reset file
+        // Provide all required arguments for updateGameStats (matches, moves, time, score, isTimedGame, isWin, difficulty)
+        stats.updateGameStats(0, 0, 0, 0, false, false, "easy"); // Optionally save/reset file for all difficulties
+        stats.updateGameStats(0, 0, 0, 0, false, false, "medium");
+        stats.updateGameStats(0, 0, 0, 0, false, false, "hard");
     }
 }
 

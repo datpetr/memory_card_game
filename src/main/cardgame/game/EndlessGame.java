@@ -14,9 +14,10 @@ public class EndlessGame extends Game {
      * Creates a new endless game
      * @param board The game board
      * @param player The player
+     * @param difficulty The difficulty level
      */
-    public EndlessGame(GameBoard board, Player player) {
-        super(board, player); // Pass GameBoard and Player to the Game constructor
+    public EndlessGame(GameBoard board, Player player, String difficulty) {
+        super(board, player, difficulty);
     }
 
     /**

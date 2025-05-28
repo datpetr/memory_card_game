@@ -92,19 +92,6 @@ public class GameOverDialog {
                 int matches = board.getMatchedPairsCount();
                 int moves = game.getPlayer().getMoves();
                 long timeInSeconds = (game.getTimer().getElapsedTime() / 1000);
-
-                // REMOVE statistics update here to prevent double-counting
-                // var profile = GlobalProfileContext.getActiveProfile();
-                // if (profile != null) {
-                //     int score = game.getPlayer().getScore();
-                //     boolean isTimedGame = game.getTimer().isCountdown();
-                //     profile.getStatistics().updateGameStats(matches, moves, timeInSeconds, score, isTimedGame);
-                //     try {
-                //         ProfileManager.saveProfile(profile);
-                //     } catch (IOException e) {
-                //         e.printStackTrace();
-                //     }
-                // }
             }
 
             gameBoardUI.returnToMainMenu(gameBoardUI.getPrimaryStage());

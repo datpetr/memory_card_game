@@ -36,7 +36,7 @@ public class GameBoardUI extends Application implements Observer {
     /** Default number of columns in the game board */
     private static int BOARD_COLS = 4;
     /** Aspect ratio for cards (width/height) */
-    private static final double CARD_ASPECT_RATIO = 2.0 / 2.0;
+    private static final double CARD_ASPECT_RATIO = 1.0 / 1.0;
     /** Padding around the game board */
     private static final double PADDING = 20;
     /** Gap between cards */
@@ -153,9 +153,9 @@ public class GameBoardUI extends Application implements Observer {
                 case "hard": timeLimit = TimedGame.HARD_TIME; break;
                 default: timeLimit = TimedGame.EASY_TIME;
             }
-            this.game = new TimedGame(board, player, timeLimit);
+            this.game = new TimedGame(board, player, timeLimit, difficulty);
         } else {
-            this.game = new EndlessGame(board, player);
+            this.game = new EndlessGame(board, player, difficulty);
         }
 
         // Register as observer for the timer
@@ -289,7 +289,8 @@ public class GameBoardUI extends Application implements Observer {
                 game.getTimer().getElapsedSeconds(),
                 game.getPlayer().getScore(),
                 game.getTimer().isCountdown(),
-                isWin
+                isWin,
+                currentDifficulty
             );
         }
 
